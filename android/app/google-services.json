@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "271331178626",
+    "project_id": "e-commerce-9754b",
+    "storage_bucket": "e-commerce-9754b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:271331178626:android:387ae14e62969be5e11c9b",
+        "android_client_info": {
+          "package_name": "com.impexally.ecommerce"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "271331178626-si4g1d88ju80h3hrf4d60t9uf1796k0t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoPQJWYeO9lGOVwXk-IdGgblTBa7dgELM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "271331178626-si4g1d88ju80h3hrf4d60t9uf1796k0t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
