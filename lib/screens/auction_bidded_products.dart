@@ -77,7 +77,7 @@ class _AuctionBiddedProductsState extends State<AuctionBiddedProducts> {
 
   addToCart(id) async {
     var cartAddResponse =
-        await CartRepository().getCartAddResponse(id, "", user_id.$, 1);
+        await CartRepository().getCartAddResponse(id, "", user_id.$, 1,5);
 
     if (cartAddResponse.result == false) {
       ToastComponent.showDialog(cartAddResponse.message,

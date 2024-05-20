@@ -10,34 +10,51 @@ ProductMiniResponse productMiniResponseFromJson(String str) =>
 String productMiniResponseToJson(ProductMiniResponse data) =>
     json.encode(data.toJson());
 
+// class ProductMiniResponse {
+//   ProductMiniResponse({
+//     this.products,
+//     this.meta,
+//     this.success,
+//     this.status,
+//   });
+
+//   List<Product>? products;
+//   bool? success;
+//   int? status;
+//   Meta? meta;
+
+//   factory ProductMiniResponse.fromJson(Map<String, dynamic> json) =>
+//       ProductMiniResponse(
+//         products: json.map((x) => Product.fromJson(x)).toList(),
+//         meta: json["meta"] == null ? null : Meta.fromJson(json["meta"]),
+//         success: json["success"],
+//         status: json["status"],
+//       );
+
+//   Map<String, dynamic> toJson() => {
+//         "data": List<dynamic>.from(products!.map((x) => x.toJson())),
+//         "meta": meta == null ? null : meta!.toJson(),
+//         "success": success,
+//         "status": status,
+//       };
+// }
+
+
 class ProductMiniResponse {
   ProductMiniResponse({
     this.products,
-    this.meta,
-    this.success,
-    this.status,
   });
 
   List<Product>? products;
-  bool? success;
-  int? status;
-  Meta? meta;
 
-  factory ProductMiniResponse.fromJson(Map<String, dynamic> json) =>
+
+  factory ProductMiniResponse.fromJson(List<dynamic> json) =>
       ProductMiniResponse(
-        products:
-            List<Product>.from(json["data"]?.map((x) => Product.fromJson(x))),
-        meta: json["meta"] == null ? null : Meta.fromJson(json["meta"]),
-        success: json["success"],
-        status: json["status"],
+        products: json.map((x) => Product.fromJson(x)).toList(),
+
       );
 
-  Map<String, dynamic> toJson() => {
-        "data": List<dynamic>.from(products!.map((x) => x.toJson())),
-        "meta": meta == null ? null : meta!.toJson(),
-        "success": success,
-        "status": status,
-      };
+  List<dynamic> toJson() => products!.map((x) => x.toJson()).toList();
 }
 
 class Product {

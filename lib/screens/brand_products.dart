@@ -62,7 +62,7 @@ class _BrandProductsState extends State<BrandProducts> {
         .getBrandProducts(slug: widget.slug, page: _page, name: _searchKey);
     _productList.addAll(productResponse.products!);
     _isInitial = false;
-    _totalData = productResponse.meta!.total;
+    _totalData =300;
     _showLoadingContainer = false;
     setState(() {});
   }

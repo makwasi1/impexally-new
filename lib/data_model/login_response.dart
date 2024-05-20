@@ -26,8 +26,8 @@ class LoginResponse {
   User? user;
 
   factory LoginResponse.fromJson(Map<String, dynamic> json) => LoginResponse(
-    result: json["result"],
-    message: json["message"],
+    result: json["result"] == null ? true : json["result"],
+    message: json["message"] == null ? "Loged in" : json["message"],
     access_token: json["access_token"] == null ? null : json["access_token"],
     token_type: json["token_type"] == null ? null : json["token_type"],
     expires_at: json["expires_at"] == null ? null : DateTime.parse(json["expires_at"]),

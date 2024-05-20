@@ -15,6 +15,7 @@ class ProductCard extends StatefulWidget {
   String? name;
   String? main_price;
   String? stroked_price;
+  String? stock;
   bool? has_discount;
   bool? is_wholesale;
   var discount;
@@ -29,6 +30,7 @@ class ProductCard extends StatefulWidget {
     this.main_price,
     this.is_wholesale = false,
     this.stroked_price,
+    this.stock,
     this.has_discount,
     this.discount,
   }) : super(key: key);
@@ -50,7 +52,7 @@ class _ProductCardState extends State<ProductCard> {
               return widget.identifier == 'auction'
                   ? AuctionProductsDetails(slug: widget.slug)
                   : ProductDetails(
-                      slug: widget.slug,
+                      slug: widget.id.toString(),
                     );
             },
           ),
@@ -71,7 +73,7 @@ class _ProductCardState extends State<ProductCard> {
                         top: Radius.circular(6), bottom: Radius.zero),
                     child: FadeInImage.assetNetwork(
                       placeholder: 'assets/placeholder.png',
-                      image: widget.image!,
+                      image: "https://seller.impexally.com/uploads/images/"+widget.image!,
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -100,11 +102,11 @@ class _ProductCardState extends State<ProductCard> {
                         ? Padding(
                             padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
                             child: Text(
-                              SystemConfig.systemCurrency != null
-                                  ? widget.stroked_price!.replaceAll(
-                                      SystemConfig.systemCurrency!.code!,
-                                      SystemConfig.systemCurrency!.symbol!)
-                                  : widget.stroked_price!,
+                            
+                              widget.stroked_price!.replaceAll(
+                                      "GH₵",
+                                      "GH₵")
+                                  ,
                               textAlign: TextAlign.left,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 1,
@@ -121,17 +123,13 @@ class _ProductCardState extends State<ProductCard> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
                       child: Text(
-                        SystemConfig.systemCurrency! != null
-                            ? widget.main_price!.replaceAll(
-                                SystemConfig.systemCurrency!.code!,
-                                SystemConfig.systemCurrency!.symbol!)
-                            : widget.main_price!,
+                        "GH₵ ${widget.main_price!} Units(s) Left",
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: TextStyle(
                             color: MyTheme.accent_color,
-                            fontSize: 16,
+                            fontSize: 14,
                             fontWeight: FontWeight.w700),
                       ),
                     ),

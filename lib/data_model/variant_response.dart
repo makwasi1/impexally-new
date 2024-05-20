@@ -19,11 +19,10 @@ class VariantResponse {
     this.variantData,
   });
 
-  factory VariantResponse.fromJson(Map<String, dynamic> json) =>
-      VariantResponse(
-        result: json["result"],
-        variantData: VariantData.fromJson(json["data"]),
-      );
+  factory VariantResponse.fromJson(Map<String, dynamic> json) => VariantResponse(
+    result: json["result"],
+    variantData: json["data"] != null ? VariantData.fromJson(json["data"]) : null,
+  );
 
   Map<String, dynamic> toJson() => {
         "result": result,

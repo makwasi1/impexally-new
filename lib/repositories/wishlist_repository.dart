@@ -1,7 +1,7 @@
 import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/data_model/wishlist_check_response.dart';
 import 'package:active_ecommerce_flutter/data_model/wishlist_delete_response.dart';
-import 'package:active_ecommerce_flutter/data_model/wishlist_response.dart';
+// import 'package:active_ecommerce_flutter/data_model/wishlist_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
@@ -19,7 +19,7 @@ class WishListRepository {
     final response = await ApiRequest.get(
         url: url, headers: header, middleware: BannedUser());
 
-    return wishlistResponseFromJson(response.body);
+    return [];
   }
 
   Future<dynamic> delete({

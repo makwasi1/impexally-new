@@ -127,9 +127,7 @@ class _RegistrationState extends State<Registration> {
         name,
         _register_by == 'email' ? email : _phone,
         password,
-        password_confirm,
-        _register_by,
-        googleRecaptchaKey);
+        );
     Loading.close();
 
     if (signupResponse.result == false) {
@@ -146,10 +144,10 @@ class _RegistrationState extends State<Registration> {
 
 
       // redirect to main
-      Navigator.pushAndRemoveUntil(context,
-          MaterialPageRoute(builder: (context) {
-            return Main();
-          }), (newRoute) => false);
+      // Navigator.pushAndRemoveUntil(context,
+      //     MaterialPageRoute(builder: (context) {
+      //       return Main();
+      //     }), (newRoute) => false);
 
       // push notification starts
       if (OtherConfig.USE_PUSH_NOTIFICATION) {
@@ -178,7 +176,7 @@ class _RegistrationState extends State<Registration> {
       }
 
 
-      context.go("/");
+      context.push("/");
 
       // if ((mail_verification_status.$ && _register_by == "email") ||
       //     _register_by == "phone") {

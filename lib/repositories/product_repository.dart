@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/data_model/category.dart';
+import 'package:active_ecommerce_flutter/data_model/login_response.dart';
 import 'package:active_ecommerce_flutter/data_model/product_details_response.dart';
 import 'package:active_ecommerce_flutter/data_model/product_mini_response.dart';
 import 'package:active_ecommerce_flutter/data_model/variant_response.dart';
@@ -9,7 +10,10 @@ import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
 
+import '../data_model/product_detail.dart';
+import '../data_model/products_model.dart';
 import '../data_model/variant_price_response.dart';
+import '../data_model/vendor_response.dart';
 
 class ProductRepository {
   Future<CatResponse> getCategoryRes() async {
@@ -72,15 +76,13 @@ class ProductRepository {
     return productMiniResponseFromJson(response.body);
   }
 
-  Future<ProductMiniResponse> getCategoryProducts(
+  Future<ProductResponse> getCategoryProducts(
       {String? id = "", name = "", page = 1}) async {
-    String url = ("${AppConfig.BASE_URL}/products/category/" +
-        id.toString() +
-        "?page=${page}&name=${name}");
+    String url = ("${AppConfig.BASE_URL}/category/${id.toString()}/products/");
     final response = await ApiRequest.get(url: url, headers: {
       "App-Language": app_language.$!,
     });
-    return productMiniResponseFromJson(response.body);
+    return productResponseFromJson(response.body);
   }
 
   Future<ProductMiniResponse> getShopProducts(
@@ -106,7 +108,7 @@ class ProductRepository {
     return productMiniResponseFromJson(response.body);
   }
 
-  Future<ProductMiniResponse> getFilteredProducts(
+  Future<ProductResponse> getFilteredProducts(
       {name = "",
       sort_key = "",
       page = 1,
@@ -114,7 +116,24 @@ class ProductRepository {
       categories = "",
       min = "",
       max = ""}) async {
-    String url = ("${AppConfig.BASE_URL}/products/search" +
+    String url = ("${AppConfig.BASE_URL}/products");
+
+    print(url.toString());
+    final response = await ApiRequest.get(url: url, headers: {
+      "Content-Type": "application/json",
+    });
+    return productResponseFromJson(response.body);
+  }
+
+  Future<ProductMiniResponse> getFilteredProducts2(
+      {name = "",
+      sort_key = "",
+      page = 1,
+      brands = "",
+      categories = "",
+      min = "",
+      max = ""}) async {
+    String url = ("${AppConfig.BASE_URL}/products" +
         "?page=$page&name=${name}&sort_key=${sort_key}&brands=${brands}&categories=${categories}&min=${min}&max=${max}");
 
     print(url.toString());
@@ -137,19 +156,31 @@ class ProductRepository {
     return productMiniResponseFromJson(response.body);
   }
 
-  Future<ProductDetailsResponse> getProductDetails({String? slug = ""}) async {
-    String url = ("${AppConfig.BASE_URL}/products/" + slug.toString());
-    print("Product Url");
+  Future<ProductMiniDetail> getProductDetails({String? slug = ""}) async {
+    String url = "${AppConfig.BASE_URL}/product/$slug";
+    print("Product Url: $url");
 
-    // Future<ProductDetailsResponse> getProductDetails({int? id = 0}) async {
-    //   String url = ("${AppConfig.BASE_URL}/products/" + id.toString());
-    //   print(url.toString());
     final response = await ApiRequest.get(url: url, headers: {
-      "App-Language": app_language.$!,
+      "Content-Type": "application/json",
     });
+
     print(response.body);
 
-    return productDetailsResponseFromJson(response.body);
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+
+      return ProductMiniDetail(
+        products: Products.fromJson(jsonResponse['product']),
+        productDetails: (jsonResponse['productDetails'] as List)
+            .map((i) => ProductDetail.fromJson(i))
+            .toList(),
+        image: (jsonResponse['image'] as List)
+            .map((i) => Photos.fromJson(i))
+            .toList(),
+      );
+    } else {
+      throw Exception('Failed to load product details');
+    }
   }
 
   Future<ProductDetailsResponse> getDigitalProductDetails({int id = 0}) async {
@@ -163,12 +194,12 @@ class ProductRepository {
     return productDetailsResponseFromJson(response.body);
   }
 
-  Future<ProductMiniResponse> getRelatedProducts({required String slug}) async {
-    String url = ("${AppConfig.BASE_URL}/products/related/$slug");
+  Future<ProductResponse> getRelatedProducts({required String slug}) async {
+    String url = ("${AppConfig.BASE_URL}/category/$slug/products");
     final response = await ApiRequest.get(url: url, headers: {
-      "App-Language": app_language.$!,
+      "content-type": "application/json",
     });
-    return productMiniResponseFromJson(response.body);
+    return productResponseFromJson(response.body);
   }
 
   Future<ProductMiniResponse> getTopFromThisSellerProducts(
@@ -217,5 +248,24 @@ class ProductRepository {
         body: post_body);
 
     return variantPriceResponseFromJson(response.body);
+  }
+
+
+  //get vendor 
+  Future<VendorDetails> getVendorDetails({String? id}) async {
+    String url = ("${AppConfig.BASE_URL}/user/" + id.toString());
+
+    final response = await ApiRequest.get(url: url, headers: {
+      "Content-Type": "application/json",
+    });
+
+    if (response.statusCode == 200) {
+     
+        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+
+        return VendorDetails.fromJson(jsonResponse['user']);
+    } else {
+      throw Exception('Failed to load vendor details');
+    }
   }
 }

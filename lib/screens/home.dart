@@ -148,6 +148,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                           ),
                                         )
                                       : Container(),
+                                  buildInfoBar(context),    
                                   buildHomeCarouselSlider(context, homeData),
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
@@ -331,12 +332,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           return ProductCard(
             id: homeData.allProductList[index].id,
             slug: homeData.allProductList[index].slug,
-            image: homeData.allProductList[index].thumbnail_image,
-            name: homeData.allProductList[index].name,
-            main_price: homeData.allProductList[index].main_price,
-            stroked_price: homeData.allProductList[index].stroked_price,
-            has_discount: homeData.allProductList[index].has_discount,
-            discount: homeData.allProductList[index].discount,
+            image: homeData.allProductList[index].image.imageDefault,
+            name: homeData.allProductList[index].productDetail.title,
+            main_price: homeData.allProductList[index].price,
+            stroked_price: homeData.allProductList[index].priceDiscounted,
+            has_discount: true,
+            discount: homeData.allProductList[index].priceDiscounted,
           );
         },
       );
@@ -357,23 +358,24 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     } else if (homeData.allProductList.length > 0) {
       return MasonryGridView.count(
           crossAxisCount: 2,
-          mainAxisSpacing: 14,
-          crossAxisSpacing: 14,
+          mainAxisSpacing: 8,
+          crossAxisSpacing: 8,
           itemCount: homeData.allProductList.length,
           shrinkWrap: true,
-          padding: EdgeInsets.only(top: 20.0, bottom: 10, left: 18, right: 18),
+          padding: EdgeInsets.only(top: 20.0, bottom: 10, left: 5, right: 5),
           physics: NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
             return ProductCard(
               id: homeData.allProductList[index].id,
               slug: homeData.allProductList[index].slug,
-              image: homeData.allProductList[index].thumbnail_image,
-              name: homeData.allProductList[index].name,
-              main_price: homeData.allProductList[index].main_price,
-              stroked_price: homeData.allProductList[index].stroked_price,
-              has_discount: homeData.allProductList[index].has_discount,
-              discount: homeData.allProductList[index].discount,
-              is_wholesale: homeData.allProductList[index].isWholesale,
+              image: homeData.allProductList[index].image.imageDefault,
+              name: homeData.allProductList[index].productDetail.title,
+              main_price: homeData.allProductList[index].price,
+              stroked_price: homeData.allProductList[index].priceDiscounted,
+              has_discount: true,
+              stock: homeData.allProductList[index].stock,
+              discount: homeData.allProductList[index].priceDiscounted,
+              is_wholesale: true,
             );
           });
     } else if (homeData.totalAllProductData == 0) {
@@ -412,7 +414,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return CategoryProducts(
-                    slug: homeData.featuredCategoryList[index].slug,
+                    slug: homeData.featuredCategoryList[index].id.toString(),
                     // category_name: homeData.featuredCategoryList[index].name,
                   );
                 }));
@@ -428,14 +430,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                             child: FadeInImage.assetNetwork(
                               placeholder: 'assets/placeholder.png',
                               image:
-                                  homeData.featuredCategoryList[index].banner,
+                                  "https://seller.impexally.com/"+homeData.featuredCategoryList[index].image,
                               fit: BoxFit.cover,
                             ))),
                     Flexible(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          homeData.featuredCategoryList[index].name,
+                          homeData.featuredCategoryList[index].titleMetaTag,
                           textAlign: TextAlign.left,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 3,
@@ -516,7 +518,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               physics: const BouncingScrollPhysics(
                   parent: AlwaysScrollableScrollPhysics()),
               itemBuilder: (context, index) {
-                return (index == homeData.featuredProductList.length)
+                return (index == 4)
                     ? SpinKitFadingFour(
                         itemBuilder: (BuildContext context, int index) {
                           return DecoratedBox(
@@ -530,17 +532,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         id: homeData.featuredProductList[index].id,
                         slug: homeData.featuredProductList[index].slug,
                         image:
-                            homeData.featuredProductList[index].thumbnail_image,
-                        name: homeData.featuredProductList[index].name,
+                            homeData.featuredProductList[index].image.imageDefault,
+                        name: homeData.featuredProductList[index].productDetail.title,
                         main_price:
-                            homeData.featuredProductList[index].main_price,
+                            homeData.featuredProductList[index].price,
                         stroked_price:
-                            homeData.featuredProductList[index].stroked_price,
+                            homeData.featuredProductList[index].priceDiscounted,
                         has_discount:
-                            homeData.featuredProductList[index].has_discount,
+                            true,
                         is_wholesale:
-                            homeData.featuredProductList[index].isWholesale,
-                        discount: homeData.featuredProductList[index].discount,
+                            true,
+                        discount: homeData.featuredProductList[index].priceDiscounted,
                       );
               },
             ),
@@ -745,6 +747,28 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     );
   }
 
+  Widget buildInfoBar(BuildContext context) {
+    return Container(
+      height: 40,
+      color: MyTheme.white,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 8.0),
+            child: Text(
+              "📍 🇬🇭 Impexpress - Sameday Delivery in Accra",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget buildHomeCarouselSlider(context, HomePresenter homeData) {
     if (homeData.isCarouselInitial && homeData.carouselImageList.length == 0) {
       return Padding(
@@ -789,10 +813,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       height: 140,
                       child: InkWell(
                         onTap: () {
+                          // var url =
+                          //     i.url?.split(AppConfig.DOMAIN_PATH).last ?? "";
                           var url =
-                              i.url?.split(AppConfig.DOMAIN_PATH).last ?? "";
+                              i.url;
                           print(url);
-                          GoRouter.of(context).go(url);
+                          GoRouter.of(context).go(url!);
                         },
                         child: AIZImage.radiusImage(i.photo, 6),
                       ),
@@ -856,7 +882,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             : const EdgeInsets.only(left: 9.0),
         child: CarouselSlider(
           options: CarouselOptions(
-              aspectRatio: 270 / 120,
+              aspectRatio: 200 / 150,
               viewportFraction: .75,
               initialPage: 0,
               padEnds: false,
@@ -864,9 +890,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               reverse: false,
               autoPlay: true,
               onPageChanged: (index, reason) {
-                // setState(() {
-                //   homeData.current_slider = index;
-                // });
+                setState(() {
+                  homeData.current_slider = index;
+                });
               }),
           items: homeData.bannerOneImageList.map((i) {
             return Builder(
@@ -928,7 +954,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               viewportFraction: 0.7,
               enableInfiniteScroll: true,
               reverse: false,
-              autoPlay: true,
+              autoPlay: false,
               autoPlayInterval: Duration(seconds: 5),
               autoPlayAnimationDuration: Duration(milliseconds: 1000),
               autoPlayCurve: Curves.easeInExpo,
@@ -944,7 +970,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               builder: (BuildContext context) {
                 return Padding(
                   padding: const EdgeInsets.only(
-                      left: 9.0, right: 9, top: 20.0, bottom: 10),
+                      left: 1.0, right: 1, top: 20.0, bottom: 10),
                   child: Container(
                       width: double.infinity,
                       child: InkWell(

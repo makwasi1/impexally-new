@@ -40,7 +40,7 @@ class _MiniProductCardState extends State<MiniProductCard> {
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return ProductDetails(
-            slug: widget.slug,
+            slug: widget.id.toString(),
           );
         }));
       },
@@ -60,7 +60,7 @@ class _MiniProductCardState extends State<MiniProductCard> {
                               top: Radius.circular(6), bottom: Radius.zero),
                           child: FadeInImage.assetNetwork(
                             placeholder: 'assets/placeholder.png',
-                            image: widget.image!,
+                            image: "https://seller.impexally.com/uploads/images/" +widget.image!,
                             fit: BoxFit.cover,
                           ))),
                 ),
@@ -85,7 +85,7 @@ class _MiniProductCardState extends State<MiniProductCard> {
                               ? widget.stroked_price!.replaceAll(
                                   SystemConfig.systemCurrency!.code!,
                                   SystemConfig.systemCurrency!.symbol!)
-                              : widget.stroked_price!,
+                              : "GH₵" + widget.stroked_price!,
                           maxLines: 1,
                           style: TextStyle(
                               decoration: TextDecoration.lineThrough,
@@ -102,11 +102,11 @@ class _MiniProductCardState extends State<MiniProductCard> {
                         ? widget.main_price!.replaceAll(
                             SystemConfig.systemCurrency!.code!,
                             SystemConfig.systemCurrency!.symbol!)
-                        : widget.main_price!,
+                        : "GH₵"+widget.main_price!,
                     maxLines: 1,
                     style: TextStyle(
                         color: MyTheme.accent_color,
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w700),
                   ),
                 ),

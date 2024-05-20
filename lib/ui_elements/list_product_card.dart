@@ -35,7 +35,7 @@ class _ListProductCardState extends State<ListProductCard> {
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return ProductDetails(
-            slug: widget.slug,
+            slug: widget.id.toString(),
           );
         }));
       },
@@ -51,7 +51,7 @@ class _ListProductCardState extends State<ListProductCard> {
                       left: Radius.circular(6), right: Radius.zero),
                   child: FadeInImage.assetNetwork(
                     placeholder: 'assets/placeholder.png',
-                    image: widget.image!,
+                    image:  "https://seller.impexally.com/uploads/images/"+widget.image!,
                     fit: BoxFit.cover,
                   ))),
           Flexible(
@@ -85,9 +85,7 @@ class _ListProductCardState extends State<ListProductCard> {
                       alignment: WrapAlignment.spaceBetween,
                       children: [
                         Text(
-                          SystemConfig.systemCurrency!.code!=null?
-                          widget.main_price!.replaceAll(SystemConfig.systemCurrency!.code!, SystemConfig.systemCurrency!.symbol!)
-                              :widget.main_price!,
+                          "${SystemConfig.currency} ${widget.main_price!}",
                           textAlign: TextAlign.left,
                           maxLines: 1,
                           style: TextStyle(
@@ -97,9 +95,7 @@ class _ListProductCardState extends State<ListProductCard> {
                         ),
                         widget.has_discount!
                             ? Text(
-                          SystemConfig.systemCurrency!.code!=null?
-                          widget.stroked_price!.replaceAll(SystemConfig.systemCurrency!.code!, SystemConfig.systemCurrency!.symbol!)
-                              :widget.stroked_price!,
+                          "${SystemConfig.currency + " "+ widget.stroked_price!}",
 
                               textAlign: TextAlign.left,
                               maxLines: 1,

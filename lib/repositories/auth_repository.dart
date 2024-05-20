@@ -20,17 +20,14 @@ class AuthRepository {
     var post_body = jsonEncode({
       "email": "${email}",
       "password": "$password",
-      "identity_matrix": AppConfig.purchase_code,
-      "login_by":loginBy
     });
 
-    String url = ("${AppConfig.BASE_URL}/auth/login");
+    String url = ("${AppConfig.BASE_URL}/login");
     final response = await ApiRequest.post(
         url: url,
         headers: {
           "Accept": "*/*",
           "Content-Type": "application/json",
-          "App-Language": app_language.$!,
         },
         body: post_body);
 
@@ -106,25 +103,22 @@ class AuthRepository {
     String name,
     String? email_or_phone,
     String password,
-    String passowrd_confirmation,
-    String register_by,
-    String capchaKey,
   ) async {
     var post_body = jsonEncode({
-      "name": "$name",
-      "email_or_phone": "${email_or_phone}",
+      "username": "$name",
+      "email": "${email_or_phone}",
       "password": "$password",
-      "password_confirmation": "${passowrd_confirmation}",
-      "register_by": "$register_by",
-      "g-recaptcha-response": "$capchaKey",
+      "first_name": "$name",
+      "last_name": "$name",
+      // "register_by": "$register_by",
+      // "g-recaptcha-response": "$capchaKey",
     });
 
-    String url = ("${AppConfig.BASE_URL}/auth/signup");
+    String url = ("${AppConfig.BASE_URL}/register");
     final response = await ApiRequest.post(
         url: url,
         headers: {
           "Content-Type": "application/json",
-          "App-Language": app_language.$!,
         },
         body: post_body);
 

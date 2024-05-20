@@ -32,7 +32,7 @@ class _InhouseProductsState extends State<InhouseProducts> {
         await ProductRepository().getInHouseProducts(page: _page);
     _inhouseProductList.addAll(productResponse.products!);
     _isFetch = false;
-    _totalData = productResponse.meta!.total;
+    _totalData = 300;
     _showLoadingContainer = false;
     setState(() {});
   }

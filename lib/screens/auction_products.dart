@@ -68,7 +68,7 @@ class _AuctionProductsState extends State<AuctionProducts> {
     var auctionProductResponse =
         await AuctionProductsRepository().getAuctionProducts(page: _page);
     _auctionlProductItems.addAll(auctionProductResponse.products!);
-    _totalData = auctionProductResponse.meta!.total;
+    _totalData =300;
     _dataFetch = true;
     _showLoadingContainer = false;
 

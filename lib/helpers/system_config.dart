@@ -10,5 +10,6 @@ class SystemConfig{
   static CurrencyInfo? systemCurrency;
   static User? systemUser;
   static bool isShownSplashScreed = false;
+  static String currency = "GH₵";
 
 }

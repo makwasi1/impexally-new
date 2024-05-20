@@ -211,7 +211,7 @@ class _FilterState extends State<Filter> {
 
     _productList.addAll(productResponse.products!);
     _isProductInitial = false;
-    _totalProductData = productResponse.meta!.total;
+    _totalProductData = 300;
     _showProductLoadingContainer = false;
     setState(() {});
   }
@@ -1147,13 +1147,13 @@ class _FilterState extends State<Filter> {
                   return ProductCard(
                     id: _productList[index].id,
                     slug: _productList[index].slug,
-                    image: _productList[index].thumbnail_image,
-                    name: _productList[index].name,
-                    main_price: _productList[index].main_price,
-                    stroked_price: _productList[index].stroked_price,
-                    has_discount: _productList[index].has_discount,
-                    discount: _productList[index].discount,
-                    is_wholesale: _productList[index].isWholesale,
+                    image: _productList[index].image.imageDefault,
+                    name: _productList[index].productDetail.title,
+                    main_price: _productList[index].priceDiscounted,
+                    stroked_price: _productList[index].price,
+                    has_discount: true,
+                    discount: _productList[index].discountRate + "%",
+                    is_wholesale: true,
                   );
                 },
               )

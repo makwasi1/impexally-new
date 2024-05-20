@@ -13,6 +13,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../data_model/category_mini_response.dart';
+
 class CategoryList extends StatefulWidget {
   CategoryList(
       {Key? key,
@@ -133,10 +135,10 @@ class _CategoryListState extends State<CategoryList> {
   buildCategoryList() {
     var data = widget.is_top_category
         ? CategoryRepository().getTopCategories()
-        : CategoryRepository().getCategories(parent_id: widget.slug);
+        : CategoryRepository().getTopCategories();
     return FutureBuilder(
       future: data,
-      builder: (context, AsyncSnapshot<CategoryResponse> snapshot) {
+      builder: (context, AsyncSnapshot<CategoryListResponse> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return SingleChildScrollView(child: buildShimmer());
         }
@@ -182,7 +184,7 @@ class _CategoryListState extends State<CategoryList> {
             MaterialPageRoute(
               builder: (context) {
                 return CategoryProducts(
-                  slug: categoryResponse.categories[index].slug ?? "",
+                  slug: categoryResponse.categories[index].id.toString() ?? "",
                 );
               },
             ),
@@ -201,7 +203,7 @@ class _CategoryListState extends State<CategoryList> {
                       topLeft: Radius.circular(6)),
                   child: FadeInImage.assetNetwork(
                     placeholder: 'assets/placeholder.png',
-                    image: categoryResponse.categories[index].banner,
+                    image: "https://seller.impexally.com/"+categoryResponse.categories[index].image ?? "",
                     fit: BoxFit.cover,
                     height: itemWidth,
                     width: DeviceInfo(context).width,
@@ -215,7 +217,7 @@ class _CategoryListState extends State<CategoryList> {
                 width: DeviceInfo(context).width,
                 padding: const EdgeInsets.symmetric(horizontal: 14),
                 child: Text(
-                  categoryResponse.categories[index].name,
+                  categoryResponse.categories[index].titleMetaTag ?? "",
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,

@@ -4,31 +4,26 @@
 //https://app.quicktype.io/
 import 'dart:convert';
 
-CategoryResponse categoryResponseFromJson(String str) => CategoryResponse.fromJson(json.decode(str));
+CategoryResponse categoryResponseFromJson(String str) => 
+  CategoryResponse.fromJson(List<Map<String, dynamic>>.from(json.decode(str).map((x) => Map<String, dynamic>.from(x))));
 
 String categoryResponseToJson(CategoryResponse data) => json.encode(data.toJson());
 
 class CategoryResponse {
   CategoryResponse({
     this.categories,
-    this.success,
-    this.status,
   });
 
   List<Category>? categories;
-  bool? success;
-  int? status;
 
-  factory CategoryResponse.fromJson(Map<String, dynamic> json) => CategoryResponse(
-    categories: List<Category>.from(json["data"].map((x) => Category.fromJson(x))),
-    success: json["success"],
-    status: json["status"],
-  );
+
+  factory CategoryResponse.fromJson(List<Map<String, dynamic>> json) => 
+    CategoryResponse(
+      categories: json.map((x) => Category.fromJson(x)).toList(),
+    );
 
   Map<String, dynamic> toJson() => {
     "data": List<dynamic>.from(categories!.map((x) => x.toJson())),
-    "success": success,
-    "status": status,
   };
 }
 
@@ -53,12 +48,12 @@ class Category {
 
   factory Category.fromJson(Map<String, dynamic> json) => Category(
     id: json["id"],
-    name: json["name"],
+    name: json["title_meta_tag"],
     slug: json["slug"],
-    banner: json["banner"],
+    banner: json["image"],
     icon: json["icon"],
-    number_of_children: json["number_of_children"],
-    links: Links.fromJson(json["links"]),
+    number_of_children: json["homepage_order"],
+    // links: Links.fromJson(json["links"]),
   );
 
   Map<String, dynamic> toJson() => {
@@ -68,7 +63,7 @@ class Category {
     "banner": banner,
     "icon": icon,
     "number_of_children": number_of_children,
-    "links": links!.toJson(),
+    // "links": links!.toJson(),
   };
 }
 

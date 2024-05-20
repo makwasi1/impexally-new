@@ -19,12 +19,7 @@ class HomePresenter extends ChangeNotifier {
   late AnimationController pirated_logo_controller;
   late Animation pirated_logo_animation;
 
-  List<AIZSlider> carouselImageList = [
-    //add some dummy data
-    AIZSlider(photo: "assets/images/slider_1.jpg"),
-    AIZSlider(photo: "assets/images/slider_2.jpg"),
-    AIZSlider(photo: "assets/images/slider_3.jpg"),
-  ];
+  List<AIZSlider> carouselImageList = [];
   List<AIZSlider> bannerOneImageList = [];
   var bannerTwoImageList = [];
   var featuredCategoryList = [];
@@ -65,7 +60,7 @@ class HomePresenter extends ChangeNotifier {
   fetchTodayDealData() async {
     var deal = await ProductRepository().getTodaysDealProducts();
     print(deal.products!.length);
-    if (deal.success! && deal.products!.isNotEmpty) {
+    if (deal.products!.isNotEmpty) {
       isTodayDeal = true;
       notifyListeners();
     }
@@ -81,28 +76,43 @@ class HomePresenter extends ChangeNotifier {
   }
 
   fetchCarouselImages() async {
-    var carouselResponse = await SlidersRepository().getSliders();
-    carouselResponse.sliders!.forEach((slider) {
-      carouselImageList.add(slider);
-    });
+    // var carouselResponse = await SlidersRepository().getSliders();
+    // carouselResponse.sliders!.forEach((slider) {
+    //   carouselImageList.add(slider);
+    // });
+    carouselImageList.add(
+        AIZSlider(photo: "https://image.impexally.com/images/app/impexally/ng/savenow.webp", url: "https://image.impexally.com/images/app/impexally/ng/savenow.webp"),
+        );
+    carouselImageList.add(
+        AIZSlider(photo: "https://image.impexally.com/images/app/impexally/Dreamland.webp", url: "https://image.impexally.com/images/app/impexally/Dreamland.webp"),
+        );    
     isCarouselInitial = false;
     notifyListeners();
   }
 
   fetchBannerOneImages() async {
-    var bannerOneResponse = await SlidersRepository().getBannerOneImages();
-    bannerOneResponse.sliders!.forEach((slider) {
-      bannerOneImageList.add(slider);
-    });
+    // var bannerOneResponse = await SlidersRepository().getBannerOneImages();
+    // bannerOneResponse.sliders!.forEach((slider) {
+    //   bannerOneImageList.add(slider);
+    // });
+    bannerOneImageList.add(
+               AIZSlider(photo: "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp", url: "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp"),
+        );
+    bannerOneImageList.add(
+               AIZSlider(photo: "https://image.impexally.com/images/app/impexally/make-mone-online.png", url: "https://image.impexally.com/images/app/impexally/make-mone-online.png"),
+        );    
     isBannerOneInitial = false;
     notifyListeners();
   }
 
   fetchBannerTwoImages() async {
-    var bannerTwoResponse = await SlidersRepository().getBannerTwoImages();
-    bannerTwoResponse.sliders!.forEach((slider) {
-      bannerTwoImageList.add(slider);
-    });
+    // var bannerTwoResponse = await SlidersRepository().getBannerTwoImages();
+    // bannerTwoResponse.sliders!.forEach((slider) {
+    //   bannerTwoImageList.add(slider);
+    // });
+    bannerTwoImageList.add(
+               AIZSlider(photo: "https://image.impexally.com/images/app/impexally/athleisure.webp", url: "https://image.impexally.com/images/app/impexally/athleisure.webp"),
+        );
     isBannerTwoInitial = false;
     notifyListeners();
   }
@@ -115,13 +125,13 @@ class HomePresenter extends ChangeNotifier {
   }
 
   fetchFeaturedProducts() async {
-    var productResponse = await ProductRepository().getFeaturedProducts(
+    var productResponse = await ProductRepository().getFilteredProducts(
       page: featuredProductPage,
     );
     featuredProductPage++;
     featuredProductList.addAll(productResponse.products!);
     isFeaturedProductInitial = false;
-    totalFeaturedProductData = productResponse.meta!.total;
+    totalFeaturedProductData = 30;
     showFeaturedLoadingContainer = false;
     notifyListeners();
   }
@@ -136,7 +146,7 @@ class HomePresenter extends ChangeNotifier {
 
     allProductList.addAll(productResponse.products!);
     isAllProductInitial = false;
-    totalAllProductData = productResponse.meta!.total;
+    totalAllProductData = 300;
     showAllLoadingContainer = false;
     notifyListeners();
   }

@@ -1,16 +1,17 @@
 import 'package:active_ecommerce_flutter/custom/box_decorations.dart';
 import 'package:active_ecommerce_flutter/custom/device_info.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
-import 'package:active_ecommerce_flutter/data_model/category_response.dart';
+// import 'package:active_ecommerce_flutter/data_model/category_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/repositories/category_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/product_repository.dart';
 import 'package:active_ecommerce_flutter/ui_elements/product_card.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
+
+import '../data_model/category_mini_response.dart';
 
 class CategoryProducts extends StatefulWidget {
   CategoryProducts({Key? key,required this.slug})
@@ -27,7 +28,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
   TextEditingController _searchController = TextEditingController();
 
   List<dynamic> _productList = [];
-  List<Category> _subCategoryList = [];
+  List<CategoryListResponse> _subCategoryList = [];
   bool _isInitial = true;
   int _page = 1;
   String _searchKey = "";
@@ -39,7 +40,8 @@ class _CategoryProductsState extends State<CategoryProducts> {
   getSubCategory() async {
     var res =
         await CategoryRepository().getCategories(parent_id: widget.slug);
-    _subCategoryList.addAll(res.categories!);
+    print(res.categories.toString());
+    // _subCategoryList.addAll(res.categories);
     setState(() {});
   }
   getCategoryInfo() async {
@@ -47,7 +49,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
         await CategoryRepository().getCategoryInfo(widget.slug);
     print(res.categories.toString());
     if(res.categories?.isNotEmpty??false) {
-      categoryInfo = res.categories?.first ?? null;
+      // categoryInfo = res.categories?.first ?? null;
     }
     setState(() {});
   }
@@ -87,7 +89,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
         id: widget.slug, page: _page, name: _searchKey);
     _productList.addAll(productResponse.products!);
     _isInitial = false;
-    _totalData = productResponse.meta!.total;
+    _totalData =300;
     _showLoadingContainer = false;
     setState(() {});
   }
@@ -213,7 +215,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
             padding: EdgeInsets.only(left: 10),
             width: DeviceInfo(context).width! / 2,
             child: Text(
-              categoryInfo?.name??"",
+              categoryInfo?.titleMetaTag??"",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -313,7 +315,8 @@ class _CategoryProductsState extends State<CategoryProducts> {
               padding: EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecorations.buildBoxDecoration_1(),
               child: Text(
-                _subCategoryList[index].name!,
+                "Test Category",
+                // _subCategoryList[index].name!,
                 style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
@@ -360,13 +363,13 @@ class _CategoryProductsState extends State<CategoryProducts> {
               return ProductCard(
                   id: _productList[index].id,
                   slug:_productList[index].slug,
-                  image: _productList[index].thumbnail_image,
-                  name: _productList[index].name,
-                  main_price: _productList[index].main_price,
-                  stroked_price: _productList[index].stroked_price,
-                  discount: _productList[index].discount,
-                  is_wholesale: _productList[index].isWholesale,
-                  has_discount: _productList[index].has_discount);
+                  image: _productList[index].image.imageDefault,
+                  name: _productList[index].productDetail.title,
+                  main_price: _productList[index].priceDiscounted,
+                  stroked_price: _productList[index].price,
+                  discount: _productList[index].discountRate + "%",
+                  is_wholesale: true,
+                  has_discount:true);
             },
           ),
         ),
