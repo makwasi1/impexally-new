@@ -48,6 +48,9 @@ class _ProductVariantsState extends State<ProductVariants> {
   var _cartTotal = 0.00;
   var _cartTotalString = ". . .";
   ProductMiniDetail? _singleProduct;
+  List<Map<String, dynamic>> variationsWithOptions = [];
+  Map<int, int> selectedOptions = {};
+    TextEditingController quantityController = TextEditingController(text: "1");
 
   @override
   void initState() {
@@ -83,7 +86,34 @@ class _ProductVariantsState extends State<ProductVariants> {
     if (widget.variation != null) {
       _singleProduct = widget.variation;
     }
-    print("Variation ${widget.variation}");
+
+
+    for (int i = 0; i < _singleProduct!.products!.variation!.length; i++) {
+      selectedOptions[i] = 0; // Select the first option by default
+    }
+
+    // Loop through the variations
+    for (var variation in _singleProduct!.products!.variation!) {
+      Map<String, dynamic> variationDetail = {
+        'variation_id': variation.id,
+        'label_names': variation.labelNames,
+        'options': []
+      };
+
+      // Loop through the variation options and add them to the list
+      for (var option in variation.variationOptions!) {
+        variationDetail['options'].add({
+          'option_id': option.id,
+          'option_names': getVariationOptionName(option.optionNames!)
+        });
+      }
+
+      variationsWithOptions.add(variationDetail);
+    }
+
+    // Now you have a list of variations with their options, each including IDs
+    print(variationsWithOptions);
+
     setState(() {});
   }
 
@@ -91,9 +121,13 @@ class _ProductVariantsState extends State<ProductVariants> {
     addToCart(mode: "add_to_cart", context: context, snackbar: snackbar);
   }
 
-  addToCart({mode, BuildContext? context, snackbar = null, ProductMiniDetail? variation}) async {
-    var cartAddResponse = await CartRepository().getCartAddResponse(
-        widget.variation!.products!.id, "3", 18, 10, 3);
+  addToCart(
+      {mode,
+      BuildContext? context,
+      snackbar = null,
+      ProductMiniDetail? variation}) async {
+    var cartAddResponse = await CartRepository()
+        .getCartAddResponse(widget.variation!.products!.id, "3", 18, 10, 3);
 
     if (cartAddResponse.result == false) {
       ToastComponent.showDialog(cartAddResponse.message,
@@ -755,12 +789,6 @@ class _ProductVariantsState extends State<ProductVariants> {
       children: [
         // Product Size Selection
         buildSizeSelection(),
-        Divider(color: MyTheme.light_grey, thickness: 1),
-
-        // Product Color Selection
-        buildColorSelection(),
-        Divider(color: MyTheme.light_grey, thickness: 1),
-
         // Product Quantity Selection
         buildQuantitySelection(),
       ],
@@ -769,121 +797,78 @@ class _ProductVariantsState extends State<ProductVariants> {
 
   Widget buildSizeSelection() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                color: Colors.red, // Border color
-              ),
-              color: Color.fromARGB(255, 241, 199, 199), // Background color
-            ),
-            child: Text(
-              "Select Product Size",
-              style: TextStyle(
-                color: const Color.fromARGB(255, 171, 15, 4),
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
+          Text(
+            "Enjoy Unlimited Deliveries Across Ghana with Easy and Free Returns",
+            style: TextStyle(
+              color: MyTheme.dark_font_grey,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
             ),
           ),
-          SizedBox(height: 8),
-          Row(
+          SizedBox(height: 2),
+          //small network image here make the width take the full width
+          Image.network(
+            "https://image.impexally.com/images/app/impexally/ng/get-cash-back-1.webp",
+            width: DeviceInfo(context).width,
+            height: 100,
+          ),
+          Column(
             children: List.generate(_singleProduct!.products!.variation!.length,
                 (index) {
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    // Handle size selection
-                  });
-                },
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 4),
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      color: Colors.red, // Border color
+              var variation = _singleProduct!.products!.variation![index];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(5),
+                      border: Border.all(color: Colors.red),
+                      color: Color.fromARGB(255, 241, 199, 199),
                     ),
-                    color:
-                        Color.fromARGB(255, 241, 199, 199), // Background color
-                  ),
-                  child: Text(
-                    _singleProduct!.products!.variation![index].labelNames!,
-                    style: TextStyle(
-                      color: Color.fromARGB(255, 194, 29, 17),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
+                    child: Text(
+                      "Select Product ${variation.labelNames!}",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 171, 15, 4),
+                        fontSize: 14,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
-                ),
+                  SizedBox(height: 3),
+                  Wrap(
+                    spacing: 8,
+                    children: List.generate(variation.variationOptions!.length,
+                        (optionIndex) {
+                      var option = variation.variationOptions![optionIndex];
+                      bool isSelected = selectedOptions[index] == optionIndex;
+                      return ChoiceChip(
+                        label:
+                            Text(getVariationOptionName(option.optionNames!)),
+                        selected: isSelected,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          
+                        ),
+                        selectedColor: Color.fromARGB(255, 241, 199, 199),
+                        onSelected: (bool selected) {
+                          setState(() {
+                            selectedOptions[index] =
+                                optionIndex; // Update the selected index
+                          });
+                        },
+                      );
+                    }),
+                  ),
+                  Divider(color: Colors.grey, thickness: 1),
+                ],
               );
             }),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget buildColorSelection() {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(5),
-              border: Border.all(
-                color: Colors.red, // Border color
-              ),
-              color: Color.fromARGB(255, 241, 199, 199), // Background color
-            ),
-            child: Text(
-              "Select Product Color",
-              style: TextStyle(
-                color: const Color.fromARGB(255, 171, 15, 4),
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: List.generate(_singleProduct!.products!.variation!.length,
-                (index) {
-              return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    // Handle color selection
-                  });
-                },
-                child: Container(
-                  margin: EdgeInsets.symmetric(horizontal: 4),
-                  padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(5),
-                    border: Border.all(
-                      color: Colors.red, // Border color
-                    ),
-                    color:
-                        Color.fromARGB(255, 241, 199, 199), // Background color
-                  ),
-                  child: Image.network(
-                    "https://seller.impexally.com/uploads/images/" +
-                        _singleProduct!.image![index].imageDefault!,
-                    width: 50,
-                    height: 50,
-                  ),
-                ),
-              );
-            }),
-          ),
+          )
         ],
       ),
     );
@@ -891,12 +876,12 @@ class _ProductVariantsState extends State<ProductVariants> {
 
   Widget buildQuantitySelection() {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.only(top: 4.0, left: 8.0, right: 8.0),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(5),
               border: Border.all(
@@ -907,37 +892,73 @@ class _ProductVariantsState extends State<ProductVariants> {
             child: Text(
               "Select Product Qty.",
               style: TextStyle(
-                color: const Color.fromARGB(255, 171, 15, 4),
+                color: Color.fromARGB(255, 171, 15, 4),
                 fontSize: 14,
                 fontWeight: FontWeight.w400,
               ),
             ),
           ),
-          SizedBox(width: 18),
+          SizedBox(width: 5),
           Row(
             children: [
-              IconButton(
-                icon: Icon(Icons.remove),
-                onPressed: () {
-                  setState(() {
-                    // Handle quantity decrease
-                  });
-                },
-              ),
-              Text(
-                "1", // Display selected quantity
-                style: TextStyle(
-                  color: MyTheme.accent_color,
-                  fontSize: 16,
+              Container(
+                width: 40,
+                height: 40,
+                margin: EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200], // Background color
+                  border: Border.all(color: Colors.grey), // Border color
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: IconButton(
+                  
+                  icon: Icon(Icons.remove),
+                  onPressed: () {
+                    int currentQty = int.tryParse(quantityController.text) ?? 1;
+                    if (currentQty > 1) {
+                      quantityController.text = (currentQty - 1).toString();
+                    }
+                  },
                 ),
               ),
-              IconButton(
-                icon: Icon(Icons.add),
-                onPressed: () {
-                  setState(() {
-                    // Handle quantity increase
-                  });
-                },
+              Container(
+                width: 40,
+                height: 40,
+                margin: EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  color: Colors.white, // Background color
+                  border: Border.all(color: Colors.grey), // Border color
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: TextField(
+                  controller: quantityController,
+                  keyboardType: TextInputType.number,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                  ),
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+              Container(
+                width: 40,
+                height: 40,
+                margin: EdgeInsets.symmetric(horizontal: 5),
+                decoration: BoxDecoration(
+                  
+                  color: Colors.grey[200], // Background color
+                  border: Border.all(color: Colors.grey), // Border color
+                  borderRadius: BorderRadius.circular(5),
+                ),
+                child: IconButton(
+                  icon: Icon(Icons.add),
+                  onPressed: () {
+                    int currentQty = int.tryParse(quantityController.text) ?? 1;
+                    quantityController.text = (currentQty + 1).toString();
+                  },
+                ),
               ),
             ],
           ),
