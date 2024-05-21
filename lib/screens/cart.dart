@@ -18,6 +18,10 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 
+import '../data_model/new_cart.dart';
+import '../data_model/product_detail.dart';
+import '../repositories/product_repository.dart';
+
 class Cart extends StatefulWidget {
   Cart(
       {Key? key,
@@ -37,10 +41,11 @@ class _CartState extends State<Cart> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   ScrollController _mainScrollController = ScrollController();
   var _shopList = [];
-  CartResponse? _shopResponse;
+  CartModel? _shopResponse;
   bool _isInitial = true;
   var _cartTotal = 0.00;
   var _cartTotalString = ". . .";
+  ProductMiniDetail? _productDetails;
 
   @override
   void initState() {
@@ -53,9 +58,9 @@ class _CartState extends State<Cart> {
     print(user_id.$);
     print(user_name.$);*/
 
-    if (is_logged_in.$ == true) {
-      fetchData();
-    }
+    // if (is_logged_in.$ == true) {
+    fetchData();
+    // }
   }
 
   @override
@@ -72,52 +77,78 @@ class _CartState extends State<Cart> {
 
   fetchData() async {
     getCartCount();
-    CartResponse cartResponseList =
-        await CartRepository().getCartResponseList(user_id.$);
+    CartModel cartResponseList =
+        await CartRepository().getCartResponseList(user_id: 18);
 
-    if (cartResponseList != null || cartResponseList.data!.length > 0) {
-      _shopList = cartResponseList.data!;
+    if (cartResponseList != null || cartResponseList.the0!.items!.length > 0) {
+      _shopList = cartResponseList.the0!.items!;
       _shopResponse = cartResponseList;
       getSetCartTotal();
-    }
-    _isInitial = false;
+      _isInitial = false;
 
-    setState(() {});
+      setState(() {});
+    }
   }
 
   getSetCartTotal() {
-    _cartTotalString = _shopResponse!.grandTotal!.replaceAll(
-        SystemConfig.systemCurrency!.code!,
-        SystemConfig.systemCurrency!.symbol!);
+    _cartTotalString = _shopResponse!.cartTotal!
+        .toString()
+        .replaceAll(SystemConfig.currency, SystemConfig.currency);
 
     setState(() {});
   }
 
-  onQuantityIncrease(seller_index, item_index) {
-    if (_shopList[seller_index].cartItems[item_index].quantity <
-        _shopList[seller_index].cartItems[item_index].upperLimit) {
-      _shopList[seller_index].cartItems[item_index].quantity++;
-      // getSetCartTotal();
-      setState(() {});
-      process(mode: "update");
+  onQuantityIncrease(seller_index) async {
+    if (int.tryParse(_shopList[seller_index].quantity)! <
+        int.tryParse(_shopList[seller_index].product.stock)!) {
+      try {
+        int? currentQuantity = int.tryParse(_shopList[seller_index].quantity);
+        if (currentQuantity != null) {
+          currentQuantity++;
+          _shopList[seller_index].quantity = currentQuantity.toString();
+        }
+        ToastComponent.showDialog(
+          "Updating Cart...",
+          gravity: Toast.center,
+          duration: Toast.lengthLong);
+
+        await CartRepository().getCartProcessResponse(
+            _shopList[seller_index].id.toString(),
+            _shopList[seller_index].quantity);
+            fetchData();
+      } catch (e) {
+        print(e);
+      }
     } else {
       ToastComponent.showDialog(
-          "${AppLocalizations.of(context)!.cannot_order_more_than} ${_shopList[seller_index].cartItems[item_index].upperLimit} ${AppLocalizations.of(context)!.items_of_this_all_lower}",
+          "${AppLocalizations.of(context)!.cannot_order_more_than} ${_shopList[seller_index].product.stock!} ${AppLocalizations.of(context)!.items_of_this_all_lower}",
           gravity: Toast.center,
           duration: Toast.lengthLong);
     }
   }
 
-  onQuantityDecrease(seller_index, item_index) {
-    if (_shopList[seller_index].cartItems[item_index].quantity >
-        _shopList[seller_index].cartItems[item_index].lowerLimit) {
-      _shopList[seller_index].cartItems[item_index].quantity--;
-      // getSetCartTotal();
-      setState(() {});
-      process(mode: "update");
+  onQuantityDecrease(seller_index, item_index) async {
+    if (int.tryParse(_shopList[seller_index].quantity)! > 1) {
+      try {
+        int? currentQuantity = int.tryParse(_shopList[seller_index].quantity);
+        if (currentQuantity != null) {
+          currentQuantity--;
+          _shopList[seller_index].quantity = currentQuantity.toString();
+        }
+        ToastComponent.showDialog(
+          "Updating Cart...",
+          gravity: Toast.center,
+          duration: Toast.lengthLong);
+        await CartRepository().getCartProcessResponse(
+            _shopList[seller_index].id.toString(),
+            _shopList[seller_index].quantity);
+            fetchData();
+      } catch (e) {
+        print(e);
+      }
     } else {
       ToastComponent.showDialog(
-          "${AppLocalizations.of(context)!.cannot_order_more_than} ${_shopList[seller_index].cartItems[item_index].lowerLimit} ${AppLocalizations.of(context)!.items_of_this_all_lower}",
+          "${AppLocalizations.of(context)!.cannot_order_more_than} 1 ${AppLocalizations.of(context)!.items_of_this_all_lower}",
           gravity: Toast.center,
           duration: Toast.lengthLong);
     }
@@ -237,6 +268,17 @@ class _CartState extends State<Cart> {
     }
   }
 
+  Future<ProductMiniDetail?> fetchProductDetails(id) async {
+    var productDetailsResponse =
+        await ProductRepository().getProductDetails(slug: id.toString());
+
+    // if (productDetailsResponse.products!.productDetail!.description != null) {
+    _productDetails = productDetailsResponse;
+
+    // setState(() {});
+    return _productDetails;
+  }
+
   reset() {
     _shopList = [];
     _isInitial = true;
@@ -330,17 +372,17 @@ class _CartState extends State<Cart> {
                       AppLocalizations.of(context)!.total_amount_ucf,
                       style: TextStyle(
                           color: MyTheme.dark_font_grey,
-                          fontSize: 13,
+                          fontSize: 16,
                           fontWeight: FontWeight.w700),
                     ),
                   ),
                   Spacer(),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text(_cartTotalString,
+                    child: Text("GH₵ " + _cartTotalString,
                         style: TextStyle(
                             color: MyTheme.accent_color,
-                            fontSize: 14,
+                            fontSize: 18,
                             fontWeight: FontWeight.w600)),
                   ),
                 ],
@@ -348,59 +390,6 @@ class _CartState extends State<Cart> {
             ),
             Row(
               children: [
-                // Padding(
-                //   padding: const EdgeInsets.only(top: 8.0),
-                //   child: Container(
-                //     width: (MediaQuery.of(context).size.width - 48) * (1 / 3),
-                //     height: 58,
-                //     decoration: BoxDecoration(
-                //         color: Colors.white,
-                //         // border:
-                //         //     Border.all(color: MyTheme.accent_color, width: 1),
-                //         borderRadius: app_language_rtl.$!
-                //             ? const BorderRadius.only(
-                //                 topLeft: const Radius.circular(0.0),
-                //                 bottomLeft: const Radius.circular(0.0),
-                //                 topRight: const Radius.circular(6.0),
-                //                 bottomRight: const Radius.circular(6.0),
-                //               )
-                //             : const BorderRadius.only(
-                //                 topLeft: const Radius.circular(6.0),
-                //                 bottomLeft: const Radius.circular(6.0),
-                //                 topRight: const Radius.circular(0.0),
-                //                 bottomRight: const Radius.circular(0.0),
-                //               )),
-                //     child: Btn.basic(
-                //       minWidth: MediaQuery.of(context).size.width,
-                //       color: MyTheme.soft_accent_color,
-                //       shape: app_language_rtl.$!
-                //           ? RoundedRectangleBorder(
-                //               borderRadius: const BorderRadius.only(
-                //               topLeft: const Radius.circular(0.0),
-                //               bottomLeft: const Radius.circular(0.0),
-                //               topRight: const Radius.circular(6.0),
-                //               bottomRight: const Radius.circular(6.0),
-                //             ))
-                //           : RoundedRectangleBorder(
-                //               borderRadius: const BorderRadius.only(
-                //               topLeft: const Radius.circular(6.0),
-                //               bottomLeft: const Radius.circular(6.0),
-                //               topRight: const Radius.circular(0.0),
-                //               bottomRight: const Radius.circular(0.0),
-                //             )),
-                //       child: Text(
-                //         AppLocalizations.of(context)!.update_cart_ucf,
-                //         style: TextStyle(
-                //             color: MyTheme.dark_font_grey,
-                //             fontSize: 13,
-                //             fontWeight: FontWeight.w700),
-                //       ),
-                //       onPressed: () {
-                //         onPressUpdate();
-                //       },
-                //     ),
-                //   ),
-                // ),
                 Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Container(
@@ -481,63 +470,12 @@ class _CartState extends State<Cart> {
   }
 
   buildCartSellerList() {
-    if (is_logged_in.$ == false) {
-      return Container(
-          height: 100,
-          child: Center(
-              child: Text(
-            AppLocalizations.of(context)!.please_log_in_to_see_the_cart_items,
-            style: TextStyle(color: MyTheme.font_grey),
-          )));
-    } else if (_isInitial && _shopList.length == 0) {
+    if (_isInitial && _shopList.length == 0) {
       return SingleChildScrollView(
           child: ShimmerHelper()
               .buildListShimmer(item_count: 5, item_height: 100.0));
     } else if (_shopList.length > 0) {
-      return SingleChildScrollView(
-        child: ListView.separated(
-          separatorBuilder: (context, index) => SizedBox(
-            height: 26,
-          ),
-          itemCount: _shopList.length,
-          scrollDirection: Axis.vertical,
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            return Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: Row(
-                    children: [
-                      Text(
-                        _shopList[index].name,
-                        style: TextStyle(
-                            color: MyTheme.dark_font_grey,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12),
-                      ),
-                      Spacer(),
-                      Text(
-                        _shopList[index].subTotal.replaceAll(
-                                SystemConfig.systemCurrency!.code,
-                                SystemConfig.systemCurrency!.symbol) ??
-                            '',
-                        style: TextStyle(
-                            color: MyTheme.accent_color,
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-                buildCartSellerItemList(index),
-              ],
-            );
-          },
-        ),
-      );
+      return buildCartSellerItemList();
     } else if (!_isInitial && _shopList.length == 0) {
       return Container(
           height: 100,
@@ -549,24 +487,184 @@ class _CartState extends State<Cart> {
     }
   }
 
-  SingleChildScrollView buildCartSellerItemList(seller_index) {
+  SingleChildScrollView buildCartSellerItemList() {
     return SingleChildScrollView(
       child: ListView.separated(
         separatorBuilder: (context, index) => SizedBox(
           height: 14,
         ),
-        itemCount: _shopList[seller_index].cartItems.length,
+        itemCount: _shopList.length,
         scrollDirection: Axis.vertical,
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemBuilder: (context, index) {
-          return buildCartSellerItemCard(seller_index, index);
+          return buildCartSellerItemCard(index, index);
         },
       ),
     );
   }
 
   buildCartSellerItemCard(seller_index, item_index) {
+    return FutureBuilder(
+      future: fetchProductDetails(_shopList[seller_index].productId),
+      builder: (context, AsyncSnapshot<ProductMiniDetail?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return  ShimmerHelper()
+              .buildListShimmer(item_count: 5, item_height: 100.0); // Show loading indicator while waiting for data
+        } else if (snapshot.hasError) {
+          return Text(
+              "Error: ${snapshot.error}"); // Show error if something went wrong
+        } else if (snapshot.hasData) {
+          var prod = snapshot.data; // Your product details object
+          return Container(
+            height: 120,
+            decoration: BoxDecorations.buildBoxDecoration_1(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  width: DeviceInfo(context).width! / 4,
+                  height: 120,
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.horizontal(
+                          left: Radius.circular(6), right: Radius.zero),
+                      child: FadeInImage.assetNetwork(
+                        placeholder: 'assets/placeholder.png',
+                        image: "https://seller.impexally.com/uploads/images/"+ prod!.image![0]
+                            .imageDefault!, // Assuming 'image' is the field for image URL
+                        fit: BoxFit.cover,
+                      )),
+                ),
+                Container(
+                  //color: Colors.red,
+                  width: DeviceInfo(context).width! / 3,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          prod.productDetails!.first.title ?? '',
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 2,
+                          style: TextStyle(
+                              color: MyTheme.font_grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 23.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                'GH₵ ' +
+                                    _shopList[seller_index]
+                                        .product
+                                        .priceDiscounted!,
+                                textAlign: TextAlign.left,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                    color: MyTheme.accent_color,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Spacer(),
+            Container(
+              width: 32,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      onPressDelete(_shopList[seller_index].id);
+                    },
+                    child: Container(
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 14.0),
+                        child: Image.asset(
+                          'assets/trash.png',
+                          height: 16,
+                          color: Colors.red,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(14.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      onQuantityIncrease(seller_index);
+                    },
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration:
+                          BoxDecorations.buildCartCircularButtonDecoration(),
+                      child: Icon(
+                        Icons.add,
+                        color: MyTheme.grey_153,
+                        size: 12,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                    child: Text(
+                      _shopList[seller_index].quantity.toString(),
+                      style:
+                          TextStyle(color: MyTheme.accent_color, fontSize: 16),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      
+                        onQuantityDecrease(seller_index, item_index);
+                     
+                    },
+                    child: Container(
+                      width: 24,
+                      height: 24,
+                      decoration:
+                          BoxDecorations.buildCartCircularButtonDecoration(),
+                      child: Icon(
+                        Icons.remove,
+                        color: MyTheme.grey_153,
+                        size: 12,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            )
+              ],
+            ),
+          );
+        } else {
+          return Text(
+              "No data available"); // Handle case where no data is returned
+        }
+      },
+    );
+  }
+
+  buildCartSellerItemCard1(seller_index, item_index) {
+    //get product details by porduct id
+    var prod = fetchProductDetails(_shopList[seller_index].productId);
     return Container(
       height: 120,
       decoration: BoxDecorations.buildBoxDecoration_1(),
@@ -581,9 +679,7 @@ class _CartState extends State<Cart> {
                         left: Radius.circular(6), right: Radius.zero),
                     child: FadeInImage.assetNetwork(
                       placeholder: 'assets/placeholder.png',
-                      image: _shopList[seller_index]
-                          .cartItems[item_index]
-                          .productThumbnailImage,
+                      image: "",
                       fit: BoxFit.cover,
                     ))),
             Container(
@@ -596,7 +692,7 @@ class _CartState extends State<Cart> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      _shopList[seller_index].cartItems[item_index].productName,
+                      _shopList[seller_index].product.slug ?? '',
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
                       style: TextStyle(
@@ -609,16 +705,10 @@ class _CartState extends State<Cart> {
                       child: Row(
                         children: [
                           Text(
-                            SystemConfig.systemCurrency != null
-                                ? _shopList[seller_index]
-                                    .cartItems[item_index]
-                                    .price
-                                    .replaceAll(
-                                        SystemConfig.systemCurrency!.code,
-                                        SystemConfig.systemCurrency!.symbol)
-                                : _shopList[seller_index]
-                                    .cart_items[item_index]
-                                    .price,
+                            'GH₵ ' +
+                                _shopList[seller_index]
+                                    .product
+                                    .priceDiscounted!,
                             textAlign: TextAlign.left,
                             overflow: TextOverflow.ellipsis,
                             maxLines: 2,
@@ -642,8 +732,7 @@ class _CartState extends State<Cart> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      onPressDelete(
-                          _shopList[seller_index].cartItems[item_index].id);
+                      onPressDelete(_shopList[seller_index].id);
                     },
                     child: Container(
                       child: Padding(
@@ -666,13 +755,7 @@ class _CartState extends State<Cart> {
                 children: [
                   GestureDetector(
                     onTap: () {
-                      if (_shopList[seller_index]
-                              .cartItems[item_index]
-                              .auctionProduct ==
-                          0) {
-                        onQuantityIncrease(seller_index, item_index);
-                      }
-                      return null;
+                      onQuantityIncrease(seller_index);
                     },
                     child: Container(
                       width: 24,
@@ -681,12 +764,7 @@ class _CartState extends State<Cart> {
                           BoxDecorations.buildCartCircularButtonDecoration(),
                       child: Icon(
                         Icons.add,
-                        color: _shopList[seller_index]
-                                    .cartItems[item_index]
-                                    .auctionProduct ==
-                                0
-                            ? MyTheme.accent_color
-                            : MyTheme.grey_153,
+                        color: MyTheme.grey_153,
                         size: 12,
                       ),
                     ),
@@ -694,23 +772,14 @@ class _CartState extends State<Cart> {
                   Padding(
                     padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
                     child: Text(
-                      _shopList[seller_index]
-                          .cartItems[item_index]
-                          .quantity
-                          .toString(),
+                      _shopList[seller_index].quantity.toString(),
                       style:
                           TextStyle(color: MyTheme.accent_color, fontSize: 16),
                     ),
                   ),
                   GestureDetector(
                     onTap: () {
-                      if (_shopList[seller_index]
-                              .cartItems[item_index]
-                              .auctionProduct ==
-                          0) {
-                        onQuantityDecrease(seller_index, item_index);
-                      }
-                      return null;
+                      onQuantityDecrease(seller_index, item_index);
                     },
                     child: Container(
                       width: 24,
@@ -719,12 +788,7 @@ class _CartState extends State<Cart> {
                           BoxDecorations.buildCartCircularButtonDecoration(),
                       child: Icon(
                         Icons.remove,
-                        color: _shopList[seller_index]
-                                    .cartItems[item_index]
-                                    .auctionProduct ==
-                                0
-                            ? MyTheme.accent_color
-                            : MyTheme.grey_153,
+                        color: MyTheme.grey_153,
                         size: 12,
                       ),
                     ),

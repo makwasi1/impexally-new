@@ -93,7 +93,7 @@ class _ProductVariantsState extends State<ProductVariants> {
 
   addToCart({mode, BuildContext? context, snackbar = null, ProductMiniDetail? variation}) async {
     var cartAddResponse = await CartRepository().getCartAddResponse(
-        6, "5", 18, 10, 10);
+        widget.variation!.products!.id, "3", 18, 10, 3);
 
     if (cartAddResponse.result == false) {
       ToastComponent.showDialog(cartAddResponse.message,
@@ -119,16 +119,15 @@ class _ProductVariantsState extends State<ProductVariants> {
   }
 
   fetchData() async {
-    getCartCount();
-    CartResponse cartResponseList =
-        await CartRepository().getCartResponseList(user_id.$);
+    // getCartCount();
+    // CartResponse cartResponseList = null;
 
-    if (cartResponseList != null || cartResponseList.data!.length > 0) {
-      _shopList = cartResponseList.data!;
-      _shopResponse = cartResponseList;
-      getSetCartTotal();
-    }
-    _isInitial = false;
+    // if (cartResponseList != null || cartResponseList.data!.length > 0) {
+    //   _shopList = cartResponseList.data!;
+    //   _shopResponse = cartResponseList;
+    //   getSetCartTotal();
+    // }
+    // _isInitial = false;
 
     setState(() {});
   }
