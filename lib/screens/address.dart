@@ -60,9 +60,9 @@ class _AddressState extends State<Address> {
     // TODO: implement initState
     super.initState();
 
-    if (is_logged_in.$ == true) {
+
       fetchAll();
-    }
+    
   }
 
   fetchAll() {
@@ -100,12 +100,12 @@ class _AddressState extends State<Address> {
             .add(TextEditingController(text: address.state_name));
         _cityControllerListForUpdate
             .add(TextEditingController(text: address.city_name));
-        _selected_country_list_for_update
-            .add(Country(id: address.country_id, name: address.country_name));
-        _selected_state_list_for_update
-            .add(MyState(id: address.state_id, name: address.state_name));
-        _selected_city_list_for_update
-            .add(City(id: address.city_id, name: address.city_name));
+        // _selected_country_list_for_update
+        //     .add(TextEditingController(text: address.country_name);
+        // _selected_state_list_for_update
+        //     .add(MyState(id: address.state_id, name: address.state_name));
+        // _selected_city_list_for_update
+        //     .add(City(id: address.city_id, name: address.city_name));
       });
 
       print("fetchShippingAddressList");
@@ -246,6 +246,9 @@ class _AddressState extends State<Address> {
     var address = _addressController.text.toString();
     var postal_code = _postalCodeController.text.toString();
     var phone = _phoneController.text.toString();
+    var country = _countryController.text.toString();
+    var state = _stateController.text.toString();
+    var city = _cityController.text.toString();
 
     if (address == "") {
       ToastComponent.showDialog(
@@ -255,7 +258,7 @@ class _AddressState extends State<Address> {
       return;
     }
 
-    if (_selected_country == null) {
+    if (country == "") {
       ToastComponent.showDialog(
           AppLocalizations.of(context)!.select_a_country,
           gravity: Toast.center,
@@ -263,7 +266,7 @@ class _AddressState extends State<Address> {
       return;
     }
 
-    if (_selected_state == null) {
+    if (state == "") {
       ToastComponent.showDialog(
           AppLocalizations.of(context)!.select_a_state,
           gravity: Toast.center,
@@ -271,7 +274,7 @@ class _AddressState extends State<Address> {
       return;
     }
 
-    if (_selected_city == null) {
+    if (city == "") {
       ToastComponent.showDialog(
           AppLocalizations.of(context)!.select_a_city,
           gravity: Toast.center,
@@ -281,11 +284,13 @@ class _AddressState extends State<Address> {
 
     var addressAddResponse = await AddressRepository().getAddressAddResponse(
         address: address,
-        country_id: _selected_country!.id,
-        state_id: _selected_state!.id,
-        city_id: _selected_city!.id,
+        country_id: 81,
+        state_id: 1037,
+        city_id: city,
         postal_code: postal_code,
-        phone: phone);
+        phone: phone,
+        email: "test@gmail.com"
+        );
 
     if (addressAddResponse.result == false) {
       ToastComponent.showDialog(addressAddResponse.message,
@@ -590,65 +595,20 @@ class _AddressState extends State<Address> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),
                         child: Text(
-                            "${AppLocalizations.of(context)!.country_ucf} *",
+                            "Country *",
                             style: TextStyle(
                                 color: MyTheme.font_grey, fontSize: 12)),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Container(
-                          height: 40,
-                          child: TypeAheadField(
-                            suggestionsCallback: (name) async {
-                              var countryResponse = await AddressRepository()
-                                  .getCountryList(name: name);
-                              return countryResponse.countries;
-                            } ,
-                            loadingBuilder: (context) {
-                              return Container(
-                                height: 50,
-                                child: Center(
-                                    child: Text(
-                                        AppLocalizations.of(context)!
-                                            .loading_countries_ucf,
-                                        style: TextStyle(
-                                            color: MyTheme.medium_grey))),
-                              );
-                            },
-                            itemBuilder: (context, dynamic country) {
-                              //print(suggestion.toString());
-                              return ListTile(
-                                dense: true,
-                                title: Text(
-                                  country.name,
-                                  style: TextStyle(color: MyTheme.font_grey),
-                                ),
-                              );
-                            },
-                            noItemsFoundBuilder: (context) {
-                              return Container(
-                                height: 50,
-                                child: Center(
-                                    child: Text(
-                                        AppLocalizations.of(context)!
-                                            .no_country_available,
-                                        style: TextStyle(
-                                            color: MyTheme.medium_grey))),
-                              );
-                            },
-                            onSuggestionSelected: (dynamic country) {
-                              onSelectCountryDuringAdd(country, setModalState);
-                            },
-                            textFieldConfiguration: TextFieldConfiguration(
-                              onTap: () {},
-                              //autofocus: true,
-                              controller: _countryController,
-                              onSubmitted: (txt) {
-                                // keep this blank
-                              },
-                              decoration: buildAddressInputDecoration(context,  AppLocalizations.of(context)!
-                                  .enter_country_ucf),
-                            ),
+                          height: 55,
+                          child: TextField(
+                            controller: _countryController,
+                            autofocus: false,
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
+                            decoration: buildAddressInputDecoration(context,AppLocalizations.of(context)!.enter_country_ucf),
                           ),
                         ),
                       ),
@@ -662,67 +622,13 @@ class _AddressState extends State<Address> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Container(
-                          height: 40,
-                          child: TypeAheadField(
-                            suggestionsCallback: (name) async {
-                              if (_selected_country == null) {
-                                var stateResponse = await AddressRepository()
-                                    .getStateListByCountry(); // blank response
-                                return stateResponse.states;
-                              }
-                              var stateResponse = await AddressRepository()
-                                  .getStateListByCountry(
-                                      country_id: _selected_country!.id,
-                                      name: name);
-                              return stateResponse.states;
-                            },
-                            loadingBuilder: (context) {
-                              return Container(
-                                height: 50,
-                                child: Center(
-                                    child: Text(
-                                        AppLocalizations.of(context)!
-                                            .loading_states_ucf,
-                                        style: TextStyle(
-                                            color: MyTheme.medium_grey))),
-                              );
-                            },
-                            itemBuilder: (context, dynamic state) {
-                              //print(suggestion.toString());
-                              return ListTile(
-                                dense: true,
-                                title: Text(
-                                  state.name,
-                                  style: TextStyle(color: MyTheme.font_grey),
-                                ),
-                              );
-                            },
-                            noItemsFoundBuilder: (context) {
-                              return Container(
-                                height: 50,
-                                child: Center(
-                                    child: Text(
-                                        AppLocalizations.of(context)!
-                                            .no_state_available,
-                                        style: TextStyle(
-                                            color: MyTheme.medium_grey))),
-                              );
-                            },
-                            onSuggestionSelected: (dynamic state) {
-                              onSelectStateDuringAdd(state, setModalState);
-                            },
-                            textFieldConfiguration: TextFieldConfiguration(
-                              onTap: () {},
-                              //autofocus: true,
-                              controller: _stateController,
-                              onSubmitted: (txt) {
-                                // _searchKey = txt;
-                                // setState(() {});
-                                // _onSearchSubmit();
-                              },
-                              decoration: buildAddressInputDecoration(context, AppLocalizations.of(context)!
-                                  .enter_state_ucf),
-                            ),
+                          height: 55,
+                          child: TextField(
+                            controller: _stateController,
+                            autofocus: false,
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
+                            decoration: buildAddressInputDecoration(context,AppLocalizations.of(context)!.enter_state_ucf),
                           ),
                         ),
                       ),
@@ -736,64 +642,13 @@ class _AddressState extends State<Address> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 16.0),
                         child: Container(
-                          height: 40,
-                          child: TypeAheadField(
-                            suggestionsCallback: (name) async {
-                              if (_selected_state == null) {
-                                var cityResponse = await AddressRepository()
-                                    .getCityListByState(); // blank response
-                                return cityResponse.cities;
-                              }
-                              var cityResponse = await AddressRepository()
-                                  .getCityListByState(
-                                      state_id: _selected_state!.id, name: name);
-                              return cityResponse.cities;
-                            },
-                            loadingBuilder: (context) {
-                              return Container(
-                                height: 50,
-                                child: Center(
-                                    child: Text(
-                                        AppLocalizations.of(context)!
-                                            .loading_cities_ucf,
-                                        style: TextStyle(
-                                            color: MyTheme.medium_grey))),
-                              );
-                            },
-                            itemBuilder: (context, dynamic city) {
-                              //print(suggestion.toString());
-                              return ListTile(
-                                dense: true,
-                                title: Text(
-                                  city.name,
-                                  style: TextStyle(color: MyTheme.font_grey),
-                                ),
-                              );
-                            },
-                            noItemsFoundBuilder: (context) {
-                              return Container(
-                                height: 50,
-                                child: Center(
-                                    child: Text(
-                                        AppLocalizations.of(context)!
-                                            .no_city_available,
-                                        style: TextStyle(
-                                            color: MyTheme.medium_grey))),
-                              );
-                            },
-                            onSuggestionSelected: (dynamic city) {
-                              onSelectCityDuringAdd(city, setModalState);
-                            },
-                            textFieldConfiguration: TextFieldConfiguration(
-                              onTap: () {},
-                              //autofocus: true,
-                              controller: _cityController,
-                              onSubmitted: (txt) {
-                                // keep blank
-                              },
-                              decoration: buildAddressInputDecoration(context, AppLocalizations.of(context)!
-                                  .enter_city_ucf),
-                            ),
+                          height: 55,
+                          child: TextField(
+                            controller: _cityController,
+                            autofocus: false,
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
+                            decoration: buildAddressInputDecoration(context,AppLocalizations.of(context)!.enter_city_ucf),
                           ),
                         ),
                       ),

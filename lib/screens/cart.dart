@@ -115,7 +115,8 @@ class _CartState extends State<Cart> {
         await CartRepository().getCartProcessResponse(
             _shopList[seller_index].id.toString(),
             _shopList[seller_index].quantity);
-            fetchData();
+            // fetchData();
+            setState(() {});
       } catch (e) {
         print(e);
       }
@@ -142,7 +143,8 @@ class _CartState extends State<Cart> {
         await CartRepository().getCartProcessResponse(
             _shopList[seller_index].id.toString(),
             _shopList[seller_index].quantity);
-            fetchData();
+            // fetchData();
+            setState(() {});
       } catch (e) {
         print(e);
       }
@@ -220,52 +222,52 @@ class _CartState extends State<Cart> {
   }
 
   process({mode}) async {
-    var cart_ids = [];
-    var cart_quantities = [];
-    if (_shopList.length > 0) {
-      _shopList.forEach((shop) {
-        if (shop.cartItems.length > 0) {
-          shop.cartItems.forEach((cart_item) {
-            cart_ids.add(cart_item.id);
-            cart_quantities.add(cart_item.quantity);
-          });
-        }
-      });
-    }
+    // var cart_ids = [];
+    // var cart_quantities = [];
+    // if (_shopList.length > 0) {
+    //   _shopList.forEach((shop) {
+    //     if (shop.cartItems.length > 0) {
+    //       shop.cartItems.forEach((cart_item) {
+    //         cart_ids.add(cart_item.id);
+    //         cart_quantities.add(cart_item.quantity);
+    //       });
+    //     }
+    //   });
+    // }
 
-    if (cart_ids.length == 0) {
-      ToastComponent.showDialog(AppLocalizations.of(context)!.cart_is_empty,
-          gravity: Toast.center, duration: Toast.lengthLong);
-      return;
-    }
+    // if (cart_ids.length == 0) {
+    //   ToastComponent.showDialog(AppLocalizations.of(context)!.cart_is_empty,
+    //       gravity: Toast.center, duration: Toast.lengthLong);
+    //   return;
+    // }
 
-    var cart_ids_string = cart_ids.join(',').toString();
-    var cart_quantities_string = cart_quantities.join(',').toString();
+    // var cart_ids_string = cart_ids.join(',').toString();
+    // var cart_quantities_string = cart_quantities.join(',').toString();
 
-    print(cart_ids_string);
-    print(cart_quantities_string);
+    // print(cart_ids_string);
+    // print(cart_quantities_string);
 
-    var cartProcessResponse = await CartRepository()
-        .getCartProcessResponse(cart_ids_string, cart_quantities_string);
+    // var cartProcessResponse = await CartRepository()
+    //     .getCartProcessResponse(cart_ids_string, cart_quantities_string);
 
-    if (cartProcessResponse.result == false) {
-      ToastComponent.showDialog(cartProcessResponse.message,
-          gravity: Toast.center, duration: Toast.lengthLong);
-    } else {
-      // cart update message
-      // remove on
-      // ToastComponent.showDialog(cartProcessResponse.message,
-      //     gravity: Toast.center, duration: Toast.lengthLong);
+    // if (cartProcessResponse.result == false) {
+    //   ToastComponent.showDialog(cartProcessResponse.message,
+    //       gravity: Toast.center, duration: Toast.lengthLong);
+    // } else {
+    //   // cart update message
+    //   // remove on
+    //   // ToastComponent.showDialog(cartProcessResponse.message,
+    //   //     gravity: Toast.center, duration: Toast.lengthLong);
 
-      if (mode == "update") {
-        // reset();
-        fetchData();
-      } else if (mode == "proceed_to_shipping") {
+    //   if (mode == "update") {
+    //     // reset();
+    //     fetchData();
+    //   } else if (mode == "proceed_to_shipping") {
         AIZRoute.push(context, SelectAddress()).then((value) {
           onPopped(value);
         });
-      }
-    }
+      // }
+    // }
   }
 
   Future<ProductMiniDetail?> fetchProductDetails(id) async {

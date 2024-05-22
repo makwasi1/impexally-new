@@ -52,11 +52,11 @@ class Address {
   });
 
   int? id;
-  int? user_id;
+  String? user_id;
   String? address;
-  int? country_id;
-  int? state_id;
-  int? city_id;
+  String? country_id;
+  String? state_id;
+  String? city_id;
   String? country_name;
   String? state_name;
   String? city_name;
@@ -73,12 +73,12 @@ class Address {
     address: json["address"],
     country_id: json["country_id"],
     state_id: json["state_id"],
-    city_id: json["city_id"],
-    country_name: json["country_name"],
-    state_name: json["state_name"],
-    city_name: json["city_name"],
-    postal_code: json["postal_code"] == null ? "" :  json["postal_code"],
-    phone: json["phone"]== null ? "" :  json["phone"],
+    city_id: json["city"],
+    country_name: json["country_id"],
+    state_name: json["state_id"],
+    city_name: json["city"],
+    postal_code: json["zip_code"] == null ? "" :  json["zip_code"],
+    phone: json["phone_number"]== null ? "" :  json["phone_number"],
     set_default: json["set_default"],
     location_available: json["location_available"],
     lat: json["lat"],
@@ -95,8 +95,8 @@ class Address {
     "country_name": country_name,
     "state_name": state_name,
     "city_name": city_name,
-    "postal_code": postal_code,
-    "phone": phone,
+    "zip_code": postal_code,
+    "phone_number": phone,
     "set_default": set_default,
     "location_available": location_available,
     "lat": lat,

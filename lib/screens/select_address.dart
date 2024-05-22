@@ -48,10 +48,10 @@ class _SelectAddressState extends State<SelectAddress> {
 
 
   fetchAll() {
-    if (is_logged_in.$ == true) {
+    // if (is_logged_in.$ == true) {
       fetchShippingAddressList();
       //fetchPickupPoints();
-    }
+    // }
     setState(() {});
   }
 
@@ -83,9 +83,9 @@ class _SelectAddressState extends State<SelectAddress> {
 
   Future<void> _onRefresh() async {
     reset();
-    if (is_logged_in.$ == true) {
+    // if (is_logged_in.$ == true) {
       fetchAll();
-    }
+    // }
   }
 
   onPopped(value) async {
@@ -145,9 +145,9 @@ class _SelectAddressState extends State<SelectAddress> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if (is_logged_in.$ == true) {
+    // if (is_logged_in.$ == true) {
       fetchAll();
-    }
+    // }
   }
 
   @override
@@ -263,15 +263,7 @@ class _SelectAddressState extends State<SelectAddress> {
   }
 
   buildShippingInfoList() {
-    if (is_logged_in.$ == false) {
-      return Container(
-          height: 100,
-          child: Center(
-              child: Text(
-                LangText(context).local!.you_need_to_log_in,
-                style: TextStyle(color: MyTheme.font_grey),
-              )));
-    } else if (!_faceData && _shippingAddressList.length == 0) {
+    if (!_faceData && _shippingAddressList.length == 0) {
       return SingleChildScrollView(
           child: ShimmerHelper()
               .buildListShimmer(item_count: 5, item_height: 100.0));
@@ -545,7 +537,7 @@ class _SelectAddressState extends State<SelectAddress> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Btn.minWidthFixHeight(
-              minWidth: MediaQuery.of(context).size.width,
+              minWidth: MediaQuery.of(context).size.width ,
               height: 50,
               color: MyTheme.accent_color,
               shape: RoundedRectangleBorder(
