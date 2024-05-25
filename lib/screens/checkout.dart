@@ -33,6 +33,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:toast/toast.dart';
 
+import '../data_model/payment_type_response.dart';
+import '../dummy_data/payment_methods.dart';
+
 class Checkout extends StatefulWidget {
   int? order_id; // only need when making manual payment from order details
   String list;
@@ -67,16 +70,19 @@ class _CheckoutState extends State<Checkout> {
   var _paymentTypeList = [];
   bool _isInitial = true;
   String? _totalString = ". . .";
-  double? _grandTotalValue = 0.00;
+  double? _grandTotalValue = 1.00;
   String? _subTotalString = ". . .";
   String? _taxString = ". . .";
   String _shippingCostString = ". . .";
   String? _discountString = ". . .";
   String _used_coupon_code = "";
   bool? _coupon_applied = false;
+  String? _cartTotalString;
   late BuildContext loadingcontext;
   String payment_type = "cart_payment";
   String? _title;
+
+  TextEditingController _phoneNumberController = TextEditingController();
 
   @override
   void initState() {
@@ -99,16 +105,16 @@ class _CheckoutState extends State<Checkout> {
   fetchAll() {
     fetchList();
 
-    if (is_logged_in.$) {
-      if (widget.paymentFor != PaymentFor.Order) {
-        _grandTotalValue = widget.rechargeAmount;
-        payment_type = widget.paymentFor == PaymentFor.WalletRecharge
-            ? "wallet_payment"
-            : "customer_package_payment";
-      } else {
-        fetchSummary();
-      }
+    // if (is_logged_in.$) {
+    if (widget.paymentFor != PaymentFor.Order) {
+      _grandTotalValue = widget.rechargeAmount;
+      payment_type = widget.paymentFor == PaymentFor.WalletRecharge
+          ? "wallet_payment"
+          : "customer_package_payment";
+    } else {
+      fetchSummary();
     }
+    // }
   }
 
   fetchList() async {
@@ -120,8 +126,25 @@ class _CheckoutState extends State<Checkout> {
           : "order";
     });
 
-    var paymentTypeResponseList = await PaymentRepository()
-        .getPaymentResponseList(list: widget.list, mode: mode);
+    List<PaymentTypeResponse> paymentTypeResponseList = [
+      PaymentTypeResponse(
+          payment_type: "1",
+          payment_type_key: "mobile_money",
+          name: "Checkout with Mobile Wallet",
+          image: "assets/MTN-Momo.png",
+          title: "Mobile Money",
+          offline_payment_id: 1,
+          details: "Pay with Mobile Money"),
+      // PaymentTypeResponse(
+      //   payment_type: "11",
+      //   payment_type_key: "cash_on_delivery",
+      //   name: "Cash on Delivery",
+      //   image: "dummy_assets/cod.png",
+      //   title: "Cash on Delivery",
+      //   offline_payment_id: 2,
+      //   details: "Pay with Cash on Delivery"
+      // ),
+    ];
 
     _paymentTypeList.addAll(paymentTypeResponseList);
     if (_paymentTypeList.length > 0) {
@@ -226,11 +249,13 @@ class _CheckoutState extends State<Checkout> {
           duration: Toast.lengthLong);
       return;
     }
-    if (_grandTotalValue == 0.00) {
-      ToastComponent.showDialog(AppLocalizations.of(context)!.nothing_to_pay,
-          gravity: Toast.center, duration: Toast.lengthLong);
-      return;
-    }
+    // if (_grandTotalValue == 0.00) {
+    //   ToastComponent.showDialog(AppLocalizations.of(context)!.nothing_to_pay,
+    //       gravity: Toast.center, duration: Toast.lengthLong);
+    //   return;
+    // }
+
+    debugPrint("Selected Payment Method: " + _selected_payment_method!);
 
     if (_selected_payment_method == "stripe_payment") {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -410,8 +435,8 @@ class _CheckoutState extends State<Checkout> {
       })).then((value) {
         onPopped(value);
       });
-    } else if (_selected_payment_method == "wallet_system") {
-      pay_by_wallet();
+    } else if (_selected_payment_method == "1") {
+      onPaymentWithMobileMoney();
     } else if (_selected_payment_method == "cash_payment") {
       pay_by_cod();
     } else if (_selected_payment_method == "manual_payment" &&
@@ -473,6 +498,24 @@ class _CheckoutState extends State<Checkout> {
     }));
   }
 
+
+  pay_by_mobile() async {
+    loading();
+    var orderCreateResponse = await PaymentRepository()
+        .getOrderCreateResponseFromMomo(_phoneNumberController.text, "MTN", _cartTotalString);
+    Navigator.of(loadingcontext).pop();
+    if (orderCreateResponse.result == false) {
+      ToastComponent.showDialog(orderCreateResponse.message,
+          gravity: Toast.center, duration: Toast.lengthLong);
+      Navigator.of(context).pop();
+      return;
+    }
+
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return OrderList(from_checkout: true);
+    }));
+  }
+
   pay_by_manual_payment() async {
     loading();
     var orderCreateResponse = await PaymentRepository()
@@ -503,6 +546,71 @@ class _CheckoutState extends State<Checkout> {
     //print(_selected_payment_method);
     //print(_selected_payment_method_key);
   }
+
+  onPaymentWithMobileMoney(){
+    //create a dialog box with a text input for user to enter their phone number plus it should also show how mucch users is gonna pay 
+    //then user will click on the pay button to proceed to the payment gateway
+    //the payment gateway will then send a message to the user's phone to confirm the payment
+    
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Payment Details'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                keyboardType: TextInputType.phone,
+                controller: _phoneNumberController,
+                decoration: InputDecoration(
+                  labelText: 'Phone number',
+                  hintText: 'Enter your phone number',
+                ),
+              ),
+              SizedBox(height: 20), // Add some spacing
+              Text(
+                'Total Amount to Pay: GH ${_cartTotalString}', // Replace with the actual amount
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.red),
+              ),
+              onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                'Proceed to Pay',
+                style: TextStyle(color: Colors.green),
+              ),
+              onPressed: () {
+                pay_by_mobile();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  
+
+//make payment with mobile money
+void initiateMobileMoneyPayment() async {
+
+
+ 
+}
 
   onPressDetails() {
     showDialog(
@@ -707,53 +815,41 @@ class _CheckoutState extends State<Checkout> {
                     SliverList(
                       delegate: SliverChildListDelegate([
                         Padding(
+                          padding: const EdgeInsets.only(
+                              left: 16.0, right: 16.0, top: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                               Padding(
+                                      padding: const EdgeInsets.only(bottom: 26.0),
+                                      child: buildAvailableOffers(),
+                                    ),
+                                  
+                              Text(
+                                "Choose Payment Method",
+                                style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ), 
+                        Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: buildPaymentMethodList(),
                         ),
                         Container(
-                          height: 140,
+                          height: 10,
+                        ),
+                        Padding(padding: EdgeInsets.only(bottom: 16.0),
+                        child: buildCartSummaryDetails(context),
                         )
                       ]),
                     )
                   ],
                 ),
               ),
-
-              //Apply Coupon and order details container
-              Align(
-                alignment: Alignment.bottomCenter,
-                child: widget.paymentFor == PaymentFor.WalletRecharge ||
-                        widget.paymentFor == PaymentFor.PackagePay
-                    ? Container()
-                    : Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-
-                          /*border: Border(
-                      top: BorderSide(color: MyTheme.light_grey,width: 1.0),
-                    )*/
-                        ),
-                        height: widget.paymentFor == PaymentFor.ManualPayment
-                            ? 80
-                            : 140,
-                        //color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            children: [
-                              widget.paymentFor == PaymentFor.Order
-                                  ? Padding(
-                                      padding:
-                                          const EdgeInsets.only(bottom: 16.0),
-                                      child: buildApplyCouponRow(context),
-                                    )
-                                  : Container(),
-                              grandTotalSection(),
-                            ],
-                          ),
-                        ),
-                      ),
-              )
             ],
           )),
     );
@@ -913,6 +1009,118 @@ class _CheckoutState extends State<Checkout> {
     }
   }
 
+
+  //create a widget with 5 text rows but it should only show 3 the other two can be shown when user clicks show more
+  Widget buildAvailableOffers() {
+    return Container(
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                "Offers & promotions",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold),
+              ),
+              
+            ],
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Row(
+            children: [
+              Flexible(
+                 // Add some padding to the container
+                child: Container(
+                  color: MyTheme.light_grey,
+                padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Get upto 25% discount on Impexally Pay using ICICI Bank Net banking or Cards",
+                    style: TextStyle(
+                        color: MyTheme.font_grey,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
+                    overflow: TextOverflow.fade, // Add this line to prevent text overflow
+                  ),
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Row(
+            children: [
+              Flexible(
+                 // Add some padding to the container
+                child: Container(
+                  color: MyTheme.light_grey,
+                padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Get upto 25% discount on Impexally Pay using ICICI Bank Net banking or Cards",
+                    style: TextStyle(
+                        color: MyTheme.font_grey,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
+                    overflow: TextOverflow.fade, // Add this line to prevent text overflow
+                  ),
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Row(
+            children: [
+              Flexible(
+                 // Add some padding to the container
+                child: Container(
+                  color: MyTheme.light_grey,
+                padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Get upto 25% discount on Impexally Pay using ICICI Bank Net banking or Cards",
+                    style: TextStyle(
+                        color: MyTheme.font_grey,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
+                    overflow: TextOverflow.fade, // Add this line to prevent text overflow
+                  ),
+                ),
+              )
+            ],
+          ),
+          SizedBox(
+            height: 8,
+          ),
+          Row(
+            children: [
+              Flexible(
+                 // Add some padding to the container
+                child: Container(
+                  color: MyTheme.light_grey,
+                padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    "Get upto 25% discount on Impexally Pay using ICICI Bank Net banking or Cards",
+                    style: TextStyle(
+                        color: MyTheme.font_grey,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600),
+                    overflow: TextOverflow.fade, // Add this line to prevent text overflow
+                  ),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+
   GestureDetector buildPaymentMethodItemCard(index) {
     return GestureDetector(
       onTap: () {
@@ -937,22 +1145,14 @@ class _CheckoutState extends State<Checkout> {
                 children: <Widget>[
                   Container(
                       width: 100,
-                      height: 100,
+                      height: 70,
                       child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child:
-                              /*Image.asset(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Image.asset(
                           _paymentTypeList[index].image,
                           fit: BoxFit.fitWidth,
-                        ),*/
-                              FadeInImage.assetNetwork(
-                            placeholder: 'assets/placeholder.png',
-                            image: _paymentTypeList[index].payment_type ==
-                                    "manual_payment"
-                                ? _paymentTypeList[index].image
-                                : _paymentTypeList[index].image,
-                            fit: BoxFit.fitWidth,
-                          ))),
+                        ),
+                      )),
                   Container(
                     width: 150,
                     child: Column(
@@ -975,18 +1175,158 @@ class _CheckoutState extends State<Checkout> {
                       ],
                     ),
                   ),
+                  Positioned(
+                    right: 4,
+                    top: 16,
+                    child: buildPaymentMethodCheckContainer(
+                        _selected_payment_method_key ==
+                            _paymentTypeList[index].payment_type_key),
+                  )
                 ]),
           ),
-          Positioned(
-            right: 16,
-            top: 16,
-            child: buildPaymentMethodCheckContainer(
-                _selected_payment_method_key ==
-                    _paymentTypeList[index].payment_type_key),
-          )
         ],
       ),
     );
+  }
+
+
+  //build order details summary widget
+  Widget buildCartSummaryDetails(BuildContext context) {
+    return Padding(
+        padding: const EdgeInsets.only(left:16, right: 16.0),
+        child: Container(
+          child: Column(
+            children: [
+              
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 120,
+                        child: Text(
+                         "Order Total",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              color: MyTheme.font_grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        "GH₵ $_cartTotalString",
+                        style: TextStyle(
+                            color: MyTheme.font_grey,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  )),
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 120,
+                        child: Text(
+                          "Bag Savings",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              color: MyTheme.font_grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        "-GH₵.....",
+                        style: TextStyle(
+                            color: MyTheme.green,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  )),
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 120,
+                        child: Text(
+                          "Coupon Discount",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              color: MyTheme.font_grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                       _coupon_applied! ? "GH₵ " : "No Coupon(s) Applied",
+                        style: TextStyle(
+                            color: MyTheme.accent_color,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  )),
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 120,
+                        child: Text(
+                          "Delivery Fee",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              color: MyTheme.font_grey,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        "GH₵ 15",
+                        style: TextStyle(
+                            color: MyTheme.font_grey,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600),
+                      ),
+                    ],
+                  )),
+              Divider(),
+              Padding(
+                  padding: const EdgeInsets.only(bottom: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 120,
+                        child: Text(
+                          "Total Amount",
+                          textAlign: TextAlign.start,
+                          style: TextStyle(
+                              color: MyTheme.font_grey,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      Spacer(),
+                      Text(
+                        "GH₵ ",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  )),
+            ],
+          ),
+        ));
   }
 
   Widget buildPaymentMethodCheckContainer(bool check) {
@@ -1027,22 +1367,26 @@ class _CheckoutState extends State<Checkout> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Container(
+                height: 50,
+                child: Center(
+                  child: Text(
+                    "GH₵ 20000",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600),
+                  ),
+                )),
             Btn.minWidthFixHeight(
-              minWidth: MediaQuery.of(context).size.width,
+              minWidth: MediaQuery.of(context).size.width / 2,
               height: 50,
               color: MyTheme.accent_color,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(0.0),
               ),
               child: Text(
-                widget.paymentFor == PaymentFor.WalletRecharge
-                    ? AppLocalizations.of(context)!.recharge_wallet_ucf
-                    : widget.paymentFor == PaymentFor.ManualPayment
-                        ? AppLocalizations.of(context)!.proceed_all_caps
-                        : widget.paymentFor == PaymentFor.PackagePay
-                            ? AppLocalizations.of(context)!.buy_package_ucf
-                            : AppLocalizations.of(context)!
-                                .place_my_order_all_capital,
+                "PLACE ORDER",
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -1057,6 +1401,45 @@ class _CheckoutState extends State<Checkout> {
       ),
     );
   }
+
+  // BottomAppBar buildBottomAppBar(BuildContext context) {
+  //   return BottomAppBar(
+  //     child: Container(
+  //       color: Colors.transparent,
+  //       height: 50,
+  //       child: Row(
+  //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //         children: [
+  //           Btn.minWidthFixHeight(
+  //             minWidth: MediaQuery.of(context).size.width,
+  //             height: 50,
+  //             color: MyTheme.accent_color,
+  //             shape: RoundedRectangleBorder(
+  //               borderRadius: BorderRadius.circular(0.0),
+  //             ),
+  //             child: Text(
+  //               widget.paymentFor == PaymentFor.WalletRecharge
+  //                   ? AppLocalizations.of(context)!.recharge_wallet_ucf
+  //                   : widget.paymentFor == PaymentFor.ManualPayment
+  //                       ? AppLocalizations.of(context)!.proceed_all_caps
+  //                       : widget.paymentFor == PaymentFor.PackagePay
+  //                           ? AppLocalizations.of(context)!.buy_package_ucf
+  //                           : AppLocalizations.of(context)!
+  //                               .place_my_order_all_capital,
+  //               style: TextStyle(
+  //                   color: Colors.white,
+  //                   fontSize: 16,
+  //                   fontWeight: FontWeight.w600),
+  //             ),
+  //             onPressed: () {
+  //               onPressPlaceOrderOrProceed();
+  //             },
+  //           )
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget grandTotalSection() {
     return Container(

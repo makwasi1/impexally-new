@@ -5,6 +5,7 @@ import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/presenter/home_presenter.dart';
+import 'package:active_ecommerce_flutter/screens/cart.dart';
 import 'package:active_ecommerce_flutter/screens/category_products.dart';
 import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/flash_deal_list.dart';
@@ -14,10 +15,14 @@ import 'package:active_ecommerce_flutter/ui_elements/mini_product_card.dart';
 import 'package:active_ecommerce_flutter/ui_elements/product_card.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+import '../presenter/cart_counter.dart';
 
 class Home extends StatefulWidget {
   Home({
@@ -148,7 +153,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                           ),
                                         )
                                       : Container(),
-                                  buildInfoBar(context),    
+                                  buildInfoBar(context),
                                   buildHomeCarouselSlider(context, homeData),
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
@@ -429,8 +434,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                 left: Radius.circular(6), right: Radius.zero),
                             child: FadeInImage.assetNetwork(
                               placeholder: 'assets/placeholder.png',
-                              image:
-                                  "https://seller.impexally.com/"+homeData.featuredCategoryList[index].image,
+                              image: "https://seller.impexally.com/" +
+                                  homeData.featuredCategoryList[index].image,
                               fit: BoxFit.cover,
                             ))),
                     Flexible(
@@ -531,18 +536,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     : MiniProductCard(
                         id: homeData.featuredProductList[index].id,
                         slug: homeData.featuredProductList[index].slug,
-                        image:
-                            homeData.featuredProductList[index].image.imageDefault,
-                        name: homeData.featuredProductList[index].productDetail.title,
-                        main_price:
-                            homeData.featuredProductList[index].price,
+                        image: homeData
+                            .featuredProductList[index].image.imageDefault,
+                        name: homeData
+                            .featuredProductList[index].productDetail.title,
+                        main_price: homeData.featuredProductList[index].price,
                         stroked_price:
                             homeData.featuredProductList[index].priceDiscounted,
-                        has_discount:
-                            true,
-                        is_wholesale:
-                            true,
-                        discount: homeData.featuredProductList[index].priceDiscounted,
+                        has_discount: true,
+                        is_wholesale: true,
+                        discount:
+                            homeData.featuredProductList[index].priceDiscounted,
                       );
               },
             ),
@@ -815,8 +819,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         onTap: () {
                           // var url =
                           //     i.url?.split(AppConfig.DOMAIN_PATH).last ?? "";
-                          var url =
-                              i.url;
+                          var url = i.url;
                           print(url);
                           GoRouter.of(context).go(url!);
                         },
@@ -1012,55 +1015,95 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       centerTitle: false,
       elevation: 0,
       flexibleSpace: Padding(
-        // padding:
-        //     const EdgeInsets.only(top: 40.0, bottom: 22, left: 18, right: 18),
-        padding:
-            const EdgeInsets.only(top: 10.0, bottom: 10, left: 18, right: 18),
-        child: GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return Filter();
-              }));
-            },
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                Image.asset(
-                  'assets/impexally.png',
-                  height: 36,
-                ),
-                buildHomeSearchBox(context),
-              ],
-            )),
-      ),
+          // padding:
+          //     const EdgeInsets.only(top: 40.0, bottom: 22, left: 18, right: 18),
+          padding:
+              const EdgeInsets.only(top: 10.0, bottom: 10, left: 18, right: 18),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Image.asset(
+                'assets/impexally.png',
+                height: 36,
+              ),
+              buildHomeSearchBox(context),
+              buildCartIcon(),
+            ],
+          )),
     );
   }
 
-  buildHomeSearchBox(BuildContext context) {
-    return Container(
-      height: 40,
-      decoration: BoxDecorations.buildBoxDecoration_2(),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Text(
-              AppLocalizations.of(context)!.search_anything,
-              style: TextStyle(fontSize: 13.0, color: MyTheme.textfield_grey),
+  buildCartIcon() {
+    return GestureDetector(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return Cart(has_bottomnav: false);
+          }));
+        },
+        child: Container(
+          decoration: BoxDecorations.buildCircularButtonDecoration_1(),
+          width: 36,
+          height: 36,
+          padding: EdgeInsets.all(8),
+          child: badges.Badge(
+            badgeStyle: badges.BadgeStyle(
+              shape: badges.BadgeShape.circle,
+              badgeColor: MyTheme.accent_color,
+              borderRadius: BorderRadius.circular(10),
             ),
-            Image.asset(
-              'assets/search.png',
+            badgeAnimation: badges.BadgeAnimation.slide(
+              toAnimate: true,
+            ),
+            stackFit: StackFit.loose,
+            child: Image.asset(
+              "assets/cart.png",
+              color: MyTheme.dark_font_grey,
               height: 16,
-              //color: MyTheme.dark_grey,
-              color: MyTheme.dark_grey,
-            )
-          ], 
-        ),
-      ),
-    );
+            ),
+            badgeContent: Consumer<CartCounter>(
+              builder: (context, cart, child) {
+                return Text(
+                  "${cart.cartCounter}",
+                  style: TextStyle(fontSize: 12, color: Colors.white),
+                );
+              },
+            ),
+          ),
+        ));
+  }
+
+  buildHomeSearchBox(BuildContext context) {
+    return GestureDetector(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return Filter();
+          }));
+        },
+        child: Container(
+          height: 40,
+          decoration: BoxDecorations.buildBoxDecoration_2(),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  AppLocalizations.of(context)!.search_anything,
+                  style:
+                      TextStyle(fontSize: 13.0, color: MyTheme.textfield_grey),
+                ),
+                Image.asset(
+                  'assets/search.png',
+                  height: 16,
+                  //color: MyTheme.dark_grey,
+                  color: MyTheme.dark_grey,
+                )
+              ],
+            ),
+          ),
+        ));
   }
 
   Container buildProductLoadingContainer(HomePresenter homeData) {

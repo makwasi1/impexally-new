@@ -98,7 +98,7 @@ class PaymentRepository {
 
   Future<dynamic> getOrderCreateResponseFromCod(payment_method) async {
     var post_body = jsonEncode(
-        {"user_id": "${user_id.$}", "payment_type": "${payment_method}"});
+        {"phone": "0533181114", "network": "${payment_method}", "amount": 0});
 
     String url = ("${AppConfig.BASE_URL}/payments/pay/cod");
 
@@ -114,6 +114,32 @@ class PaymentRepository {
     print(response.body);
 
     return orderCreateResponseFromJson(response.body);
+  }
+
+  Future<dynamic> getOrderCreateResponseFromMomo(phone, network, amount) async {
+    var post_body = jsonEncode(
+        {"phone": "$phone", "network": "${network}", "amount": "$amount"});
+
+    String url = ("${AppConfig.BASE_URL}/payment/make");
+
+    print(url);
+    final response = await ApiRequest.post(
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: post_body,
+    );
+    print(response.body);
+
+    //
+    if (response.statusCode == 200) {
+      return new OrderCreateResponse(
+          combined_order_id: 0, result: true, message: "Success");
+    } else {
+      return new OrderCreateResponse(
+          combined_order_id: 0, result: false, message: "Failed");
+    }
   }
 
   Future<dynamic> getOrderCreateResponseFromManualPayment(

@@ -250,9 +250,9 @@ class _ShippingInfoState extends State<ShippingInfo> {
     // TODO: implement initState
     super.initState();
 
-    if (is_logged_in.$ == true) {
+    // if (is_logged_in.$ == true) {
       fetchAll();
-    }
+    // }
   }
 
   @override

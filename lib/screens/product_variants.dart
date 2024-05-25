@@ -311,7 +311,9 @@ class _ProductVariantsState extends State<ProductVariants> {
         // reset();
         fetchData();
       } else if (mode == "proceed_to_shipping") {
-        AIZRoute.push(context, SelectAddress()).then((value) {
+        AIZRoute.push(context, SelectAddress(
+          cartList: _shopList,
+        )).then((value) {
           onPopped(value);
         });
       }

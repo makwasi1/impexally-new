@@ -39,7 +39,7 @@ class AddressRepository {
       // Create a new JSON structure that matches what your AddressResponse expects.
       var data = jsonEncode({
         "data":
-            [jsonResponse], // Directly use the decoded JSON if it's already an array.
+            jsonResponse, // Directly use the decoded JSON if it's already an array.
         "success": true,
         "status": 200
       });

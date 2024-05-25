@@ -107,16 +107,14 @@ class _CartState extends State<Cart> {
           currentQuantity++;
           _shopList[seller_index].quantity = currentQuantity.toString();
         }
-        ToastComponent.showDialog(
-          "Updating Cart...",
-          gravity: Toast.center,
-          duration: Toast.lengthLong);
+        ToastComponent.showDialog("Updating Cart...",
+            gravity: Toast.center, duration: Toast.lengthLong);
 
         await CartRepository().getCartProcessResponse(
             _shopList[seller_index].id.toString(),
             _shopList[seller_index].quantity);
-            // fetchData();
-            setState(() {});
+        // fetchData();
+        setState(() {});
       } catch (e) {
         print(e);
       }
@@ -136,15 +134,13 @@ class _CartState extends State<Cart> {
           currentQuantity--;
           _shopList[seller_index].quantity = currentQuantity.toString();
         }
-        ToastComponent.showDialog(
-          "Updating Cart...",
-          gravity: Toast.center,
-          duration: Toast.lengthLong);
+        ToastComponent.showDialog("Updating Cart...",
+            gravity: Toast.center, duration: Toast.lengthLong);
         await CartRepository().getCartProcessResponse(
             _shopList[seller_index].id.toString(),
             _shopList[seller_index].quantity);
-            // fetchData();
-            setState(() {});
+        // fetchData();
+        setState(() {});
       } catch (e) {
         print(e);
       }
@@ -263,10 +259,12 @@ class _CartState extends State<Cart> {
     //     // reset();
     //     fetchData();
     //   } else if (mode == "proceed_to_shipping") {
-        AIZRoute.push(context, SelectAddress()).then((value) {
-          onPopped(value);
-        });
-      // }
+    AIZRoute.push(context, SelectAddress(
+      cartList: _shopList,
+    )).then((value) {
+      onPopped(value);
+    });
+    // }
     // }
   }
 
@@ -511,8 +509,10 @@ class _CartState extends State<Cart> {
       future: fetchProductDetails(_shopList[seller_index].productId),
       builder: (context, AsyncSnapshot<ProductMiniDetail?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return  ShimmerHelper()
-              .buildListShimmer(item_count: 5, item_height: 100.0); // Show loading indicator while waiting for data
+          return ShimmerHelper().buildListShimmer(
+              item_count: 5,
+              item_height:
+                  100.0); // Show loading indicator while waiting for data
         } else if (snapshot.hasError) {
           return Text(
               "Error: ${snapshot.error}"); // Show error if something went wrong
@@ -532,8 +532,9 @@ class _CartState extends State<Cart> {
                           left: Radius.circular(6), right: Radius.zero),
                       child: FadeInImage.assetNetwork(
                         placeholder: 'assets/placeholder.png',
-                        image: "https://seller.impexally.com/uploads/images/"+ prod!.image![0]
-                            .imageDefault!, // Assuming 'image' is the field for image URL
+                        image: "https://seller.impexally.com/uploads/images/" +
+                            prod!.image![0]
+                                .imageDefault!, // Assuming 'image' is the field for image URL
                         fit: BoxFit.cover,
                       )),
                 ),
@@ -580,79 +581,77 @@ class _CartState extends State<Cart> {
                   ),
                 ),
                 Spacer(),
-            Container(
-              width: 32,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      onPressDelete(_shopList[seller_index].id);
-                    },
-                    child: Container(
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 14.0),
-                        child: Image.asset(
-                          'assets/trash.png',
-                          height: 16,
-                          color: Colors.red,
+                Container(
+                  width: 32,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          onPressDelete(_shopList[seller_index].id);
+                        },
+                        child: Container(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 14.0),
+                            child: Image.asset(
+                              'assets/trash.png',
+                              height: 16,
+                              color: Colors.red,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(14.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      onQuantityIncrease(seller_index);
-                    },
-                    child: Container(
-                      width: 24,
-                      height: 24,
-                      decoration:
-                          BoxDecorations.buildCartCircularButtonDecoration(),
-                      child: Icon(
-                        Icons.add,
-                        color: MyTheme.grey_153,
-                        size: 12,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(14.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          onQuantityIncrease(seller_index);
+                        },
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecorations
+                              .buildCartCircularButtonDecoration(),
+                          child: Icon(
+                            Icons.add,
+                            color: MyTheme.grey_153,
+                            size: 12,
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                    child: Text(
-                      _shopList[seller_index].quantity.toString(),
-                      style:
-                          TextStyle(color: MyTheme.accent_color, fontSize: 16),
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () {
-                      
-                        onQuantityDecrease(seller_index, item_index);
-                     
-                    },
-                    child: Container(
-                      width: 24,
-                      height: 24,
-                      decoration:
-                          BoxDecorations.buildCartCircularButtonDecoration(),
-                      child: Icon(
-                        Icons.remove,
-                        color: MyTheme.grey_153,
-                        size: 12,
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                        child: Text(
+                          _shopList[seller_index].quantity.toString(),
+                          style: TextStyle(
+                              color: MyTheme.accent_color, fontSize: 16),
+                        ),
                       ),
-                    ),
+                      GestureDetector(
+                        onTap: () {
+                          onQuantityDecrease(seller_index, item_index);
+                        },
+                        child: Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecorations
+                              .buildCartCircularButtonDecoration(),
+                          child: Icon(
+                            Icons.remove,
+                            color: MyTheme.grey_153,
+                            size: 12,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            )
+                )
               ],
             ),
           );
