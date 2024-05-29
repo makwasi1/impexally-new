@@ -50,7 +50,7 @@ class _ProductVariantsState extends State<ProductVariants> {
   ProductMiniDetail? _singleProduct;
   List<Map<String, dynamic>> variationsWithOptions = [];
   Map<int, int> selectedOptions = {};
-    TextEditingController quantityController = TextEditingController(text: "1");
+  TextEditingController quantityController = TextEditingController(text: "1");
 
   @override
   void initState() {
@@ -86,7 +86,6 @@ class _ProductVariantsState extends State<ProductVariants> {
     if (widget.variation != null) {
       _singleProduct = widget.variation;
     }
-
 
     for (int i = 0; i < _singleProduct!.products!.variation!.length; i++) {
       selectedOptions[i] = 0; // Select the first option by default
@@ -311,9 +310,11 @@ class _ProductVariantsState extends State<ProductVariants> {
         // reset();
         fetchData();
       } else if (mode == "proceed_to_shipping") {
-        AIZRoute.push(context, SelectAddress(
-          cartList: _shopList,
-        )).then((value) {
+        AIZRoute.push(
+            context,
+            SelectAddress(
+              cartList: _shopList,
+            )).then((value) {
           onPopped(value);
         });
       }
@@ -842,30 +843,73 @@ class _ProductVariantsState extends State<ProductVariants> {
                     ),
                   ),
                   SizedBox(height: 3),
-                  Wrap(
-                    spacing: 8,
-                    children: List.generate(variation.variationOptions!.length,
-                        (optionIndex) {
-                      var option = variation.variationOptions![optionIndex];
-                      bool isSelected = selectedOptions[index] == optionIndex;
-                      return ChoiceChip(
-                        label:
-                            Text(getVariationOptionName(option.optionNames!)),
-                        selected: isSelected,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(5),
-                          
+                  variation.labelNames == "Color"
+                      ? Wrap(
+                          spacing: 8,
+                          children:
+                              List.generate(variation.variationOptions!.length,
+                                  (optionIndex) {
+                            var option =
+                                variation.variationOptions![optionIndex];
+                            bool isSelected =
+                                selectedOptions[index] == optionIndex;
+                            return FadeInImage.assetNetwork(
+                              height: 50,
+                              width: 50,
+                                placeholder: 'assets/placeholder.png',
+                                image:
+                                    "https://seller.impexally.com/uploads/images/" +
+                                        option.imageVariation!.imageSmall!,
+                                fit: BoxFit.cover,
+                              );
+                            // ChoiceChip(
+                            //   label: FadeInImage.assetNetwork(
+                            //     placeholder: 'assets/placeholder.png',
+                            //     image:
+                            //         "https://seller.impexally.com/uploads/images/" +
+                            //             option.imageVariation!.imageSmall!,
+                            //     fit: BoxFit.cover,
+                            //   ),
+                            //   selected: isSelected,
+                            //   shape: RoundedRectangleBorder(
+                            //     borderRadius: BorderRadius.circular(5),
+                            //   ),
+                            //   selectedColor: Color.fromARGB(255, 241, 199, 199),
+                            //   onSelected: (bool selected) {
+                            //     setState(() {
+                            //       selectedOptions[index] =
+                            //           optionIndex; // Update the selected index
+                            //     });
+                            //   },
+                            // );
+                          }),
+                        )
+                      : Wrap(
+                          spacing: 8,
+                          children:
+                              List.generate(variation.variationOptions!.length,
+                                  (optionIndex) {
+                            var option =
+                                variation.variationOptions![optionIndex];
+                            bool isSelected =
+                                selectedOptions[index] == optionIndex;
+                            return ChoiceChip(
+                              label: Text(
+                                  getVariationOptionName(option.optionNames!)),
+                              selected: isSelected,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              selectedColor: Color.fromARGB(255, 241, 199, 199),
+                              onSelected: (bool selected) {
+                                setState(() {
+                                  selectedOptions[index] =
+                                      optionIndex; // Update the selected index
+                                });
+                              },
+                            );
+                          }),
                         ),
-                        selectedColor: Color.fromARGB(255, 241, 199, 199),
-                        onSelected: (bool selected) {
-                          setState(() {
-                            selectedOptions[index] =
-                                optionIndex; // Update the selected index
-                          });
-                        },
-                      );
-                    }),
-                  ),
                   Divider(color: Colors.grey, thickness: 1),
                 ],
               );
@@ -913,7 +957,6 @@ class _ProductVariantsState extends State<ProductVariants> {
                   borderRadius: BorderRadius.circular(5),
                 ),
                 child: IconButton(
-                  
                   icon: Icon(Icons.remove),
                   onPressed: () {
                     int currentQty = int.tryParse(quantityController.text) ?? 1;
@@ -949,7 +992,6 @@ class _ProductVariantsState extends State<ProductVariants> {
                 height: 40,
                 margin: EdgeInsets.symmetric(horizontal: 5),
                 decoration: BoxDecoration(
-                  
                   color: Colors.grey[200], // Background color
                   border: Border.all(color: Colors.grey), // Border color
                   borderRadius: BorderRadius.circular(5),

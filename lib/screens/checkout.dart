@@ -502,7 +502,7 @@ class _CheckoutState extends State<Checkout> {
   pay_by_mobile() async {
     loading();
     var orderCreateResponse = await PaymentRepository()
-        .getOrderCreateResponseFromMomo(_phoneNumberController.text, "MTN", _cartTotalString);
+        .getOrderCreateResponseFromMomo(_phoneNumberController.text, "MTN", "30");
     Navigator.of(loadingcontext).pop();
     if (orderCreateResponse.result == false) {
       ToastComponent.showDialog(orderCreateResponse.message,
@@ -606,11 +606,6 @@ class _CheckoutState extends State<Checkout> {
   
 
 //make payment with mobile money
-void initiateMobileMoneyPayment() async {
-
-
- 
-}
 
   onPressDetails() {
     showDialog(

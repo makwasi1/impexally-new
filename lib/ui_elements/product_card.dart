@@ -90,40 +90,19 @@ class _ProductCardState extends State<ProductCard> {
                       child: Text(
                         widget.name!,
                         overflow: TextOverflow.ellipsis,
-                        maxLines: 2,
+                        maxLines: 1,
                         style: TextStyle(
-                            color: MyTheme.font_grey,
+                            color: Colors.black,
                             fontSize: 14,
                             height: 1.2,
                             fontWeight: FontWeight.w400),
                       ),
                     ),
-                    widget.has_discount!
-                        ? Padding(
-                            padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
-                            child: Text(
-                            
-                              widget.stroked_price!.replaceAll(
-                                      "GH₵",
-                                      "GH₵")
-                                  ,
-                              textAlign: TextAlign.left,
-                              overflow: TextOverflow.ellipsis,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  decoration: TextDecoration.lineThrough,
-                                  color: MyTheme.medium_grey,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400),
-                            ),
-                          )
-                        : Container(
-                            height: 8.0,
-                          ),
+                   
                     Padding(
-                      padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, 2),
                       child: Text(
-                        "GH₵ ${widget.main_price!} Units(s) Left",
+                        "GH₵ ${widget.main_price!} - ${widget.stock} Units(s) Left",
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -133,90 +112,56 @@ class _ProductCardState extends State<ProductCard> {
                             fontWeight: FontWeight.w700),
                       ),
                     ),
+                    Padding(
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                  child: Text(
+                    "Like it, Buy it now! Sameday Delivery",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                      child: Image.network(
+                          height: 20,
+                     
+                          "https://image.flylandexpress.com/images/home-page/flylan-express-officia-1.webp"),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Icon(
+                          Icons.star,
+                          color: Colors.yellow,
+                          size: 20,
+                        ),
+                        Icon(
+                          Icons.star,
+                          color: Colors.yellow,
+                          size: 20,
+                        ),
+                        Icon(
+                          Icons.star,
+                          color: Colors.grey[300],
+                          size: 20,
+                        )
+                      ],
+                    )
+                  ],
+                ),
+                SizedBox(height: 10,)
                   ],
                 ),
               ),
             ]),
 
-            // discount and wholesale
-            Positioned.fill(
-              child: Align(
-                alignment: Alignment.topRight,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    if (widget.has_discount!)
-                      Container(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        margin: EdgeInsets.only(bottom: 5),
-                        decoration: BoxDecoration(
-                          color: const Color(0xffe62e04),
-                          borderRadius: BorderRadius.only(
-                            topRight: Radius.circular(6.0),
-                            bottomLeft: Radius.circular(6.0),
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0x14000000),
-                              offset: Offset(-1, 1),
-                              blurRadius: 1,
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          widget.discount ?? "",
-                          style: TextStyle(
-                            fontSize: 10,
-                            color: const Color(0xffffffff),
-                            fontWeight: FontWeight.w700,
-                            height: 1.8,
-                          ),
-                          textHeightBehavior: TextHeightBehavior(
-                              applyHeightToFirstAscent: false),
-                          softWrap: false,
-                        ),
-                      ),
-                    Visibility(
-                      visible: whole_sale_addon_installed.$,
-                      child: widget.is_wholesale != null && widget.is_wholesale!
-                          ? Container(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 12, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: Colors.blueGrey,
-                                borderRadius: BorderRadius.only(
-                                  topRight: Radius.circular(6.0),
-                                  bottomLeft: Radius.circular(6.0),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: const Color(0x14000000),
-                                    offset: Offset(-1, 1),
-                                    blurRadius: 1,
-                                  ),
-                                ],
-                              ),
-                              child: Text(
-                                "Wholesale",
-                                style: TextStyle(
-                                  fontSize: 10,
-                                  color: const Color(0xffffffff),
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.8,
-                                ),
-                                textHeightBehavior: TextHeightBehavior(
-                                    applyHeightToFirstAscent: false),
-                                softWrap: false,
-                              ),
-                            )
-                          : SizedBox.shrink(),
-                    )
-                  ],
-                ),
-              ),
-            ),
+            
           ],
         ),
       ),

@@ -14,8 +14,10 @@ import 'package:active_ecommerce_flutter/screens/top_sellers.dart';
 import 'package:active_ecommerce_flutter/ui_elements/mini_product_card.dart';
 import 'package:active_ecommerce_flutter/ui_elements/product_card.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
+import 'package:flutter/widgets.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
@@ -155,21 +157,21 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                       : Container(),
                                   buildInfoBar(context),
                                   buildHomeCarouselSlider(context, homeData),
+                                  // buildPromoItems(),
+                                  // buildHomeMenuRow1(context, homeData),
                                   Padding(
-                                    padding: const EdgeInsets.fromLTRB(
-                                      18.0,
-                                      0.0,
-                                      18.0,
-                                      0.0,
+                                    padding: const EdgeInsets.only(
+                                      bottom: 10.0,
                                     ),
-                                    child: buildHomeMenuRow1(context, homeData),
+                                    child: buildPromoItems(),
                                   ),
-                                  buildHomeBannerOne(context, homeData),
+                                  buildHomeRow(),
+                                  // buildHomeBannerOne(context, homeData),
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
-                                      18.0,
+                                      8.0,
                                       0.0,
-                                      18.0,
+                                      8.0,
                                       0.0,
                                     ),
                                     child: buildHomeMenuRow2(context),
@@ -254,13 +256,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   ),
                                 ]),
                               ),
-                              SliverList(
-                                delegate: SliverChildListDelegate(
-                                  [
-                                    buildHomeBannerTwo(context, homeData),
-                                  ],
-                                ),
-                              ),
+                              // SliverList(
+                              //   delegate: SliverChildListDelegate(
+                              //     [
+                              //       buildHomeBannerTwo(context, homeData),
+                              //     ],
+                              //   ),
+                              // ),
                               SliverList(
                                 delegate: SliverChildListDelegate([
                                   Padding(
@@ -432,12 +434,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         child: ClipRRect(
                             borderRadius: BorderRadius.horizontal(
                                 left: Radius.circular(6), right: Radius.zero),
-                            child: FadeInImage.assetNetwork(
+                            child: homeData.featuredCategoryList[index].image != "" ? FadeInImage.assetNetwork(
                               placeholder: 'assets/placeholder.png',
                               image: "https://seller.impexally.com/" +
                                   homeData.featuredCategoryList[index].image,
                               fit: BoxFit.cover,
-                            ))),
+                            ): Image.asset('assets/placeholder.png', fit: BoxFit.cover,))),
                     Flexible(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -499,7 +501,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     } else if (homeData.featuredProductList.length > 0) {
       return SingleChildScrollView(
         child: SizedBox(
-          height: 248,
+          height: 260,
           child: NotificationListener<ScrollNotification>(
             onNotification: (ScrollNotification scrollInfo) {
               if (scrollInfo.metrics.pixels ==
@@ -637,119 +639,125 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   Widget buildHomeMenuRow2(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        /* Flexible(
-          flex: 1,
-          fit: FlexFit.tight,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return CategoryList(
-                  is_top_category: true,
-                );
-              }));
-            },
-            child: Container(
-              height: 90,
-              width: MediaQuery.of(context).size.width / 3 - 4,
-              decoration: BoxDecorations.buildBoxDecoration_1(),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                        height: 20,
-                        width: 20,
-                        child: Image.asset("assets/top_categories.png")),
-                  ),
-                  Text(
-                    AppLocalizations.of(context).home_screen_top_categories,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: Color.fromRGBO(132, 132, 132, 1),
-                        fontWeight: FontWeight.w300),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),*/
-        Flexible(
-          flex: 1,
-          fit: FlexFit.tight,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return Filter(
-                  selected_filter: "brands",
-                );
-              }));
-            },
-            child: Container(
-              height: 90,
-              width: MediaQuery.of(context).size.width / 3 - 4,
-              decoration: BoxDecorations.buildBoxDecoration_1(),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Container(
-                        height: 20,
-                        width: 20,
-                        child: Image.asset("assets/brands.png")),
-                  ),
-                  Text(AppLocalizations.of(context)!.brands_ucf,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Color.fromRGBO(132, 132, 132, 1),
-                          fontWeight: FontWeight.w300)),
-                ],
-              ),
-            ),
-          ),
-        ),
-        if (vendor_system.$)
-          SizedBox(
-            width: 10,
-          ),
-        if (vendor_system.$)
-          Flexible(
-            flex: 1,
-            fit: FlexFit.tight,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return TopSellers();
-                }));
-              },
-              child: Container(
-                height: 90,
-                width: MediaQuery.of(context).size.width / 3 - 4,
-                decoration: BoxDecorations.buildBoxDecoration_1(),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                          height: 20,
-                          width: 20,
-                          child: Image.asset("assets/top_sellers.png")),
-                    ),
-                    Text(AppLocalizations.of(context)!.top_sellers_ucf,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: Color.fromRGBO(132, 132, 132, 1),
-                            fontWeight: FontWeight.w300)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-      ],
-    );
+    return Container(
+        padding: EdgeInsets.only(top: 5, bottom: 10),
+        child: Image.network(
+            "https://image.impexally.com/images/app/impexally/athleisure.webp"));
   }
+  //   return Row(
+  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  //     children: [
+  //       /* Flexible(
+  //         flex: 1,
+  //         fit: FlexFit.tight,
+  //         child: GestureDetector(
+  //           onTap: () {
+  //             Navigator.push(context, MaterialPageRoute(builder: (context) {
+  //               return CategoryList(
+  //                 is_top_category: true,
+  //               );
+  //             }));
+  //           },
+  //           child: Container(
+  //             height: 90,
+  //             width: MediaQuery.of(context).size.width / 3 - 4,
+  //             decoration: BoxDecorations.buildBoxDecoration_1(),
+  //             child: Column(
+  //               children: [
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(16.0),
+  //                   child: Container(
+  //                       height: 20,
+  //                       width: 20,
+  //                       child: Image.asset("assets/top_categories.png")),
+  //                 ),
+  //                 Text(
+  //                   AppLocalizations.of(context).home_screen_top_categories,
+  //                   textAlign: TextAlign.center,
+  //                   style: TextStyle(
+  //                       color: Color.fromRGBO(132, 132, 132, 1),
+  //                       fontWeight: FontWeight.w300),
+  //                 )
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ),*/
+
+  //       Flexible(
+  //         flex: 1,
+  //         fit: FlexFit.tight,
+  //         child: GestureDetector(
+  //           onTap: () {
+  //             Navigator.push(context, MaterialPageRoute(builder: (context) {
+  //               return Filter(
+  //                 selected_filter: "brands",
+  //               );
+  //             }));
+  //           },
+  //           child: Container(
+  //             height: 90,
+  //             width: MediaQuery.of(context).size.width / 3 - 4,
+  //             decoration: BoxDecorations.buildBoxDecoration_1(),
+  //             child: Column(
+  //               children: [
+  //                 Padding(
+  //                   padding: const EdgeInsets.all(16.0),
+  //                   child: Container(
+  //                       height: 20,
+  //                       width: 20,
+  //                       child: Image.network("https://image.impexally.com/images/app/impexally/athleisure.webp")),
+  //                 ),
+  //                 // Text(AppLocalizations.of(context)!.brands_ucf,
+  //                 //     textAlign: TextAlign.center,
+  //                 //     style: TextStyle(
+  //                 //         color: Color.fromRGBO(132, 132, 132, 1),
+  //                 //         fontWeight: FontWeight.w300)),
+  //               ],
+  //             ),
+  //           ),
+  //         ),
+  //       ),
+  //       if (vendor_system.$)
+  //         SizedBox(
+  //           width: 10,
+  //         ),
+  //       if (vendor_system.$)
+  //         Flexible(
+  //           flex: 1,
+  //           fit: FlexFit.tight,
+  //           child: GestureDetector(
+  //             onTap: () {
+  //               Navigator.push(context, MaterialPageRoute(builder: (context) {
+  //                 return TopSellers();
+  //               }));
+  //             },
+  //             child: Container(
+  //               height: 90,
+  //               width: MediaQuery.of(context).size.width / 3 - 4,
+  //               decoration: BoxDecorations.buildBoxDecoration_1(),
+  //               child: Column(
+  //                 children: [
+  //                   Padding(
+  //                     padding: const EdgeInsets.all(16.0),
+  //                     child: Container(
+  //                         height: 20,
+  //                         width: 20,
+  //                         child: Image.asset("assets/top_sellers.png")),
+  //                   ),
+  //                   Text(AppLocalizations.of(context)!.top_sellers_ucf,
+  //                       textAlign: TextAlign.center,
+  //                       style: TextStyle(
+  //                           color: Color.fromRGBO(132, 132, 132, 1),
+  //                           fontWeight: FontWeight.w300)),
+  //                 ],
+  //               ),
+  //             ),
+  //           ),
+  //         ),
+  //     ],
+  //   );
+  // }
 
   Widget buildInfoBar(BuildContext context) {
     return Container(
@@ -780,7 +788,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           left: 18,
           right: 18,
           top: 0,
-          bottom: 20,
+          bottom: 10,
         ),
         child: ShimmerHelper().buildBasicShimmer(
           height: 120,
@@ -789,7 +797,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     } else if (homeData.carouselImageList.length > 0) {
       return CarouselSlider(
         options: CarouselOptions(
-          aspectRatio: 338 / 140,
+          height: 150,
           viewportFraction: 1,
           initialPage: 0,
           enableInfiniteScroll: true,
@@ -809,12 +817,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             builder: (BuildContext context) {
               return Padding(
                 padding: const EdgeInsets.only(
-                    left: 18, right: 18, top: 0, bottom: 20),
+                    left: 18, right: 18, top: 10, bottom: 20),
                 child: Stack(
                   children: <Widget>[
                     Container(
                       width: double.infinity,
-                      height: 140,
+                      height: 180,
                       child: InkWell(
                         onTap: () {
                           // var url =
@@ -869,6 +877,220 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         height: 100,
       );
     }
+  }
+
+  Widget buildPromoItems() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.only(left: 10),
+                    child: Image.network(
+                      "https://image.impexally.com/images/agents/riderz.png",
+                      // Adjust the height as needed
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Get Riders",
+                      style: TextStyle(
+                          overflow: TextOverflow.ellipsis,
+                          color: Colors.black,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.only(left: 10),
+                    child: Image.network(
+                      "https://image.impexally.com/images/ae/home-page/z0.png",
+                      // Adjust the height as needed
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Under 49",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.only(left: 10),
+                    child: Image.network(
+                      "https://image.impexally.com/images/ae/home-page/z5.png",
+                      // Adjust the height as needed
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Deals",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.only(right: 10),
+                    child: Image.network(
+                      "https://image.impexally.com/images/ae/home-page/12.png",
+                      // Adjust the height as needed
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Featured",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  Container(
+                    height: 100,
+                    padding: EdgeInsets.only(right: 10),
+                    child: Image.network(
+                      "https://image.impexally.com/images/ae/home-page/z2.png",
+                      // Adjust the height as needed
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Special Offer",
+                      style: TextStyle( 
+                          overflow: TextOverflow.ellipsis,
+                          color: Colors.black,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget buildHomeRow() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.only(left: 10),
+                    child: Image.network(
+                      "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp",
+                      // Adjust the height as needed
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Pickup & Delivery Ghana",
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    padding: EdgeInsets.only(right: 10),
+                    child: Image.network(
+                      "https://image.impexally.com/images/app/impexally/make-mone-online.png",
+                      // Adjust the height as needed
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      "Start Selling now & Get Money",
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      ],
+    );
   }
 
   Widget buildHomeBannerOne(context, HomePresenter homeData) {
@@ -1018,16 +1240,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           // padding:
           //     const EdgeInsets.only(top: 40.0, bottom: 22, left: 18, right: 18),
           padding:
-              const EdgeInsets.only(top: 10.0, bottom: 10, left: 18, right: 18),
+              const EdgeInsets.only(top: 10.0, bottom: 10, left: 0, right: 18),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              Image.asset(
-                'assets/impexally.png',
-                height: 36,
+              Expanded(
+                child: Image.asset(
+                  'assets/impexally.png',
+                  height: 36,
+                ),
               ),
-              buildHomeSearchBox(context),
+              Expanded(child: buildHomeSearchBox(context)),
+              SizedBox(width: 10),
               buildCartIcon(),
             ],
           )),

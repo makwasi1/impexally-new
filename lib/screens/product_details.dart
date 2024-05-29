@@ -1,33 +1,26 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/custom/box_decorations.dart';
 import 'package:active_ecommerce_flutter/custom/btn.dart';
 import 'package:active_ecommerce_flutter/custom/device_info.dart';
-import 'package:active_ecommerce_flutter/custom/lang_text.dart';
 import 'package:active_ecommerce_flutter/custom/quantity_input.dart';
 import 'package:active_ecommerce_flutter/custom/text_styles.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
-import 'package:active_ecommerce_flutter/data_model/product_details_response.dart';
 import 'package:active_ecommerce_flutter/helpers/color_helper.dart';
-import 'package:active_ecommerce_flutter/helpers/main_helpers.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
-import 'package:active_ecommerce_flutter/repositories/cart_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/chat_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/product_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/wishlist_repository.dart';
-import 'package:active_ecommerce_flutter/screens/brand_products.dart';
 import 'package:active_ecommerce_flutter/screens/cart.dart';
 import 'package:active_ecommerce_flutter/screens/chat.dart';
-import 'package:active_ecommerce_flutter/screens/common_webview_screen.dart';
-import 'package:active_ecommerce_flutter/screens/product_reviews.dart';
 import 'package:active_ecommerce_flutter/screens/product_variants.dart';
 import 'package:active_ecommerce_flutter/screens/seller_details.dart';
-import 'package:active_ecommerce_flutter/screens/video_description_screen.dart';
 import 'package:active_ecommerce_flutter/ui_elements/list_product_card.dart';
 import 'package:active_ecommerce_flutter/ui_elements/mini_product_card.dart';
 import 'package:badges/badges.dart' as badges;
@@ -38,16 +31,12 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:go_router/go_router.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
-import 'package:social_share/social_share.dart';
 import 'package:toast/toast.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../data_model/product_detail.dart';
-import '../data_model/products_model.dart';
 import '../data_model/vendor_response.dart';
 
 class ProductDetails extends StatefulWidget {
@@ -87,7 +76,6 @@ class _ProductDetailsState extends State<ProductDetails>
   //init values
 
   bool _isInWishList = false;
-  var _productDetailsFetched = false;
   ProductMiniDetail? _productDetails;
   VendorDetails? _vendorDetails;
   var _productImageList = [];
@@ -95,13 +83,10 @@ class _ProductDetailsState extends State<ProductDetails>
   int _selectedColorIndex = 0;
   var _selectedChoices = [];
   var _choiceString = "";
-  String? _variant = "";
   String? _totalPrice = "...";
-  var _singlePrice;
   var _singlePriceString;
   int? _quantity = 1;
   int? _stock = 0;
-  var _stock_txt;
 
   double opacity = 0;
 
@@ -148,15 +133,15 @@ class _ProductDetailsState extends State<ProductDetails>
     super.initState();
   }
 
-  // @override
-  // void dispose() {
-  //   _mainScrollController.dispose();
-  //   _variantScrollController.dispose();
-  //   _imageScrollController.dispose();
-  //   _colorScrollController.dispose();
-  //   _ColorAnimationController.dispose();
-  //   super.dispose();
-  // }
+  @override
+  void dispose() {
+    _mainScrollController.dispose();
+    _variantScrollController.dispose();
+    _imageScrollController.dispose();
+    _colorScrollController.dispose();
+    _ColorAnimationController.dispose();
+    super.dispose();
+  }
 
   fetchAll() {
     fetchProductDetails();
@@ -212,7 +197,13 @@ class _ProductDetailsState extends State<ProductDetails>
 
   fetchTopProducts() async {
     var topProductResponse = await ProductRepository().getFilteredProducts();
-    _topProducts.addAll(topProductResponse.products!);
+    
+    // Get the number of products to add
+    int numProductsToAdd = min(10, topProductResponse.products!.length);
+
+    // Add only the first numProductsToAdd products to _topProducts
+    _topProducts.addAll(topProductResponse.products!.take(numProductsToAdd));
+
     _topProductInit = true;
   }
 
@@ -221,7 +212,6 @@ class _ProductDetailsState extends State<ProductDetails>
       controller.loadHtmlString(
           makeHtml(_productDetails!.productDetails![0].description!));
       _appbarPriceString = _productDetails!.products!.price;
-      _singlePrice = _productDetails!.products!.price;
       _singlePriceString = _productDetails!.products!.price;
       // fetchVariantPrice();
       _stock = int.tryParse(_productDetails!.products!.stock!);
@@ -246,7 +236,6 @@ class _ProductDetailsState extends State<ProductDetails>
       //   fetchAndSetVariantWiseInfo(change_appbar_string: true);
       // }
       fetchAndSetVariantWiseInfo(change_appbar_string: true);
-      _productDetailsFetched = true;
 
       setState(() {});
     }
@@ -330,12 +319,10 @@ class _ProductDetailsState extends State<ProductDetails>
 
     // _singlePrice = variantResponse.price;
     _stock = 10;
-    _stock_txt = "In Stock";
     if (_quantity! > _stock!) {
       _quantity = _stock;
     }
 
-    _variant = "";
 
     //fetchVariantPrice();
     // _singlePriceString = variantResponse.price_string;
@@ -367,10 +354,8 @@ class _ProductDetailsState extends State<ProductDetails>
     _relatedProducts.clear();
     _topProducts.clear();
     _choiceString = "";
-    _variant = "";
     _selectedColorIndex = 0;
     _quantity = 1;
-    _productDetailsFetched = false;
     _isInWishList = false;
     sellerChatTitleController.clear();
     setState(() {});
@@ -2548,58 +2533,57 @@ class _ProductDetailsState extends State<ProductDetails>
   }
 
   Widget buildBottomAppBar(BuildContext context, _addedToCartSnackbar) {
-    return BottomAppBar(
-      color: MyTheme.white.withOpacity(0.9),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: EdgeInsets.all(1.0),
-            child: IconButton(
-              icon: Icon(Icons.call),
-              color: MyTheme.dark_font_grey,
-              onPressed: () {
-                // Add your chat functionality here
-              },
-            ),
-          ),
-          SizedBox(
-            width: 3,
-          ),
-          Container(
-            padding: EdgeInsets.all(1.0),
-            child: IconButton(
-              icon: Icon(Icons.chat),
-              color: MyTheme.dark_font_grey,
-              onPressed: () {
-                onPressAddToCart(context, _addedToCartSnackbar);
-              },
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 30),
-            height: 40,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 65, vertical: 5),
-                  backgroundColor: MyTheme.accent_color // foreground
-                  ),
-              onPressed: () {
-                onPressBuyNow(context, _productDetails);
-              },
-              child: Text(
-                AppLocalizations.of(context)!.buy_now_ucf,
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600),
+      return BottomAppBar(
+        color: MyTheme.white.withOpacity(0.9),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Container(
+              padding: EdgeInsets.all(1.0),
+              child: IconButton(
+                icon: Icon(Icons.call),
+                color: MyTheme.dark_font_grey,
+                onPressed: () {
+                  // Add your chat functionality here
+                },
               ),
             ),
-          ),
-        ],
-      ),
-    );
-  }
+
+            Container(
+              padding: EdgeInsets.all(1.0),
+              child: IconButton(
+                icon: Icon(Icons.chat),
+                color: MyTheme.dark_font_grey,
+                onPressed: () {
+                  onPressAddToCart(context, _addedToCartSnackbar);
+                },
+              ),
+            ),
+            Expanded( // Use Expanded here
+              child: Container(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    backgroundColor: MyTheme.accent_color,
+                  ),
+                  onPressed: () {
+                    onPressBuyNow(context, _productDetails);
+                  },
+                  child: Text(
+                    AppLocalizations.of(context)!.buy_now_ucf,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
   Widget buildBottomAppBar2(BuildContext context, _addedToCartSnackbar) {
     return BottomNavigationBar(

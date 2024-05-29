@@ -207,6 +207,8 @@ class VariationOptions {
   String? discountRate;
   String? isDefault;
   String? useDefaultPrice;
+  ImageVariation? imageVariation;
+
   
 
   VariationOptions(
@@ -221,6 +223,7 @@ class VariationOptions {
       this.discountRate,
       this.isDefault,
       this.useDefaultPrice,
+      this.imageVariation
       });
 
   VariationOptions.fromJson(Map<String, dynamic> json) {
@@ -235,6 +238,9 @@ class VariationOptions {
     discountRate = json['discount_rate'];
     isDefault = json['is_default'];
     useDefaultPrice = json['use_default_price'];
+    imageVariation = json['image_variation'] != null
+        ? new ImageVariation.fromJson(json['image_variation'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
@@ -250,6 +256,55 @@ class VariationOptions {
     data['discount_rate'] = this.discountRate;
     data['is_default'] = this.isDefault;
     data['use_default_price'] = this.useDefaultPrice;
+    if (this.imageVariation != null) {
+      data['image_variation'] = this.imageVariation!.toJson();
+    }
+    return data;
+  }
+}
+
+
+class ImageVariation {
+  int? id;
+  String? productId;
+  String? variationOptionId;
+  String? imageDefault;
+  String? imageBig;
+  String? imageSmall;
+  String? isMain;
+  String? storage;
+
+  ImageVariation(
+      {this.id,
+      this.productId,
+      this.variationOptionId,
+      this.imageDefault,
+      this.imageBig,
+      this.imageSmall,
+      this.isMain,
+      this.storage});
+
+  ImageVariation.fromJson(Map<String, dynamic> json) {
+    id = json['id'];
+    productId = json['product_id'];
+    variationOptionId = json['variation_option_id'];
+    imageDefault = json['image_default'];
+    imageBig = json['image_big'];
+    imageSmall = json['image_small'];
+    isMain = json['is_main'];
+    storage = json['storage'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['id'] = this.id;
+    data['product_id'] = this.productId;
+    data['variation_option_id'] = this.variationOptionId;
+    data['image_default'] = this.imageDefault;
+    data['image_big'] = this.imageBig;
+    data['image_small'] = this.imageSmall;
+    data['is_main'] = this.isMain;
+    data['storage'] = this.storage;
     return data;
   }
 }

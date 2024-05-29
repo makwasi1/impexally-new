@@ -25,7 +25,7 @@ class MiniProductCard extends StatefulWidget {
     this.main_price,
     this.stroked_price,
     this.has_discount,
-    this.is_wholesale=false,
+    this.is_wholesale = false,
     this.discount,
   }) : super(key: key);
 
@@ -60,7 +60,9 @@ class _MiniProductCardState extends State<MiniProductCard> {
                               top: Radius.circular(6), bottom: Radius.zero),
                           child: FadeInImage.assetNetwork(
                             placeholder: 'assets/placeholder.png',
-                            image: "https://seller.impexally.com/uploads/images/" +widget.image!,
+                            image:
+                                "https://seller.impexally.com/uploads/images/" +
+                                    widget.image!,
                             fit: BoxFit.cover,
                           ))),
                 ),
@@ -69,32 +71,15 @@ class _MiniProductCardState extends State<MiniProductCard> {
                   child: Text(
                     widget.name!,
                     overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
+                    maxLines: 1,
                     style: TextStyle(
-                        color: MyTheme.font_grey,
+                        color: Colors.black,
                         fontSize: 12,
                         height: 1.2,
-                        fontWeight: FontWeight.w400),
+                        fontWeight: FontWeight.w600),
                   ),
                 ),
-                widget.has_discount!
-                    ? Padding(
-                        padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                        child: Text(
-                          SystemConfig.systemCurrency != null
-                              ? widget.stroked_price!.replaceAll(
-                                  SystemConfig.systemCurrency!.code!,
-                                  SystemConfig.systemCurrency!.symbol!)
-                              : "GH₵" + widget.stroked_price!,
-                          maxLines: 1,
-                          style: TextStyle(
-                              decoration: TextDecoration.lineThrough,
-                              color: MyTheme.medium_grey,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600),
-                        ),
-                      )
-                    : Container(),
+          
                 Padding(
                   padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
                   child: Text(
@@ -102,95 +87,47 @@ class _MiniProductCardState extends State<MiniProductCard> {
                         ? widget.main_price!.replaceAll(
                             SystemConfig.systemCurrency!.code!,
                             SystemConfig.systemCurrency!.symbol!)
-                        : "GH₵"+widget.main_price!,
+                        : "GH₵" + widget.main_price!,
                     maxLines: 1,
                     style: TextStyle(
                         color: MyTheme.accent_color,
                         fontSize: 14,
-                        fontWeight: FontWeight.w700),
+                        fontWeight: FontWeight.w100),
                   ),
                 ),
-              ]),
-
-          // discount and wholesale
-          Positioned.fill(
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  if (widget.has_discount!)
-                    Container(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                      margin: EdgeInsets.only(bottom: 5),
-                      decoration: BoxDecoration(
-                        color: const Color(0xffe62e04),
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(6.0),
-                          bottomLeft: Radius.circular(6.0),
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color(0x14000000),
-                            offset: Offset(-1, 1),
-                            blurRadius: 1,
-                          ),
-                        ],
-                      ),
-                      child: Text(
-                        widget.discount ?? "",
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: const Color(0xffffffff),
-                          fontWeight: FontWeight.w700,
-                          height: 1.8,
-                        ),
-                        textHeightBehavior:
-                            TextHeightBehavior(applyHeightToFirstAscent: false),
-                        softWrap: false,
-                      ),
+                Padding(
+                  padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                  child: Text(
+                    "Like it, Buy it now! Sameday Delivery",
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500),
+                  ),
+                ),
+                Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                      child: Image.network(
+                          height: 18,
+                          "https://image.flylandexpress.com/images/home-page/flylan-express-officia-1.webp"),
                     ),
-                  Visibility(
-                    visible: whole_sale_addon_installed.$,
-                    child:  widget.is_wholesale!
-                        ? Container(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 4),
-                            decoration: BoxDecoration(
-                              color: Colors.blueGrey,
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(6.0),
-                                bottomLeft: Radius.circular(6.0),
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: const Color(0x14000000),
-                                  offset: Offset(-1, 1),
-                                  blurRadius: 1,
-                                ),
-                              ],
-                            ),
-                            child: Text(
-                              "Wholesale",
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: const Color(0xffffffff),
-                                fontWeight: FontWeight.w700,
-                                height: 1.8,
-                              ),
-                              textHeightBehavior: TextHeightBehavior(
-                                  applyHeightToFirstAscent: false),
-                              softWrap: false,
-                            ),
-                          )
-                        : SizedBox.shrink(),
-                  )
-                ],
-              ),
-            ),
-          ),
-
+                    Icon(
+                      Icons.star,
+                      color: Colors.yellow,
+                      size: 15,
+                    ),
+                    Icon(
+                      Icons.star,
+                      color: Colors.yellow,
+                      size: 15,
+                    )
+                  ],
+                )
+              ]),       
           // whole sale
         ]),
       ),
