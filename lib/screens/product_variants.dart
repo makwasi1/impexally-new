@@ -50,7 +50,10 @@ class _ProductVariantsState extends State<ProductVariants> {
   ProductMiniDetail? _singleProduct;
   List<Map<String, dynamic>> variationsWithOptions = [];
   Map<int, int> selectedOptions = {};
+  var selectedOptions1 = 0;
   TextEditingController quantityController = TextEditingController(text: "1");
+  var _selectedVariationOption = 0;
+  var _selectedVariationOption2 = 0;
 
   @override
   void initState() {
@@ -126,7 +129,7 @@ class _ProductVariantsState extends State<ProductVariants> {
       snackbar = null,
       ProductMiniDetail? variation}) async {
     var cartAddResponse = await CartRepository()
-        .getCartAddResponse(widget.variation!.products!.id, "3", 18, 10, 3);
+        .getCartAddResponse(widget.variation!.products!.id, selectedOptions1.toString(), 18, int.tryParse(quantityController.text), _selectedVariationOption);
 
     if (cartAddResponse.result == false) {
       ToastComponent.showDialog(cartAddResponse.message,
@@ -429,7 +432,7 @@ class _ProductVariantsState extends State<ProductVariants> {
             padding: EdgeInsets.all(1.0),
             child: IconButton(
               icon: Icon(Icons.call),
-              color: MyTheme.dark_font_grey,
+              color: Colors.black,
               onPressed: () {
                 // Add your chat functionality here
               },
@@ -438,36 +441,38 @@ class _ProductVariantsState extends State<ProductVariants> {
           SizedBox(
             width: 3,
           ),
+          
           Container(
             padding: EdgeInsets.all(1.0),
             child: IconButton(
-              icon: Icon(Icons.shopping_cart_outlined),
-              color: MyTheme.dark_font_grey,
+              icon: Icon(Icons.add_shopping_cart),
+              color: Colors.black,
               onPressed: () {
                 onPressAddToCart(context, _addedToCartSnackbar);
               },
             ),
           ),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20),
-            height: 40,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(horizontal: 45, vertical: 5),
-                  backgroundColor: MyTheme.accent_color // foreground
+          Expanded( // Use Expanded here
+              child: Container(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                    backgroundColor: MyTheme.accent_color,
                   ),
-              onPressed: () {
-                // onPressBuyNow(context, _productDetails!.products!.variation);
-              },
-              child: Text(
-                "Place Order Now",
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600),
+                  onPressed: () {
+                    // onPressBuyNow(context, _productDetails);
+                  },
+                  child: Text(
+                    "Place Order Now",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
+            )
         ],
       ),
     );
@@ -842,7 +847,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                       ),
                     ),
                   ),
-                  SizedBox(height: 3),
+                  SizedBox(height: 5),
                   variation.labelNames == "Color"
                       ? Wrap(
                           spacing: 8,
@@ -853,35 +858,38 @@ class _ProductVariantsState extends State<ProductVariants> {
                                 variation.variationOptions![optionIndex];
                             bool isSelected =
                                 selectedOptions[index] == optionIndex;
-                            return FadeInImage.assetNetwork(
-                              height: 50,
-                              width: 50,
-                                placeholder: 'assets/placeholder.png',
-                                image:
-                                    "https://seller.impexally.com/uploads/images/" +
-                                        option.imageVariation!.imageSmall!,
-                                fit: BoxFit.cover,
-                              );
-                            // ChoiceChip(
-                            //   label: FadeInImage.assetNetwork(
-                            //     placeholder: 'assets/placeholder.png',
-                            //     image:
-                            //         "https://seller.impexally.com/uploads/images/" +
-                            //             option.imageVariation!.imageSmall!,
-                            //     fit: BoxFit.cover,
-                            //   ),
-                            //   selected: isSelected,
-                            //   shape: RoundedRectangleBorder(
-                            //     borderRadius: BorderRadius.circular(5),
-                            //   ),
-                            //   selectedColor: Color.fromARGB(255, 241, 199, 199),
-                            //   onSelected: (bool selected) {
-                            //     setState(() {
-                            //       selectedOptions[index] =
-                            //           optionIndex; // Update the selected index
-                            //     });
-                            //   },
-                            // );
+                            return GestureDetector(
+                              onTap: () {
+                                debugPrint("Image tapped ${option.id} ${variation.id}");
+                                _selectedVariationOption = option.id!;
+                                selectedOptions1 = option.id!;
+                                setState(() {
+                                  selectedOptions[index] =
+                                      optionIndex; // Update the selected index when the image is tapped
+                                });
+
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: isSelected
+                                        ? Colors.red
+                                        : Colors
+                                            .transparent, // If this image is selected, use a red border. Otherwise, use a transparent border.
+                                    width: 2, // Specify the width of the border
+                                  ),
+                                ),
+                                child: FadeInImage.assetNetwork(
+                                  height: 50,
+                                  width: 50,
+                                  placeholder: 'assets/placeholder.png',
+                                  image:
+                                      "https://seller.impexally.com/uploads/images/" +
+                                          option.imageVariation!.imageSmall!,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            );
                           }),
                         )
                       : Wrap(
