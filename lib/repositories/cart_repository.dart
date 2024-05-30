@@ -18,13 +18,13 @@ import '../data_model/new_cart.dart';
 
 class CartRepository {
   
-  Future<CartModel> getCartResponseList(
-  {int? user_id = 18}
+  Future<CartModel?> getCartResponseList(
+  int? user_id
 ) async {
   const storage = FlutterSecureStorage();
   String? cart_id = await storage.read(key: 'cart_id');
 
-  String url = ("${AppConfig.BASE_URL}/cart/26/18");
+  String url = ("${AppConfig.BASE_URL}/cart/$cart_id/$user_id");
   final response = await ApiRequest.get(
     url: url,
     headers: {"Content-Type": "application/json"}
@@ -53,8 +53,9 @@ class CartRepository {
 
   Future<dynamic> getCartDeleteResponse(
     int? cart_id,
+    int? user_id,
   ) async {
-    var post_body = jsonEncode({"cart_item_id": cart_id, "user_id": 18});
+    var post_body = jsonEncode({"cart_item_id": cart_id, "user_id": user_id});
     String url = ("${AppConfig.BASE_URL}/cart/remove");
     final response = await http.delete(
         Uri.parse(url),
@@ -112,8 +113,8 @@ class CartRepository {
     return cart_id;
   }
 
-  Future<dynamic> getCartAddResponse(int? id, String? variant, int? user_id,
-      int? quantity, int? variation_option_id) async {
+  Future<dynamic> getCartAddResponse(int? id, int? user_id,
+      int? quantity, List<Map<String, dynamic>> itemSelectedVariations ) async {
     var post_body;
     const storage = FlutterSecureStorage();
 
@@ -129,7 +130,7 @@ class CartRepository {
     //update the body to include the cart_id
     post_body = jsonEncode({
       "product_id": id,
-      "variation_id": int.tryParse(variant!),
+      "variations": itemSelectedVariations,
       "user_id": user_id,
       "quantity": quantity,
       "cart_id": cart_id

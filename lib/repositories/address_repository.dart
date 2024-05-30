@@ -75,7 +75,7 @@ class AddressRepository {
       "title": "$address",
       "first_name": "$address",
       "last_name": "$address",
-      "user_id": 18,
+      "user_id": user_id.$,
       "address": "$address",
       "country_id": "$country_id",
       "state_id": "$state_id",
@@ -219,21 +219,32 @@ class AddressRepository {
     return countryResponseFromJson(response.body);
   }
 
-  Future<dynamic> getShippingCostResponse({shipping_type = ""}) async {
-    var post_body = jsonEncode({"seller_list": shipping_type});
+  Future<dynamic> getShippingCostResponse(
+      {shipping_type = "flat_rate", state_id = "", cart_id = ""}) async {
+    String url =
+        ("${AppConfig.BASE_URL}/shipping-fee/$state_id/$cart_id?shipping_method=${shipping_type}");
 
-    String url = ("${AppConfig.BASE_URL}/shipping_cost");
-
-    final response = await ApiRequest.post(
-        url: url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${access_token.$}",
-          "App-Language": app_language.$!,
-        },
-        body: post_body,
-        middleware: BannedUser());
-    return shippingCostResponseFromJson(response.body);
+    final response = await ApiRequest.get(
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      int? shipping_fee = jsonResponse['shipping_fee'];
+      return new ShippingCostResponse(
+          result: true,
+          shipping_type: "flat_rate",
+          value: 0.0,
+          value_string: shipping_fee.toString());
+    } else {
+      return new ShippingCostResponse(
+          result: false,
+          shipping_type: "flat_rate",
+          value: 0.0,
+          value_string: "0.0");
+    }
   }
 
   Future<dynamic> getAddressUpdateInCartResponse(

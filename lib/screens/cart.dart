@@ -12,9 +12,11 @@ import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
 import 'package:active_ecommerce_flutter/repositories/cart_repository.dart';
+import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:active_ecommerce_flutter/screens/select_address.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 
@@ -46,6 +48,7 @@ class _CartState extends State<Cart> {
   var _cartTotal = 0.00;
   var _cartTotalString = ". . .";
   ProductMiniDetail? _productDetails;
+  int? _cartId;
 
   @override
   void initState() {
@@ -55,8 +58,9 @@ class _CartState extends State<Cart> {
     /*print("user data");
     print(is_logged_in.$);
     print(access_token.value);
-    print(user_id.$);
+    
     print(user_name.$);*/
+    print("=====userid ${user_id.$}");
 
     // if (is_logged_in.$ == true) {
     fetchData();
@@ -76,26 +80,33 @@ class _CartState extends State<Cart> {
   }
 
   fetchData() async {
-    getCartCount();
-    CartModel cartResponseList =
-        await CartRepository().getCartResponseList(user_id: 18);
+    // getCartCount();
+    CartModel? cartResponseList =
+        await CartRepository().getCartResponseList(user_id.$);
 
-    if (cartResponseList != null || cartResponseList.the0!.items!.length > 0) {
-      _shopList = cartResponseList.the0!.items!;
-      _shopResponse = cartResponseList;
+    if (cartResponseList!.cart != null) {
+      _shopList = cartResponseList.cart!.items!;
+      // _cartTotalString = cartResponseList.cartTotal.toString();
+      _cartId = cartResponseList.cart!.id;
       getSetCartTotal();
+      _isInitial = false;
+
+      setState(() {});
+    } else {
+      _shopList = [];
       _isInitial = false;
 
       setState(() {});
     }
   }
 
-  getSetCartTotal() {
-    _cartTotalString = _shopResponse!.cartTotal!
-        .toString()
-        .replaceAll(SystemConfig.currency, SystemConfig.currency);
-
-    setState(() {});
+  getSetCartTotal() async {
+    CartModel? cartResponseList =
+        await CartRepository().getCartResponseList(user_id.$);
+    if (cartResponseList!.cart != null) {
+      _cartTotalString = cartResponseList.cartTotal.toString();
+      setState(() {});
+    }
   }
 
   onQuantityIncrease(seller_index) async {
@@ -107,14 +118,14 @@ class _CartState extends State<Cart> {
           currentQuantity++;
           _shopList[seller_index].quantity = currentQuantity.toString();
         }
-        ToastComponent.showDialog("Updating Cart...",
-            gravity: Toast.center, duration: Toast.lengthLong);
+        // ToastComponent.showDialog("Updating Cart...",
+        //     gravity: Toast.center, duration: Toast.lengthLong);
 
         await CartRepository().getCartProcessResponse(
             _shopList[seller_index].id.toString(),
-            _shopList[seller_index].quantity);
+            _shopList[seller_index].quantity).then((value) => getSetCartTotal());
         // fetchData();
-        setState(() {});
+        // setState(() {});
       } catch (e) {
         print(e);
       }
@@ -134,13 +145,13 @@ class _CartState extends State<Cart> {
           currentQuantity--;
           _shopList[seller_index].quantity = currentQuantity.toString();
         }
-        ToastComponent.showDialog("Updating Cart...",
-            gravity: Toast.center, duration: Toast.lengthLong);
+        // ToastComponent.showDialog("Updating Cart...",
+        //     gravity: Toast.center, duration: Toast.lengthLong);
         await CartRepository().getCartProcessResponse(
             _shopList[seller_index].id.toString(),
-            _shopList[seller_index].quantity);
+            _shopList[seller_index].quantity).then((value) => getSetCartTotal());
         // fetchData();
-        setState(() {});
+        // setState(() {});
       } catch (e) {
         print(e);
       }
@@ -195,7 +206,7 @@ class _CartState extends State<Cart> {
 
   confirmDelete(cart_id) async {
     var cartDeleteResponse =
-        await CartRepository().getCartDeleteResponse(cart_id);
+        await CartRepository().getCartDeleteResponse(cart_id, user_id.$);
 
     if (cartDeleteResponse.result == true) {
       ToastComponent.showDialog(cartDeleteResponse.message,
@@ -203,6 +214,7 @@ class _CartState extends State<Cart> {
 
       reset();
       fetchData();
+      
     } else {
       ToastComponent.showDialog(cartDeleteResponse.message,
           gravity: Toast.center, duration: Toast.lengthLong);
@@ -218,50 +230,36 @@ class _CartState extends State<Cart> {
   }
 
   process({mode}) async {
-    // var cart_ids = [];
-    // var cart_quantities = [];
-    // if (_shopList.length > 0) {
-    //   _shopList.forEach((shop) {
-    //     if (shop.cartItems.length > 0) {
-    //       shop.cartItems.forEach((cart_item) {
-    //         cart_ids.add(cart_item.id);
-    //         cart_quantities.add(cart_item.quantity);
-    //       });
-    //     }
-    //   });
-    // }
-
-    // if (cart_ids.length == 0) {
-    //   ToastComponent.showDialog(AppLocalizations.of(context)!.cart_is_empty,
-    //       gravity: Toast.center, duration: Toast.lengthLong);
-    //   return;
-    // }
-
-    // var cart_ids_string = cart_ids.join(',').toString();
-    // var cart_quantities_string = cart_quantities.join(',').toString();
-
-    // print(cart_ids_string);
-    // print(cart_quantities_string);
-
-    // var cartProcessResponse = await CartRepository()
-    //     .getCartProcessResponse(cart_ids_string, cart_quantities_string);
-
-    // if (cartProcessResponse.result == false) {
-    //   ToastComponent.showDialog(cartProcessResponse.message,
-    //       gravity: Toast.center, duration: Toast.lengthLong);
-    // } else {
-    //   // cart update message
-    //   // remove on
-    //   // ToastComponent.showDialog(cartProcessResponse.message,
-    //   //     gravity: Toast.center, duration: Toast.lengthLong);
-
-    //   if (mode == "update") {
-    //     // reset();
-    //     fetchData();
-    //   } else if (mode == "proceed_to_shipping") {
-    AIZRoute.push(context, SelectAddress(
-      cartList: _shopList,
-    )).then((value) {
+    if (is_logged_in.$ == false) {  
+      ToastComponent.showDialog(
+          "You must be logged in to proceed to shipping",
+          gravity: Toast.center,
+          duration: Toast.lengthLong);
+      //navigate to login
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Login(),
+        ),
+      );
+      return;
+      
+    } else {
+      if (_shopList.length == 0) {
+        ToastComponent.showDialog(
+            AppLocalizations.of(context)!.cart_is_empty,
+            gravity: Toast.center,
+            duration: Toast.lengthLong);
+        return;
+      }
+    }
+    AIZRoute.push(
+        context,
+        SelectAddress(
+          cartList: _shopList,
+          cartAmount: _cartTotalString,
+          cartId: _cartId,
+        )).then((value) {
       onPopped(value);
     });
     // }
@@ -284,18 +282,20 @@ class _CartState extends State<Cart> {
     _isInitial = true;
     _cartTotal = 0.00;
     _cartTotalString = ". . .";
-
+    getCartCount();
     setState(() {});
   }
 
   Future<void> _onRefresh() async {
     reset();
     fetchData();
+    getCartCount();
   }
 
   onPopped(value) async {
     reset();
     fetchData();
+    getCartCount();
   }
 
   @override
@@ -522,7 +522,7 @@ class _CartState extends State<Cart> {
             height: 120,
             decoration: BoxDecorations.buildBoxDecoration_1(),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
                 Container(
                   width: DeviceInfo(context).width! / 4,
@@ -580,17 +580,19 @@ class _CartState extends State<Cart> {
                     ),
                   ),
                 ),
-                Spacer(),
-                Container(
-                  width: 32,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          onPressDelete(_shopList[seller_index].id);
-                        },
-                        child: Container(
+                SizedBox(
+                  width: 10,
+                ),
+                GestureDetector(
+                  onTap: () {
+                            onPressDelete(_shopList[seller_index].id);
+                          },
+                  child: Container(
+                    width: 32,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Container(
                           child: Padding(
                             padding: const EdgeInsets.only(bottom: 14.0),
                             child: Image.asset(
@@ -600,8 +602,8 @@ class _CartState extends State<Cart> {
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 Padding(

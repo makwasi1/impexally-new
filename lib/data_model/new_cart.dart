@@ -1,28 +1,28 @@
 import 'dart:convert';
 
 class CartModel {
-    The0? the0;
+    UserCart? cart;
     int? cartTotal;
 
     CartModel({
-        this.the0,
+        this.cart,
         this.cartTotal,
     });
 
     factory CartModel.fromJson(Map<String, dynamic> json) => CartModel(
-        the0: json["0"] == null ? null : The0.fromMap(json["0"]),
+        cart: json["cart"] == null ? null : UserCart.fromMap(json["cart"]),
         cartTotal: json["cart_total"],
     );
 
     String toJson() => json.encode(toMap());
 
     Map<String, dynamic> toMap() => {
-        "0": the0?.toMap(),
+        "cart": cart?.toMap(),
         "cart_total": cartTotal,
     };
 }
 
-class The0 {
+class UserCart {
     int? id;
     String? userId;
     String? status;
@@ -30,7 +30,7 @@ class The0 {
     DateTime? updatedAt;
     List<Item>? items;
 
-    The0({
+    UserCart({
         this.id,
         this.userId,
         this.status,
@@ -39,11 +39,11 @@ class The0 {
         this.items,
     });
 
-    factory The0.fromJson(String str) => The0.fromMap(json.decode(str));
+    factory UserCart.fromJson(String str) => UserCart.fromMap(json.decode(str));
 
     String toJson() => json.encode(toMap());
 
-    factory The0.fromMap(Map<String, dynamic> json) => The0(
+    factory UserCart.fromMap(Map<String, dynamic> json) => UserCart(
         id: json["id"],
         userId: json["user_id"],
         status: json["status"],

@@ -76,24 +76,24 @@ class _AuctionBiddedProductsState extends State<AuctionBiddedProducts> {
   }
 
   addToCart(id) async {
-    var cartAddResponse =
-        await CartRepository().getCartAddResponse(id, "", user_id.$, 1,5);
+    // var cartAddResponse =
+    //     await CartRepository().getCartAddResponse(id, "", user_id.$, 1,5);
 
-    if (cartAddResponse.result == false) {
-      ToastComponent.showDialog(cartAddResponse.message,
-          gravity: Toast.center, duration: Toast.lengthLong);
-      return;
-    } else {
-      resetAll();
-      fetchAll();
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return Cart(
-          has_bottomnav: false,
-        );
-      })).then((value) {
-        resetAll();
-      });
-    }
+    // if (cartAddResponse.result == false) {
+    //   ToastComponent.showDialog(cartAddResponse.message,
+    //       gravity: Toast.center, duration: Toast.lengthLong);
+    //   return;
+    // } else {
+    //   resetAll();
+    //   fetchAll();
+    //   Navigator.push(context, MaterialPageRoute(builder: (context) {
+    //     return Cart(
+    //       has_bottomnav: false,
+    //     );
+    //   })).then((value) {
+    //     resetAll();
+    //   });
+    // }
   }
 
   @override

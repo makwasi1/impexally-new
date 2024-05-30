@@ -10,8 +10,6 @@ class AuthHelper {
       SystemConfig.systemUser= loginResponse.user;
       is_logged_in.$ = true;
       is_logged_in.save();
-      access_token.$ = loginResponse.access_token;
-      access_token.save();
       user_id.$ = loginResponse.user?.id;
       user_id.save();
       user_name.$ = loginResponse.user?.name;
@@ -20,7 +18,7 @@ class AuthHelper {
       user_email.save();
       user_phone.$ = loginResponse.user?.phone??"";
       user_phone.save();
-      avatar_original.$ = loginResponse.user?.avatar_original;
+      avatar_original.$ = loginResponse.user?.avatar_original??"";
       avatar_original.save();
     }
   }
@@ -29,8 +27,6 @@ class AuthHelper {
     SystemConfig.systemUser= null;
       is_logged_in.$ = false;
       is_logged_in.save();
-      access_token.$ = "";
-      access_token.save();
       user_id.$ = 0;
       user_id.save();
       user_name.$ = "";

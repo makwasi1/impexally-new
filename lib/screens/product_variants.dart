@@ -12,6 +12,7 @@ import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
 import 'package:active_ecommerce_flutter/repositories/cart_repository.dart';
+import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:active_ecommerce_flutter/screens/select_address.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -49,11 +50,13 @@ class _ProductVariantsState extends State<ProductVariants> {
   var _cartTotalString = ". . .";
   ProductMiniDetail? _singleProduct;
   List<Map<String, dynamic>> variationsWithOptions = [];
-  Map<int, int> selectedOptions = {};
-  var selectedOptions1 = 0;
+  Map<dynamic, int> selectedOptions = {};
+  Map<String, dynamic> userSelectedOptions = {};
+  List<Map<String, dynamic>> itemSelectedVariations = [];
+  int? selectedOptions1;
   TextEditingController quantityController = TextEditingController(text: "1");
-  var _selectedVariationOption = 0;
-  var _selectedVariationOption2 = 0;
+  int? _selectedVariationOption;
+  int? _selectedVariationOption2;
 
   @override
   void initState() {
@@ -61,6 +64,11 @@ class _ProductVariantsState extends State<ProductVariants> {
     super.initState();
 
     fetchVariations();
+
+    //   if (widget.variation != null) {
+    //   _selectedVariationOption = widget.variation!.products!.variation![0].id;
+    //   selectedOptions1 = widget.variation!.products!.variation![0].variationOptions![0].id;
+    // }
 
     /*print("user data");
     print(is_logged_in.$);
@@ -90,10 +98,25 @@ class _ProductVariantsState extends State<ProductVariants> {
       _singleProduct = widget.variation;
     }
 
+    List<Map<String, dynamic>> defaultOptions = [];
+
     for (int i = 0; i < _singleProduct!.products!.variation!.length; i++) {
       selectedOptions[i] = 0; // Select the first option by default
+      var variation = _singleProduct!.products!.variation![i];
+      var variationOptionId = variation.variationOptions != null &&
+              variation.variationOptions!.isNotEmpty
+          ? variation.variationOptions![0].id
+          : null;
+
+      defaultOptions.add({
+        "variation_id": variation.id,
+        "variation_option_id": variationOptionId,
+      });
     }
 
+    itemSelectedVariations = defaultOptions;
+
+    debugPrint("=============== $defaultOptions");
     // Loop through the variations
     for (var variation in _singleProduct!.products!.variation!) {
       Map<String, dynamic> variationDetail = {
@@ -120,6 +143,19 @@ class _ProductVariantsState extends State<ProductVariants> {
   }
 
   onPressAddToCart(context, snackbar) {
+    if (is_logged_in.$ == false) {
+      ToastComponent.showDialog(
+          "Please login / register to add this product to cart",
+          gravity: Toast.center,
+          duration: Toast.lengthLong);
+           Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return Login();
+        })).then((value) {
+          onPopped(value);
+        });
+      return;
+    }
+
     addToCart(mode: "add_to_cart", context: context, snackbar: snackbar);
   }
 
@@ -128,8 +164,11 @@ class _ProductVariantsState extends State<ProductVariants> {
       BuildContext? context,
       snackbar = null,
       ProductMiniDetail? variation}) async {
-    var cartAddResponse = await CartRepository()
-        .getCartAddResponse(widget.variation!.products!.id, selectedOptions1.toString(), 18, int.tryParse(quantityController.text), _selectedVariationOption);
+    var cartAddResponse = await CartRepository().getCartAddResponse(
+        widget.variation!.products!.id,
+        user_id.$,
+        int.tryParse(quantityController.text),
+        itemSelectedVariations);
 
     if (cartAddResponse.result == false) {
       ToastComponent.showDialog(cartAddResponse.message,
@@ -249,7 +288,7 @@ class _ProductVariantsState extends State<ProductVariants> {
 
   confirmDelete(cart_id) async {
     var cartDeleteResponse =
-        await CartRepository().getCartDeleteResponse(cart_id);
+        await CartRepository().getCartDeleteResponse(cart_id, user_id.$);
 
     if (cartDeleteResponse.result == true) {
       ToastComponent.showDialog(cartDeleteResponse.message,
@@ -441,7 +480,6 @@ class _ProductVariantsState extends State<ProductVariants> {
           SizedBox(
             width: 3,
           ),
-          
           Container(
             padding: EdgeInsets.all(1.0),
             child: IconButton(
@@ -452,27 +490,28 @@ class _ProductVariantsState extends State<ProductVariants> {
               },
             ),
           ),
-          Expanded( // Use Expanded here
-              child: Container(
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                    backgroundColor: MyTheme.accent_color,
-                  ),
-                  onPressed: () {
-                    // onPressBuyNow(context, _productDetails);
-                  },
-                  child: Text(
-                    "Place Order Now",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+          Expanded(
+            // Use Expanded here
+            child: Container(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                  backgroundColor: MyTheme.accent_color,
+                ),
+                onPressed: () {
+                  // onPressBuyNow(context, _productDetails);
+                },
+                child: Text(
+                  "Place Order Now",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-            )
+            ),
+          )
         ],
       ),
     );
@@ -860,14 +899,21 @@ class _ProductVariantsState extends State<ProductVariants> {
                                 selectedOptions[index] == optionIndex;
                             return GestureDetector(
                               onTap: () {
-                                debugPrint("Image tapped ${option.id} ${variation.id}");
-                                _selectedVariationOption = option.id!;
-                                selectedOptions1 = option.id!;
+                                debugPrint(
+                                    "Image tapped ${option.id} ${variation.id}");
+
                                 setState(() {
                                   selectedOptions[index] =
                                       optionIndex; // Update the selected index when the image is tapped
-                                });
+                                  _selectedVariationOption =
+                                      option.id ?? optionIndex;
+                                  selectedOptions1 = variation.id!;
 
+                                  itemSelectedVariations[index] = {
+                                    "variation_id": variation.id,
+                                    "variation_option_id": option.id,
+                                  };
+                                });
                               },
                               child: Container(
                                 decoration: BoxDecoration(
@@ -913,6 +959,10 @@ class _ProductVariantsState extends State<ProductVariants> {
                                 setState(() {
                                   selectedOptions[index] =
                                       optionIndex; // Update the selected index
+                                  itemSelectedVariations[index] = {
+                                    "variation_id": variation.id,
+                                    "variation_option_id": option.id,
+                                  }; 
                                 });
                               },
                             );

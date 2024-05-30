@@ -27,7 +27,9 @@ import '../repositories/product_repository.dart';
 class SelectAddress extends StatefulWidget {
   int? owner_id;
   final List<dynamic> cartList;
-  SelectAddress({Key? key, this.owner_id, required this.cartList})
+  final String? cartAmount;
+  final int? cartId;
+  SelectAddress({Key? key, this.owner_id, required this.cartList, this.cartAmount, this.cartId})
       : super(key: key);
 
   @override
@@ -39,7 +41,9 @@ class _SelectAddressState extends State<SelectAddress> {
 
   // integer type variables
   int? _seleted_shipping_address = 0;
-  String? _cartTotalString = ". . .";
+  int? _cartTotalString = 0;
+  int? _shipping_cost_string = 0;
+  String? _state_id;
 
   // list type variables
   List<dynamic> _shippingAddressList = [];
@@ -62,10 +66,10 @@ class _SelectAddressState extends State<SelectAddress> {
   double mHeight = 0;
 
   fetchAll() {
-    // if (is_logged_in.$ == true) {
+
     fetchShippingAddressList();
-    //fetchPickupPoints();
-    // }
+    
+    _cartTotalString = int.tryParse(widget.cartAmount!);
     setState(() {});
   }
 
@@ -166,7 +170,7 @@ class _SelectAddressState extends State<SelectAddress> {
       try {
         int? currentQuantity =
             int.tryParse(widget.cartList[seller_index].quantity);
-        if (currentQuantity != null) {
+        if (currentQuantity != null )  {
           currentQuantity++;
           widget.cartList[seller_index].quantity = currentQuantity.toString();
         }
@@ -231,12 +235,29 @@ class _SelectAddressState extends State<SelectAddress> {
     _faceData = true;
     setState(() {});
 
-    // getSetShippingCost();
+    getSetShippingCost();
   }
 
-  getSetCartTotal() {
-    _cartTotalString = "560";
+  getSetShippingCost() async {
+    var shippingCostResponse;
+    shippingCostResponse =
+    await AddressRepository().getShippingCostResponse(
+        shipping_type: "flat_rate",
+        state_id: _state_id,
+        cart_id: widget.cartId
+        );
+
+    if (shippingCostResponse.result == true) {
+      _shipping_cost_string = int.tryParse(shippingCostResponse.value_string);
+    } else {
+      _shipping_cost_string = 0;
+    }
+    setState(() {});
   }
+
+  // getSetCartTotal() {
+  //   _cartTotalString = "560";
+  // }
 
   reset() {
     _shippingAddressList.clear();
@@ -246,9 +267,9 @@ class _SelectAddressState extends State<SelectAddress> {
 
   Future<void> _onRefresh() async {
     reset();
-    // if (is_logged_in.$ == true) {
+    if (is_logged_in.$ == true) {
     fetchAll();
-    // }
+    }
   }
 
   Future<ProductMiniDetail?> fetchProductDetails(id) async {
@@ -317,9 +338,9 @@ class _SelectAddressState extends State<SelectAddress> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    // if (is_logged_in.$ == true) {
+    if (is_logged_in.$ == true) {
     fetchAll();
-    // }
+    }
   }
 
   @override
@@ -579,7 +600,7 @@ class _SelectAddressState extends State<SelectAddress> {
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ ",
+                        "GH₵ ${_cartTotalString}",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 18,
@@ -981,6 +1002,7 @@ class _SelectAddressState extends State<SelectAddress> {
       onTap: () {
         if (_seleted_shipping_address != _shippingAddressList[index].id) {
           _seleted_shipping_address = _shippingAddressList[index].id;
+          _state_id = _shippingAddressList[index].state_id;
 
           // onAddressSwitch();
         }
