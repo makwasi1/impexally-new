@@ -3,16 +3,20 @@ import 'package:active_ecommerce_flutter/custom/device_info.dart';
 import 'package:active_ecommerce_flutter/custom/lang_text.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
+import 'package:active_ecommerce_flutter/data_model/login_response.dart';
+import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/repositories/address_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/coupon_repository.dart';
 import 'package:active_ecommerce_flutter/screens/address.dart';
+import 'package:active_ecommerce_flutter/screens/cart.dart';
 import 'package:active_ecommerce_flutter/screens/checkout.dart';
 import 'package:active_ecommerce_flutter/screens/shipping_info.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'package:toast/toast.dart';
@@ -29,14 +33,19 @@ class SelectAddress extends StatefulWidget {
   final List<dynamic> cartList;
   final String? cartAmount;
   final int? cartId;
-  SelectAddress({Key? key, this.owner_id, required this.cartList, this.cartAmount, this.cartId})
+  SelectAddress(
+      {Key? key,
+      this.owner_id,
+      required this.cartList,
+      this.cartAmount,
+      this.cartId})
       : super(key: key);
 
   @override
   State<SelectAddress> createState() => _SelectAddressState();
 }
 
-class _SelectAddressState extends State<SelectAddress> {
+class _SelectAddressState extends State<SelectAddress> with SingleTickerProviderStateMixin {
   ScrollController _mainScrollController = ScrollController();
 
   // integer type variables
@@ -50,6 +59,8 @@ class _SelectAddressState extends State<SelectAddress> {
   ProductMiniDetail? _productDetails;
 
   TextEditingController _couponController = TextEditingController();
+
+  late AnimationController _controller;
   // List<PickupPoint> _pickupList = [];
   // List<City> _cityList = [];
   // List<Country> _countryList = [];
@@ -66,9 +77,8 @@ class _SelectAddressState extends State<SelectAddress> {
   double mHeight = 0;
 
   fetchAll() {
-
     fetchShippingAddressList();
-    
+
     _cartTotalString = int.tryParse(widget.cartAmount!);
     setState(() {});
   }
@@ -150,7 +160,7 @@ class _SelectAddressState extends State<SelectAddress> {
 
   confirmDelete(cart_id) async {
     var cartDeleteResponse =
-        await CartRepository().getCartDeleteResponse(cart_id);
+        await CartRepository().getCartDeleteResponse(cart_id, user_id.$);
 
     if (cartDeleteResponse.result == true) {
       ToastComponent.showDialog(cartDeleteResponse.message,
@@ -170,7 +180,7 @@ class _SelectAddressState extends State<SelectAddress> {
       try {
         int? currentQuantity =
             int.tryParse(widget.cartList[seller_index].quantity);
-        if (currentQuantity != null )  {
+        if (currentQuantity != null) {
           currentQuantity++;
           widget.cartList[seller_index].quantity = currentQuantity.toString();
         }
@@ -225,6 +235,7 @@ class _SelectAddressState extends State<SelectAddress> {
     _shippingAddressList.addAll(addressResponse.addresses);
     if (_shippingAddressList.length > 0) {
       _seleted_shipping_address = _shippingAddressList[0].id;
+      _state_id = _shippingAddressList[0].state_id;
 
       _shippingAddressList.forEach((address) {
         if (address.set_default == 1) {
@@ -240,15 +251,14 @@ class _SelectAddressState extends State<SelectAddress> {
 
   getSetShippingCost() async {
     var shippingCostResponse;
-    shippingCostResponse =
-    await AddressRepository().getShippingCostResponse(
+    shippingCostResponse = await AddressRepository().getShippingCostResponse(
         shipping_type: "flat_rate",
         state_id: _state_id,
-        cart_id: widget.cartId
-        );
+        cart_id: widget.cartId);
 
     if (shippingCostResponse.result == true) {
       _shipping_cost_string = int.tryParse(shippingCostResponse.value_string);
+      _cartTotalString = _cartTotalString! + _shipping_cost_string!;
     } else {
       _shipping_cost_string = 0;
     }
@@ -266,9 +276,10 @@ class _SelectAddressState extends State<SelectAddress> {
   }
 
   Future<void> _onRefresh() async {
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
     reset();
-    if (is_logged_in.$ == true) {
-    fetchAll();
+    if (res.result == true) {
+      fetchAll();
     }
   }
 
@@ -325,9 +336,11 @@ class _SelectAddressState extends State<SelectAddress> {
         title: AppLocalizations.of(context)!.checkout_ucf,
         list: "offline",
         paymentFor: PaymentFor.ManualPayment,
+        cart_amount: _cartTotalString.toString(),
+        delivery_fee: _shipping_cost_string.toString(),
         //offLinePaymentFor: OffLinePaymentFor.Order,
         rechargeAmount:
-            0, // this is for wallet recharge amount, so set 0 for order))
+            double.parse(_cartTotalString.toString()), // this is for wallet recharge amount, so set 0 for order))
       );
     })).then((value) {
       onPopped(value);
@@ -338,15 +351,20 @@ class _SelectAddressState extends State<SelectAddress> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    if (is_logged_in.$ == true) {
+    // if (is_logged_in.$ == true) {
     fetchAll();
-    }
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+    // }
   }
 
   @override
   void dispose() {
     super.dispose();
     _mainScrollController.dispose();
+    _controller.dispose();
   }
 
   @override
@@ -407,7 +425,7 @@ class _SelectAddressState extends State<SelectAddress> {
             ),
             buildExpectedCartItems(),
             SizedBox(
-              height: 10,
+              height: 4,
             ),
             Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -422,16 +440,17 @@ class _SelectAddressState extends State<SelectAddress> {
             SizedBox(
               height: 10,
             ),
-            Padding(padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8, left: 16, right: 16),
               child: Text(
                 "Order Details",
                 // textAlign: TextAlign.start,
                 style: TextStyle(
-                   
                     color: Colors.black,
                     fontSize: 18,
                     fontWeight: FontWeight.w700),
-              ),),
+              ),
+            ),
             buildCartSummaryDetails(context),
             SizedBox(
               height: 10,
@@ -446,42 +465,39 @@ class _SelectAddressState extends State<SelectAddress> {
     );
   }
 
-
   //create a row with a with an car icon and a text widget
   Widget buildCartDeliveryGif(BuildContext context) {
     return Container(
-  padding: EdgeInsets.all(16),
-  color: Colors.grey[100],
-  child: Row(
-    children: [
-      Container(
-        width: 120,
-        child: Icon(
-          Icons.local_shipping_outlined,
-          color: Colors.black,
-          size: 34,
-        ),
+      padding: EdgeInsets.all(16),
+      color: Colors.grey[100],
+      child: Row(
+        children: [
+          Container(
+            width: 120,
+            child: AnimatedIcon(
+              icon: AnimatedIcons.list_view,
+              progress: _controller,
+              color: Colors.orange,
+              size: 34,
+            ),
+          ),
+          Text(
+            "Delivered by Impex Express",
+            style: TextStyle(
+                color: Colors.black, fontSize: 16, fontWeight: FontWeight.w600),
+          ),
+        ],
       ),
-      Text(
-        "Delivered by Impex Express",
-        style: TextStyle(
-            color: Colors.black,
-            fontSize: 14,
-            fontWeight: FontWeight.w600),
-      ),
-    ],
-  ),
-);
+    );
   }
 
   //build order details summary widget
   Widget buildCartSummaryDetails(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.only(left:16, right: 16.0),
+        padding: const EdgeInsets.only(left: 16, right: 16.0),
         child: Container(
           child: Column(
             children: [
-              
               Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
@@ -489,7 +505,7 @@ class _SelectAddressState extends State<SelectAddress> {
                       Container(
                         width: 120,
                         child: Text(
-                         "Order Total",
+                          "Order Total",
                           textAlign: TextAlign.start,
                           style: TextStyle(
                               color: MyTheme.font_grey,
@@ -501,7 +517,7 @@ class _SelectAddressState extends State<SelectAddress> {
                       Text(
                         "GH₵ $_cartTotalString",
                         style: TextStyle(
-                            color: MyTheme.font_grey,
+                            color: Colors.black,
                             fontSize: 14,
                             fontWeight: FontWeight.w600),
                       ),
@@ -549,7 +565,7 @@ class _SelectAddressState extends State<SelectAddress> {
                       ),
                       Spacer(),
                       Text(
-                       _coupon_applied! ? "GH₵ " : "No Coupon(s) Applied",
+                        _coupon_applied! ? "GH₵ " : "No Coupon(s) Applied",
                         style: TextStyle(
                             color: MyTheme.accent_color,
                             fontSize: 14,
@@ -574,9 +590,9 @@ class _SelectAddressState extends State<SelectAddress> {
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ 15",
+                        "GH₵ ${_shipping_cost_string.toString()}",
                         style: TextStyle(
-                            color: MyTheme.font_grey,
+                            color: Colors.black,
                             fontSize: 14,
                             fontWeight: FontWeight.w600),
                       ),
@@ -593,7 +609,7 @@ class _SelectAddressState extends State<SelectAddress> {
                           "Total Amount",
                           textAlign: TextAlign.start,
                           style: TextStyle(
-                              color: MyTheme.font_grey,
+                              color: Colors.black,
                               fontSize: 18,
                               fontWeight: FontWeight.bold),
                         ),
@@ -644,7 +660,7 @@ class _SelectAddressState extends State<SelectAddress> {
     return SingleChildScrollView(
       child: ListView.separated(
         separatorBuilder: (context, index) => SizedBox(
-          height: 14,
+          height: 10,
         ),
         itemCount: widget.cartList.length,
         scrollDirection: Axis.vertical,
@@ -809,7 +825,7 @@ class _SelectAddressState extends State<SelectAddress> {
                               fontWeight: FontWeight.w400),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 23.0),
+                          padding: const EdgeInsets.only(top: 10.0),
                           child: Row(
                             children: [
                               Text(
@@ -827,80 +843,59 @@ class _SelectAddressState extends State<SelectAddress> {
                             ],
                           ),
                         ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Chip(
+                              label: Text(
+                                "Qty: " + widget.cartList[seller_index].quantity.toString(),
+                                style: TextStyle(color: Colors.black, fontSize: 12),
+                              ),
+                              backgroundColor: MyTheme.light_grey,
+                              padding: const EdgeInsets.only(top: 2.0, bottom: 2.0),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                               //navigate to cart screen
+                               Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                 return Cart(has_bottomnav: false,);
+                               })).then((value) {
+                                 onPopped(value);
+                               });
+                              },
+                              child: Chip(
+                                label: Text(
+                                  "Edit",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                avatar: CircleAvatar(
+                                  backgroundColor: Colors.transparent,
+                                  child: Image.asset(
+                                    'assets/edit.png',
+                                    height: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                backgroundColor: MyTheme.accent_color,
+                                padding: const EdgeInsets.only(bottom: 2.0),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                   ),
                 ),
                 Spacer(),
-                Container(
-                  width: 32,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          onPressDelete(widget.cartList[seller_index].id);
-                        },
-                        child: Container(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 14.0),
-                            child: Image.asset(
-                              'assets/trash.png',
-                              height: 16,
-                              color: Colors.red,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                
                 Padding(
                   padding: const EdgeInsets.all(14.0),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          onQuantityIncrease(seller_index);
-                        },
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecorations
-                              .buildCartCircularButtonDecoration(),
-                          child: Icon(
-                            Icons.add,
-                            color: MyTheme.grey_153,
-                            size: 12,
-                          ),
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                        child: Text(
-                          widget.cartList[seller_index].quantity.toString(),
-                          style: TextStyle(
-                              color: MyTheme.accent_color, fontSize: 16),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          onQuantityDecrease(seller_index, item_index);
-                        },
-                        child: Container(
-                          width: 24,
-                          height: 24,
-                          decoration: BoxDecorations
-                              .buildCartCircularButtonDecoration(),
-                          child: Icon(
-                            Icons.remove,
-                            color: MyTheme.grey_153,
-                            size: 12,
-                          ),
-                        ),
-                      ),
-                    ],
+                    children: [],
                   ),
                 )
               ],
@@ -1003,6 +998,7 @@ class _SelectAddressState extends State<SelectAddress> {
         if (_seleted_shipping_address != _shippingAddressList[index].id) {
           _seleted_shipping_address = _shippingAddressList[index].id;
           _state_id = _shippingAddressList[index].state_id;
+          getSetShippingCost();
 
           // onAddressSwitch();
         }
@@ -1240,19 +1236,18 @@ class _SelectAddressState extends State<SelectAddress> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(
-              height: 50,
-              child: Center(
-                child: Text(
-                  "GH₵ $_cartTotalString",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
-                ),
-              )
-            ),
+                height: 50,
+                child: Center(
+                  child: Text(
+                    "GH₵ ${_cartTotalString}",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600),
+                  ),
+                )),
             Btn.minWidthFixHeight(
-              minWidth: MediaQuery.of(context).size.width /2 ,
+              minWidth: MediaQuery.of(context).size.width / 2,
               height: 50,
               color: MyTheme.accent_color,
               shape: RoundedRectangleBorder(

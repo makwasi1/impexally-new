@@ -163,6 +163,7 @@ class _ProfileState extends State<Profile> {
 
   onTapLogout(BuildContext context) async {
     AuthHelper().clearUserData();
+    AuthHelper().clearUserDetailsFromSharedPref();
     context.go("/");
   }
 

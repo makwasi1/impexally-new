@@ -6,6 +6,7 @@ import 'package:active_ecommerce_flutter/custom/text_styles.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
 import 'package:active_ecommerce_flutter/data_model/cart_response.dart';
+import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
@@ -16,9 +17,11 @@ import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:active_ecommerce_flutter/screens/select_address.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 
+import '../data_model/login_response.dart';
 import '../data_model/product_detail.dart';
 import '../data_model/products_model.dart';
 import 'cart.dart';
@@ -142,8 +145,9 @@ class _ProductVariantsState extends State<ProductVariants> {
     setState(() {});
   }
 
-  onPressAddToCart(context, snackbar) {
-    if (is_logged_in.$ == false) {
+  onPressAddToCart(context, snackbar) async {
+    LoginResponse loginResponse = await AuthHelper().getUserDetailsFromSharedPref();
+    if (loginResponse.result == false) {
       ToastComponent.showDialog(
           "Please login / register to add this product to cart",
           gravity: Toast.center,
@@ -153,10 +157,9 @@ class _ProductVariantsState extends State<ProductVariants> {
         })).then((value) {
           onPopped(value);
         });
-      return;
-    }
-
-    addToCart(mode: "add_to_cart", context: context, snackbar: snackbar);
+    }else {
+       addToCart(mode: "add_to_cart", context: context, snackbar: snackbar);
+    }   
   }
 
   addToCart(
@@ -164,9 +167,10 @@ class _ProductVariantsState extends State<ProductVariants> {
       BuildContext? context,
       snackbar = null,
       ProductMiniDetail? variation}) async {
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
     var cartAddResponse = await CartRepository().getCartAddResponse(
         widget.variation!.products!.id,
-        user_id.$,
+        res.user!.id,
         int.tryParse(quantityController.text),
         itemSelectedVariations);
 
@@ -861,7 +865,7 @@ class _ProductVariantsState extends State<ProductVariants> {
           Image.network(
             "https://image.impexally.com/images/app/impexally/ng/get-cash-back-1.webp",
             width: DeviceInfo(context).width,
-            height: 100,
+            height: 80,
           ),
           Column(
             children: List.generate(_singleProduct!.products!.variation!.length,

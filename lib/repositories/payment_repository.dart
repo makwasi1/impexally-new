@@ -16,6 +16,7 @@ import 'package:active_ecommerce_flutter/data_model/sslcommerz_begin_response.da
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class PaymentRepository {
   Future<dynamic> getPaymentResponseList({mode = "", list = "both"}) async {
@@ -117,10 +118,13 @@ class PaymentRepository {
   }
 
   Future<dynamic> getOrderCreateResponseFromMomo(phone, network, amount) async {
+    const storage = FlutterSecureStorage();
+    String? user_id = await storage.read(key: 'user_id');
     var post_body = jsonEncode(
-        {"phone": "$phone", "network": "${network}", "amount": "$amount"});
+        {"phone": "$phone", "network": "${network}", "amount": "$amount", "user_id": "${user_id}"});
 
     String url = ("${AppConfig.BASE_URL}/payment/make");
+    
 
     print(url);
     final response = await ApiRequest.post(
@@ -134,8 +138,10 @@ class PaymentRepository {
 
     //
     if (response.statusCode == 200) {
+      int? order_id = json.decode(response.body)["order_number"];
+      await storage.write(key: 'order_id', value: order_id.toString());
       return new OrderCreateResponse(
-          combined_order_id: 0, result: true, message: "Success");
+          combined_order_id: order_id, result: true, message: "Success");
     } else {
       return new OrderCreateResponse(
           combined_order_id: 0, result: false, message: "Failed");

@@ -109,8 +109,29 @@ class CartRepository {
     print("cart_id: ${jsonResponse['cart']['id']}");
     String cart_id = (jsonResponse['cart']['id']).toString();
     storage.write(key: 'cart_id', value: cart_id);
-    // String? cart_id = await storage.read(key: 'cart_id');
     return cart_id;
+  }
+
+  Future<String?> removeUserCart(int? user_id) async {
+    var post_body = jsonEncode({"user_id": user_id});
+
+    const storage = FlutterSecureStorage();
+
+    // "cost_matrix": AppConfig.purchase_code
+    String url = ("${AppConfig.BASE_URL}/cart/delete");
+    final response = await ApiRequest.delete(
+        url: url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: post_body);
+
+    if(response.statusCode == 200){
+      storage.delete(key: "cart_id");
+      return "Deleted";
+    } else {
+      return "Failed to delete cart";
+    }
   }
 
   Future<dynamic> getCartAddResponse(int? id, int? user_id,
@@ -120,8 +141,6 @@ class CartRepository {
 
     //read the cart_id from the storage
     String? cart_id = await storage.read(key: 'cart_id');
-
-    print("cart_id: $cart_id");
 
     if (cart_id == null) {
       cart_id = await getCartCreateResponse(user_id);
@@ -144,7 +163,15 @@ class CartRepository {
         },
         body: post_body);
 
-    return cartAddResponseFromJson(response.body);
+        if(response.statusCode == 200){
+          return cartAddResponseFromJson(response.body);
+        } else if(response.statusCode == 404){ 
+          await getCartCreateResponse(user_id); 
+        } else {
+          return new CartAddResponse(result: false, message: "Failed to add item to cart");
+        }
+
+    
   }
 
   Future<dynamic> getCartSummaryResponse() async {

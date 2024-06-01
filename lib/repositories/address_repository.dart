@@ -220,7 +220,7 @@ class AddressRepository {
   }
 
   Future<dynamic> getShippingCostResponse(
-      {shipping_type = "flat_rate", state_id = "", cart_id = ""}) async {
+      {shipping_type = "flat_rate", state_id, cart_id}) async {
     String url =
         ("${AppConfig.BASE_URL}/shipping-fee/$state_id/$cart_id?shipping_method=${shipping_type}");
 
@@ -232,7 +232,7 @@ class AddressRepository {
     );
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
-      int? shipping_fee = jsonResponse['shipping_fee'];
+      int? shipping_fee = jsonResponse['shipping_cost'];
       return new ShippingCostResponse(
           result: true,
           shipping_type: "flat_rate",

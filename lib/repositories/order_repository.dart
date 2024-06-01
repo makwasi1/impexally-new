@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/data_model/common_response.dart';
 import 'package:active_ecommerce_flutter/data_model/order_detail_response.dart';
@@ -8,41 +10,72 @@ import 'package:active_ecommerce_flutter/helpers/main_helpers.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../data_model/reorder_response.dart';
 
 class OrderRepository {
-  Future<dynamic> getOrderList(
-      {page = 1, payment_status = "", delivery_status = ""}) async {
-    String url = ("${AppConfig.BASE_URL}/purchase-history" +
-        "?page=${page}&payment_status=${payment_status}&delivery_status=${delivery_status}");
-
-    Map<String,String> header = commonHeader;
-
-    header.addAll(authHeader);
-    header.addAll(currencyHeader);
+  Future<dynamic> getOrderList(String? user_id) async {
+    String url = ("${AppConfig.BASE_URL}/orders/user/" + "$user_id");
 
     final response = await ApiRequest.get(
-        url: url,
-        headers: header,
-        middleware: BannedUser());
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+
+    if(response.statusCode == 200){
+      List<Order> orders = json.decode(response.body);
+      return new OrderMiniResponse(
+        orders: orders,
+        status: 1,
+        success: true
+      );
+    }
 
     return orderMiniResponseFromJson(response.body);
+  }
+
+  //create order
+  Future<dynamic> createOrder(String? price_subtotal, String? price_shipping) async {
+    String url = ("${AppConfig.BASE_URL}/order");
+    const storage = FlutterSecureStorage();
+    String? cart_id = await storage.read(key: 'cart_id');
+    String? order_number = await storage.read(key: 'order_id');
+    var bodyObj = {
+      "cart_id": cart_id,
+      "price_subtotal": price_subtotal,
+      "price_shipping": price_shipping,
+      "order_number": order_number
+    };
+    var body = jsonEncode(bodyObj);
+    final response = await ApiRequest.post(
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: body
+    );
+
+    if(response.statusCode == 200){
+      return commonResponseFromJson(response.body);
+    }
+
+
   }
 
   Future<dynamic> getOrderDetails({int? id = 0}) async {
     String url =
         ("${AppConfig.BASE_URL}/purchase-history-details/" + id.toString());
 
-    Map<String,String> header = commonHeader;
+    Map<String, String> header = commonHeader;
 
     header.addAll(authHeader);
     header.addAll(currencyHeader);
 
     final response = await ApiRequest.get(
-        url: url,
-        headers:header,
-        middleware: BannedUser());
+        url: url, headers: header, middleware: BannedUser());
     return orderDetailResponseFromJson(response.body);
   }
 
@@ -77,15 +110,13 @@ class OrderRepository {
   Future<dynamic> getOrderItems({int? id = 0}) async {
     String url =
         ("${AppConfig.BASE_URL}/purchase-history-items/" + id.toString());
-    Map<String,String> header = commonHeader;
+    Map<String, String> header = commonHeader;
 
     header.addAll(authHeader);
     header.addAll(currencyHeader);
 
     final response = await ApiRequest.get(
-        url: url,
-        headers: header,
-        middleware: BannedUser());
+        url: url, headers: header, middleware: BannedUser());
 
     return orderItemlResponseFromJson(response.body);
   }
@@ -94,15 +125,13 @@ class OrderRepository {
     page = 1,
   }) async {
     String url = ("${AppConfig.BASE_URL}/digital/purchased-list?page=$page");
-    Map<String,String> header = commonHeader;
+    Map<String, String> header = commonHeader;
 
     header.addAll(authHeader);
     header.addAll(currencyHeader);
 
     final response = await ApiRequest.get(
-        url: url,
-        headers: header,
-        middleware: BannedUser());
+        url: url, headers: header, middleware: BannedUser());
 
     return purchasedDigitalProductResponseFromJson(response.body);
   }

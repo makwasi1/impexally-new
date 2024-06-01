@@ -32,15 +32,17 @@ class ApiRequest{
     return AIZApiResponse.check(response,middleware: middleware,groupMiddleWare: groupMiddleWare);
   }
 
-  static Future<http.Response> delete({required String url, Map<String,String>? headers,Middleware? middleware,GroupMiddleware? groupMiddleWare})async{
+  static Future<http.Response> delete({required String url, Map<String,String>? headers,String? body,Middleware? middleware,GroupMiddleware? groupMiddleWare})async{
     Uri uri = Uri.parse(url);
     Map<String,String>? headerMap=commonHeader;
     headerMap.addAll(currencyHeader);
     if(headers!=null){
       headerMap.addAll(headers);
     }
-    var response =    await http.delete(uri,headers: headerMap);
+  var response =    await http.post(uri,headers: headerMap,body: body);
     return AIZApiResponse.check(response,middleware: middleware,groupMiddleWare: groupMiddleWare);
   }
+
+ 
 
 }

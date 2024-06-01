@@ -3,12 +3,14 @@ import 'package:active_ecommerce_flutter/custom/btn.dart';
 import 'package:active_ecommerce_flutter/custom/enum_classes.dart';
 import 'package:active_ecommerce_flutter/custom/lang_text.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
+import 'package:active_ecommerce_flutter/dummy_data/orders.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/repositories/cart_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/coupon_repository.dart';
+import 'package:active_ecommerce_flutter/repositories/order_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/payment_repository.dart';
 import 'package:active_ecommerce_flutter/screens/order_list.dart';
 import 'package:active_ecommerce_flutter/screens/payment_method_screen/amarpay_screen.dart';
@@ -31,6 +33,7 @@ import 'package:active_ecommerce_flutter/screens/payment_method_screen/stripe_sc
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:toast/toast.dart';
 
 import '../data_model/payment_type_response.dart';
@@ -44,6 +47,8 @@ class Checkout extends StatefulWidget {
   final double rechargeAmount;
   final String? title;
   var packageId;
+  final String? cart_amount;
+  final String? delivery_fee;
 
   Checkout(
       {Key? key,
@@ -53,7 +58,7 @@ class Checkout extends StatefulWidget {
       //this.offLinePaymentFor,
       this.rechargeAmount = 0.0,
       this.title,
-      this.packageId = 0})
+      this.packageId = 0, this.cart_amount, this.delivery_fee})
       : super(key: key);
 
   @override
@@ -91,7 +96,7 @@ class _CheckoutState extends State<Checkout> {
     /*print("user data");
     print(is_logged_in.$);
     print(access_token.value);*/
-    print(widget.list);
+
 
     fetchAll();
   }
@@ -249,11 +254,11 @@ class _CheckoutState extends State<Checkout> {
           duration: Toast.lengthLong);
       return;
     }
-    // if (_grandTotalValue == 0.00) {
-    //   ToastComponent.showDialog(AppLocalizations.of(context)!.nothing_to_pay,
-    //       gravity: Toast.center, duration: Toast.lengthLong);
-    //   return;
-    // }
+    if (_grandTotalValue == 0.00) {
+      ToastComponent.showDialog(AppLocalizations.of(context)!.nothing_to_pay,
+          gravity: Toast.center, duration: Toast.lengthLong);
+      return;
+    }
 
     debugPrint("Selected Payment Method: " + _selected_payment_method!);
 
@@ -500,9 +505,10 @@ class _CheckoutState extends State<Checkout> {
 
 
   pay_by_mobile() async {
+    const storage = FlutterSecureStorage();
     loading();
     var orderCreateResponse = await PaymentRepository()
-        .getOrderCreateResponseFromMomo(_phoneNumberController.text, "MTN", "30");
+        .getOrderCreateResponseFromMomo(_phoneNumberController.text, "MTN", _grandTotalValue);
     Navigator.of(loadingcontext).pop();
     if (orderCreateResponse.result == false) {
       ToastComponent.showDialog(orderCreateResponse.message,
@@ -511,9 +517,16 @@ class _CheckoutState extends State<Checkout> {
       return;
     }
 
+    String? user_id = await storage.read(key: "user_id");
+    await OrderRepository().createOrder(widget.cart_amount, widget.delivery_fee);
+    await CartRepository().removeUserCart(int.tryParse(user_id!));
+
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return OrderList(from_checkout: true);
-    }));
+    })).whenComplete(() => 
+      ToastComponent.showDialog("Processing Payment... Please wait a moment.",
+          gravity: Toast.center, duration: Toast.lengthLong)
+    );
   }
 
   pay_by_manual_payment() async {
@@ -570,7 +583,7 @@ class _CheckoutState extends State<Checkout> {
               ),
               SizedBox(height: 20), // Add some spacing
               Text(
-                'Total Amount to Pay: GH ${_cartTotalString}', // Replace with the actual amount
+                'Total Amount to Pay: GH ${_grandTotalValue}', // Replace with the actual amount
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -594,6 +607,7 @@ class _CheckoutState extends State<Checkout> {
                 style: TextStyle(color: Colors.green),
               ),
               onPressed: () {
+                Navigator.of(context, rootNavigator: true).pop();
                 pay_by_mobile();
               },
             ),
@@ -1055,7 +1069,7 @@ class _CheckoutState extends State<Checkout> {
                   color: MyTheme.light_grey,
                 padding: EdgeInsets.all(8.0),
                   child: Text(
-                    "Get upto 25% discount on Impexally Pay using ICICI Bank Net banking or Cards",
+                    "Enjoy upto 50% off and free delivery on online orders",
                     style: TextStyle(
                         color: MyTheme.font_grey,
                         fontSize: 12,
@@ -1066,49 +1080,9 @@ class _CheckoutState extends State<Checkout> {
               )
             ],
           ),
+          
           SizedBox(
             height: 8,
-          ),
-          Row(
-            children: [
-              Flexible(
-                 // Add some padding to the container
-                child: Container(
-                  color: MyTheme.light_grey,
-                padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    "Get upto 25% discount on Impexally Pay using ICICI Bank Net banking or Cards",
-                    style: TextStyle(
-                        color: MyTheme.font_grey,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
-                    overflow: TextOverflow.fade, // Add this line to prevent text overflow
-                  ),
-                ),
-              )
-            ],
-          ),
-          SizedBox(
-            height: 8,
-          ),
-          Row(
-            children: [
-              Flexible(
-                 // Add some padding to the container
-                child: Container(
-                  color: MyTheme.light_grey,
-                padding: EdgeInsets.all(8.0),
-                  child: Text(
-                    "Get upto 25% discount on Impexally Pay using ICICI Bank Net banking or Cards",
-                    style: TextStyle(
-                        color: MyTheme.font_grey,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600),
-                    overflow: TextOverflow.fade, // Add this line to prevent text overflow
-                  ),
-                ),
-              )
-            ],
           ),
         ],
       ),
@@ -1170,9 +1144,9 @@ class _CheckoutState extends State<Checkout> {
                       ],
                     ),
                   ),
-                  Positioned(
-                    right: 4,
-                    top: 16,
+                  Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 16.0),
                     child: buildPaymentMethodCheckContainer(
                         _selected_payment_method_key ==
                             _paymentTypeList[index].payment_type_key),
@@ -1210,7 +1184,7 @@ class _CheckoutState extends State<Checkout> {
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ $_cartTotalString",
+                        "GH₵ ${widget.cart_amount}",
                         style: TextStyle(
                             color: MyTheme.font_grey,
                             fontSize: 14,
@@ -1285,7 +1259,7 @@ class _CheckoutState extends State<Checkout> {
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ 15",
+                        "GH₵ ${widget.delivery_fee}",
                         style: TextStyle(
                             color: MyTheme.font_grey,
                             fontSize: 14,
@@ -1311,7 +1285,7 @@ class _CheckoutState extends State<Checkout> {
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ ",
+                        "GH₵ $_grandTotalValue",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 18,
@@ -1366,10 +1340,10 @@ class _CheckoutState extends State<Checkout> {
                 height: 50,
                 child: Center(
                   child: Text(
-                    "GH₵ 20000",
+                    "GH₵ $_grandTotalValue",
                     style: TextStyle(
                         color: Colors.black,
-                        fontSize: 16,
+                        fontSize: 24,
                         fontWeight: FontWeight.w600),
                   ),
                 )),

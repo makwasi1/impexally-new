@@ -6,6 +6,8 @@ import 'package:active_ecommerce_flutter/custom/text_styles.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
 import 'package:active_ecommerce_flutter/data_model/cart_response.dart';
+import 'package:active_ecommerce_flutter/data_model/login_response.dart';
+import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
@@ -16,6 +18,7 @@ import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:active_ecommerce_flutter/screens/select_address.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
@@ -54,7 +57,6 @@ class _CartState extends State<Cart> {
   void initState() {
     // TODO: implement initState
     super.initState();
-
     /*print("user data");
     print(is_logged_in.$);
     print(access_token.value);
@@ -81,8 +83,9 @@ class _CartState extends State<Cart> {
 
   fetchData() async {
     // getCartCount();
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
     CartModel? cartResponseList =
-        await CartRepository().getCartResponseList(user_id.$);
+        await CartRepository().getCartResponseList(res.user!.id!);
 
     if (cartResponseList!.cart != null) {
       _shopList = cartResponseList.cart!.items!;
@@ -101,8 +104,9 @@ class _CartState extends State<Cart> {
   }
 
   getSetCartTotal() async {
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
     CartModel? cartResponseList =
-        await CartRepository().getCartResponseList(user_id.$);
+        await CartRepository().getCartResponseList(res.user!.id);
     if (cartResponseList!.cart != null) {
       _cartTotalString = cartResponseList.cartTotal.toString();
       setState(() {});
@@ -205,8 +209,9 @@ class _CartState extends State<Cart> {
   }
 
   confirmDelete(cart_id) async {
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
     var cartDeleteResponse =
-        await CartRepository().getCartDeleteResponse(cart_id, user_id.$);
+        await CartRepository().getCartDeleteResponse(cart_id, res.user!.id);
 
     if (cartDeleteResponse.result == true) {
       ToastComponent.showDialog(cartDeleteResponse.message,
@@ -230,7 +235,8 @@ class _CartState extends State<Cart> {
   }
 
   process({mode}) async {
-    if (is_logged_in.$ == false) {  
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+    if (res.result == false) {  
       ToastComponent.showDialog(
           "You must be logged in to proceed to shipping",
           gravity: Toast.center,
@@ -432,10 +438,10 @@ class _CartState extends State<Cart> {
                               bottomRight: const Radius.circular(6.0),
                             )),
                       child: Text(
-                        AppLocalizations.of(context)!.proceed_to_shipping_ucf,
+                        "PROCEED TO SHIPPING",
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 13,
+                            fontSize: 16,
                             fontWeight: FontWeight.w700),
                       ),
                       onPressed: () {

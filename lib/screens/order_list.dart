@@ -8,6 +8,7 @@ import 'package:active_ecommerce_flutter/screens/main.dart';
 import 'package:active_ecommerce_flutter/screens/order_details.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_context/one_context.dart';
 import 'package:shimmer/shimmer.dart';
@@ -167,10 +168,10 @@ class _OrderListState extends State<OrderList> {
   }
 
   fetchData() async {
-    var orderResponse = await OrderRepository().getOrderList(
-        page: _page,
-        payment_status: _selectedPaymentStatus!.option_key,
-        delivery_status: _selectedDeliveryStatus!.option_key);
+    const storage = FlutterSecureStorage();
+
+    String? user_id =  await storage.read(key: 'user_id');
+    var orderResponse = await OrderRepository().getOrderList(user_id);
     //print("or:"+orderResponse.toJson().toString());
     _orderList.addAll(orderResponse.orders);
     _isInitial = false;

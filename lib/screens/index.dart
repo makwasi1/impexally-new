@@ -25,9 +25,9 @@ class _IndexState extends State<Index> {
 
 
   Future<String?>  getSharedValueHelperData()async{
-    access_token.load().whenComplete(() {
-      AuthHelper().fetch_and_set();
-    });
+    // access_token.load().whenComplete(() {
+    //   AuthHelper().fetch_and_set();
+    // });
     AddonsHelper().setAddonsData();
     BusinessSettingHelper().setBusinessSettingData();
     await app_language.load();

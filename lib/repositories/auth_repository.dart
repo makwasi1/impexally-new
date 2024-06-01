@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/data_model/common_response.dart';
+import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
 import 'package:active_ecommerce_flutter/data_model/confirm_code_response.dart';
 import 'package:active_ecommerce_flutter/data_model/login_response.dart';
@@ -67,19 +68,8 @@ class AuthRepository {
     return loginResponseFromJson(response.body);
   }
 
-  Future<LogoutResponse> getLogoutResponse() async {
-    String url = ("${AppConfig.BASE_URL}/auth/logout");
-    final response = await ApiRequest.get(
-      url: url,
-      headers: {
-        "Authorization": "Bearer ${access_token.$}",
-        "App-Language": app_language.$!,
-      },
-    );
-
-    // print(response.body);
-
-    return logoutResponseFromJson(response.body);
+  Future<void> getLogoutResponse() async {
+    AuthHelper().clearUserData();
   }
 
   Future<CommonResponse> getAccountDeleteResponse() async {
