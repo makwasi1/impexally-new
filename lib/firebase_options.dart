@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCoPQJWYeO9lGOVwXk-IdGgblTBa7dgELM',
-    appId: '1:271331178626:android:387ae14e62969be5e11c9b',
-    messagingSenderId: '271331178626',
-    projectId: 'e-commerce-9754b',
-    storageBucket: 'e-commerce-9754b.appspot.com',
+    apiKey: 'AIzaSyDq_66gBWj4TY59ocw7Jm3n8ac1Pqm4eOg',
+    appId: '1:564140156072:android:6a85bbbaaee29551834e9d',
+    messagingSenderId: '564140156072',
+    projectId: 'impexall-notify',
+    storageBucket: 'impexall-notify.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCtIv0xP-BnskA2OhqxwuYZKTwKqyhvryo',
-    appId: '1:271331178626:ios:4bf207ae1e4a1163e11c9b',
-    messagingSenderId: '271331178626',
-    projectId: 'e-commerce-9754b',
-    storageBucket: 'e-commerce-9754b.appspot.com',
+    apiKey: 'AIzaSyDO4YtJDOpi_x79E1tUAqEBaG9Px__YzpY',
+    appId: '1:564140156072:ios:23b35f534c8e4f29834e9d',
+    messagingSenderId: '564140156072',
+    projectId: 'impexall-notify',
+    storageBucket: 'impexall-notify.appspot.com',
     iosBundleId: 'com.activeitzone.activeecommerceflutterapp',
   );
+
 }
