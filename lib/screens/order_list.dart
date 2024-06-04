@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart' as date; 
 import 'package:one_context/one_context.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -175,7 +176,7 @@ class _OrderListState extends State<OrderList> {
     //print("or:"+orderResponse.toJson().toString());
     _orderList.addAll(orderResponse.orders);
     _isInitial = false;
-    _totalData = orderResponse.meta.total;
+    _totalData = 100;
     _showLoadingContainer = false;
     setState(() {});
   }
@@ -451,6 +452,7 @@ class _OrderListState extends State<OrderList> {
   }
 
   buildOrderListItemCard(int index) {
+    String formattedDate = date.DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.parse(_orderList[index].createdAt));
     return Container(
       decoration: BoxDecorations.buildBoxDecoration_1(),
       child: Padding(
@@ -461,7 +463,7 @@ class _OrderListState extends State<OrderList> {
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Text(
-                _orderList[index].code,
+                _orderList[index].orderNumber,
                 style: TextStyle(
                     color: MyTheme.accent_color,
                     fontSize: 13,
@@ -472,12 +474,12 @@ class _OrderListState extends State<OrderList> {
               padding: const EdgeInsets.only(bottom: 4.0),
               child: Row(
                 children: [
-                  Text(_orderList[index].date,
+                  Text(formattedDate,
                       style: TextStyle(
                           color: MyTheme.dark_font_grey, fontSize: 12)),
                   Spacer(),
                   Text(
-                    convertPrice(_orderList[index].grand_total),
+                    _orderList[index].priceTotal,
                     style: TextStyle(
                         color: MyTheme.accent_color,
                         fontSize: 16,
@@ -496,11 +498,11 @@ class _OrderListState extends State<OrderList> {
                         TextStyle(color: MyTheme.dark_font_grey, fontSize: 12),
                   ),
                   Text(
-                    _orderList[index].payment_status_string,
+                    _orderList[index].paymentStatus,
                     style: TextStyle(
-                        color: _orderList[index].payment_status == "paid"
-                            ? Colors.green
-                            : Colors.red,
+                        color: _orderList[index].paymentStatus == "pending"
+                            ? Colors.red
+                            : Colors.green,
                         fontSize: 12,
                         fontWeight: FontWeight.w500),
                   ),
@@ -510,11 +512,11 @@ class _OrderListState extends State<OrderList> {
             Row(
               children: [
                 Text(
-                  "${AppLocalizations.of(context)!.delivery_status_ucf} -",
+                  "Payment Method: ",
                   style: TextStyle(color: MyTheme.dark_font_grey, fontSize: 12),
                 ),
                 Text(
-                  _orderList[index].delivery_status_string,
+                  _orderList[index].paymentMethod,
                   style: TextStyle(
                       color: MyTheme.dark_font_grey,
                       fontSize: 12,

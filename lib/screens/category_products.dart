@@ -368,6 +368,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
                   main_price: _productList[index].priceDiscounted,
                   stroked_price: _productList[index].price,
                   discount: _productList[index].discountRate + "%",
+                  stock: _productList[index].stock,
                   is_wholesale: true,
                   has_discount:true);
             },

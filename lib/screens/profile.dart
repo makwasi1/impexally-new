@@ -8,6 +8,7 @@ import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
+import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
 import 'package:active_ecommerce_flutter/repositories/profile_repository.dart';
 import 'package:active_ecommerce_flutter/screens/address.dart';
 import 'package:active_ecommerce_flutter/screens/auction_products.dart';
@@ -33,8 +34,10 @@ import 'package:active_ecommerce_flutter/screens/wallet.dart';
 import 'package:active_ecommerce_flutter/screens/wishlist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:one_context/one_context.dart';
+import 'package:provider/provider.dart';
 import 'package:route_transitions/route_transitions.dart';
 import 'package:toast/toast.dart';
 
@@ -62,21 +65,43 @@ class _ProfileState extends State<Profile> {
   String _wishlistCounterString = "00";
   int? _orderCounter = 0;
   String _orderCounterString = "00";
+  bool is_logged_in = false;
+  String? user_id;
+  String? user_name;
+  String? user_email;
+
   late BuildContext loadingcontext;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
-    if (is_logged_in.$ == true) {
-      fetchAll();
-    }
+    getUserDeatilsFromStorage();
   }
 
   void dispose() {
     _mainScrollController.dispose();
     super.dispose();
+  }
+
+  getUserDeatilsFromStorage() async {
+    const storage = FlutterSecureStorage();
+    final String? is_logged_in = await storage.read(key: 'is_logged_in');
+    final String? user_id = await storage.read(key: 'user_id');
+    final String? user_name = await storage.read(key: 'user_name');
+    final String? user_email = await storage.read(key: 'user_email');
+
+    setState(() {
+      if (is_logged_in == "true") {
+        this.is_logged_in = true;
+        this.user_id = user_id;
+        this.user_name = user_name;
+        this.user_email = user_email;
+      } else {
+        this.is_logged_in = false;
+      }
+    });
+    fetchAll();
   }
 
   Future<void> _onPageRefresh() async {
@@ -90,26 +115,40 @@ class _ProfileState extends State<Profile> {
   }
 
   fetchAll() {
-    fetchCounters();
+    // fetchCounters();
+    getCartCount();
   }
 
-  fetchCounters() async {
-    var profileCountersResponse =
-        await ProfileRepository().getProfileCountersResponse();
+  getCartCount() async {
+   int cartCount = await Provider.of<CartCounter>(context, listen: false).getCount();
+   int orderCount = await Provider.of<CartCounter>(context, listen: false).getOrderCount();
 
-    _cartCounter = profileCountersResponse.cart_item_count;
-    _wishlistCounter = profileCountersResponse.wishlist_item_count;
-    _orderCounter = profileCountersResponse.order_count;
-
-    _cartCounterString =
-        counterText(_cartCounter.toString(), default_length: 2);
-    _wishlistCounterString =
-        counterText(_wishlistCounter.toString(), default_length: 2);
-    _orderCounterString =
-        counterText(_orderCounter.toString(), default_length: 2);
-
-    setState(() {});
+    setState(() {
+      _cartCounter = cartCount;
+      _orderCounter = orderCount;
+      _cartCounterString = counterText(_cartCounter.toString(), default_length: 2);
+      _orderCounterString = counterText(_orderCounter.toString(), default_length: 2);
+    });
+    
   }
+
+  // fetchCounters() async {
+  //   var profileCountersResponse =
+  //       await ProfileRepository().getProfileCountersResponse();
+
+  //   _cartCounter = profileCountersResponse.cart_item_count;
+  //   _wishlistCounter = profileCountersResponse.wishlist_item_count;
+  //   _orderCounter = profileCountersResponse.order_count;
+
+  //   _cartCounterString =
+  //       counterText(_cartCounter.toString(), default_length: 2);
+  //   _wishlistCounterString =
+  //       counterText(_wishlistCounter.toString(), default_length: 2);
+  //   _orderCounterString =
+  //       counterText(_orderCounter.toString(), default_length: 2);
+
+  //   setState(() {});
+  // }
 
   deleteAccountReq() async {
     loading();
@@ -164,6 +203,7 @@ class _ProfileState extends State<Profile> {
   onTapLogout(BuildContext context) async {
     AuthHelper().clearUserData();
     AuthHelper().clearUserDetailsFromSharedPref();
+    fetchAll();
     context.go("/");
   }
 
@@ -326,17 +366,7 @@ class _ProfileState extends State<Profile> {
             ],
           ),
 
-          buildBottomVerticalCardListItem("assets/download.png",
-              LangText(context).local.all_digital_products_ucf, onPressed: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return DigitalProducts();
-            }));
-          }),
-          Divider(
-            thickness: 1,
-            color: MyTheme.light_grey,
-          ),
-
+        
           buildBottomVerticalCardListItem(
               "assets/coupon.png", LangText(context).local.coupons_ucf,
               onPressed: () {
@@ -404,7 +434,7 @@ class _ProfileState extends State<Profile> {
               children: [
                 Container(
                   height: _auctionExpand
-                      ? is_logged_in.$
+                      ? is_logged_in
                           ? 140
                           : 75
                       : 40,
@@ -486,7 +516,7 @@ class _ProfileState extends State<Profile> {
                                 const SizedBox(
                                   height: 20,
                                 ),
-                                if (is_logged_in.$)
+                                if (is_logged_in)
                                   Column(
                                     children: [
                                       GestureDetector(
@@ -585,7 +615,7 @@ class _ProfileState extends State<Profile> {
               ],
             ),
 
-          if (is_logged_in.$ && (vendor_system.$))
+          if (is_logged_in && (vendor_system.$))
             Column(
               children: [
                 buildBottomVerticalCardListItem("assets/shop.png",
@@ -602,7 +632,7 @@ class _ProfileState extends State<Profile> {
               ],
             ),
 
-          if (is_logged_in.$)
+          if (is_logged_in)
             Column(
               children: [
                 buildBottomVerticalCardListItem("assets/delete.png",
@@ -675,17 +705,7 @@ class _ProfileState extends State<Profile> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          buildHorizontalSettingItem(true, "assets/language.png",
-              AppLocalizations.of(context)!.language_ucf, () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return ChangeLanguage();
-                },
-              ),
-            );
-          }),
+          
           InkWell(
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -715,10 +735,10 @@ class _ProfileState extends State<Profile> {
             ),
           ),
           buildHorizontalSettingItem(
-              is_logged_in.$,
+              is_logged_in,
               "assets/edit.png",
               AppLocalizations.of(context)!.edit_profile_ucf,
-              is_logged_in.$
+              is_logged_in
                   ? () {
                       AIZRoute.push(context, ProfileEdit()).then((value) {
                         //onPopped(value);
@@ -730,10 +750,10 @@ class _ProfileState extends State<Profile> {
                     }
                   : () => showLoginWarning()),
           buildHorizontalSettingItem(
-              is_logged_in.$,
+              is_logged_in,
               "assets/location.png",
               AppLocalizations.of(context)!.address_ucf,
-              is_logged_in.$
+              is_logged_in
                   ? () {
                       Navigator.push(
                         context,
@@ -841,7 +861,7 @@ class _ProfileState extends State<Profile> {
             buildSettingAndAddonsHorizontalMenuItem(
                 "assets/orders.png",
                 AppLocalizations.of(context).profile_screen_orders,
-                is_logged_in.$
+                is_logged_in
                     ? () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
@@ -852,7 +872,7 @@ class _ProfileState extends State<Profile> {
             buildSettingAndAddonsHorizontalMenuItem(
                 "assets/heart.png",
                 AppLocalizations.of(context).main_drawer_my_wishlist,
-                is_logged_in.$
+                is_logged_in
                     ? () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
@@ -864,7 +884,7 @@ class _ProfileState extends State<Profile> {
               buildSettingAndAddonsHorizontalMenuItem(
                   "assets/points.png",
                   AppLocalizations.of(context).club_point_screen_earned_points,
-                  is_logged_in.$
+                  is_logged_in
                       ? () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
@@ -877,7 +897,7 @@ class _ProfileState extends State<Profile> {
                   "assets/refund.png",
                   AppLocalizations.of(context)
                       .refund_request_screen_refund_requests,
-                  is_logged_in.$
+                  is_logged_in
                       ? () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
@@ -889,7 +909,7 @@ class _ProfileState extends State<Profile> {
               buildSettingAndAddonsHorizontalMenuItem(
                   "assets/messages.png",
                   AppLocalizations.of(context).main_drawer_messages,
-                  is_logged_in.$
+                  is_logged_in
                       ? () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
@@ -901,7 +921,7 @@ class _ProfileState extends State<Profile> {
               buildSettingAndAddonsHorizontalMenuItem(
                   "assets/auction.png",
                   AppLocalizations.of(context).profile_screen_auction,
-                  is_logged_in.$
+                  is_logged_in
                       ? () {
                           // Navigator.push(context,
                           //     MaterialPageRoute(builder: (context) {
@@ -913,7 +933,7 @@ class _ProfileState extends State<Profile> {
               buildSettingAndAddonsHorizontalMenuItem(
                   "assets/classified_product.png",
                   AppLocalizations.of(context).profile_screen_classified_products,
-                  is_logged_in.$
+                  is_logged_in
                       ? () {
                           Navigator.push(context,
                               MaterialPageRoute(builder: (context) {
@@ -954,7 +974,7 @@ class _ProfileState extends State<Profile> {
           buildSettingAndAddonsHorizontalMenuItem(
               "assets/orders.png",
               AppLocalizations.of(context)!.orders_ucf,
-              is_logged_in.$
+              is_logged_in
                   ? () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
@@ -965,7 +985,7 @@ class _ProfileState extends State<Profile> {
           buildSettingAndAddonsHorizontalMenuItem(
               "assets/heart.png",
               AppLocalizations.of(context)!.my_wishlist_ucf,
-              is_logged_in.$
+              is_logged_in
                   ? () {
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
@@ -977,7 +997,7 @@ class _ProfileState extends State<Profile> {
             buildSettingAndAddonsHorizontalMenuItem(
                 "assets/points.png",
                 AppLocalizations.of(context)!.earned_points_ucf,
-                is_logged_in.$
+                is_logged_in
                     ? () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
@@ -989,7 +1009,7 @@ class _ProfileState extends State<Profile> {
             buildSettingAndAddonsHorizontalMenuItem(
                 "assets/refund.png",
                 AppLocalizations.of(context)!.refund_requests_ucf,
-                is_logged_in.$
+                is_logged_in
                     ? () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
@@ -997,11 +1017,11 @@ class _ProfileState extends State<Profile> {
                         }));
                       }
                     : () => null),
-          if (conversation_system_status.$)
+          // if (conversation_system_status.$)
             buildSettingAndAddonsHorizontalMenuItem(
                 "assets/messages.png",
                 AppLocalizations.of(context)!.messages_ucf,
-                is_logged_in.$
+                is_logged_in
                     ? () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
@@ -1014,7 +1034,7 @@ class _ProfileState extends State<Profile> {
             buildSettingAndAddonsHorizontalMenuItem(
                 "assets/auction.png",
                 AppLocalizations.of(context)!.auction_ucf,
-                is_logged_in.$
+                is_logged_in
                     ? () {
                         // Navigator.push(context,
                         //     MaterialPageRoute(builder: (context) {
@@ -1026,7 +1046,7 @@ class _ProfileState extends State<Profile> {
             buildSettingAndAddonsHorizontalMenuItem(
                 "assets/classified_product.png",
                 AppLocalizations.of(context)!.classified_products,
-                is_logged_in.$
+                is_logged_in
                     ? () {
                         Navigator.push(context,
                             MaterialPageRoute(builder: (context) {
@@ -1035,28 +1055,8 @@ class _ProfileState extends State<Profile> {
                       }
                     : () => null),
 
-          buildSettingAndAddonsHorizontalMenuItem(
-              "assets/download.png",
-              AppLocalizations.of(context)!.downloads_ucf,
-              is_logged_in.$
-                  ? () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return PurchasedDigitalProducts();
-                      }));
-                    }
-                  : () => null),
-          buildSettingAndAddonsHorizontalMenuItem(
-              "assets/download.png",
-              "Upload file",
-              is_logged_in.$
-                  ? () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return UploadFile();
-                      }));
-                    }
-                  : () => null),
+          
+         
         ],
       ),
     );
@@ -1069,7 +1069,7 @@ class _ProfileState extends State<Profile> {
       // color: Colors.red,
       // width: DeviceInfo(context).width / 4,
       child: InkWell(
-        onTap: is_logged_in.$
+        onTap: is_logged_in
             ? onTap
             : () {
                 showLoginWarning();
@@ -1081,7 +1081,7 @@ class _ProfileState extends State<Profile> {
               img,
               width: 16,
               height: 16,
-              color: is_logged_in.$
+              color: is_logged_in
                   ? MyTheme.dark_font_grey
                   : MyTheme.medium_grey_50,
             ),
@@ -1093,7 +1093,7 @@ class _ProfileState extends State<Profile> {
               textAlign: TextAlign.center,
               maxLines: 1,
               style: TextStyle(
-                  color: is_logged_in.$
+                  color: is_logged_in
                       ? MyTheme.dark_font_grey
                       : MyTheme.medium_grey_50,
                   fontSize: 12),
@@ -1455,15 +1455,17 @@ class _ProfileState extends State<Profile> {
                 border: Border.all(color: MyTheme.white, width: 1),
                 //shape: BoxShape.rectangle,
               ),
-              child: is_logged_in.$
+              child: is_logged_in
                   ? ClipRRect(
                       clipBehavior: Clip.hardEdge,
                       borderRadius: BorderRadius.all(Radius.circular(100.0)),
-                      child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/placeholder.png',
-                        image: "${avatar_original.$}",
-                        fit: BoxFit.fill,
-                      ))
+                      child: Image.asset(
+                        'assets/profile_placeholder.png',
+                        height: 48,
+                        width: 48,
+                        fit: BoxFit.fitHeight,
+                      ),
+                    )
                   : Image.asset(
                       'assets/profile_placeholder.png',
                       height: 48,
@@ -1484,7 +1486,7 @@ class _ProfileState extends State<Profile> {
                   borderRadius: BorderRadius.circular(6),
                   side: BorderSide(color: MyTheme.white)),
               child: Text(
-                is_logged_in.$
+                is_logged_in
                     ? AppLocalizations.of(context)!.logout_ucf
                     : LangText(context).local!.login_ucf,
                 style: TextStyle(
@@ -1493,11 +1495,10 @@ class _ProfileState extends State<Profile> {
                     fontWeight: FontWeight.w500),
               ),
               onPressed: () {
-                if (is_logged_in.$)
+                if (is_logged_in)
                   onTapLogout(context);
                 else
-                context.push("/users/login");
-
+                  context.push("/users/login");
               },
             ),
           ),
@@ -1507,13 +1508,13 @@ class _ProfileState extends State<Profile> {
   }
 
   Widget buildUserInfo() {
-    return is_logged_in.$
+    return is_logged_in
         ? Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                "${user_name.$}",
+                "${user_name}",
                 style: TextStyle(
                     fontSize: 14,
                     color: MyTheme.white,
@@ -1523,7 +1524,7 @@ class _ProfileState extends State<Profile> {
                   padding: const EdgeInsets.only(top: 4.0),
                   child: Text(
                     //if user email is not available then check user phone if user phone is not available use empty string
-                    "${user_email.$ != "" && user_email.$ != null ? user_email.$ : user_phone.$ != "" && user_phone.$ != null ? user_phone.$ : ''}",
+                    "${user_email != "" && user_email != null ? user_email : user_phone.$ != "" && user_phone.$ != null ? user_phone.$ : ''}",
                     style: TextStyle(
                       color: MyTheme.light_grey,
                     ),

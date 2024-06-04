@@ -32,7 +32,11 @@ class AuthRepository {
         },
         body: post_body);
 
-    return loginResponseFromJson(response.body);
+     if(response.statusCode == 200){
+        return loginResponseFromJson(response.body);  
+     } else {
+        return LoginResponse();
+     }   
   }
 
   Future<LoginResponse> getSocialLoginResponse(

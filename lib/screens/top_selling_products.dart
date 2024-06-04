@@ -9,6 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
+import '../data_model/products_model.dart';
+
 class TopSellingProducts extends StatefulWidget {
   @override
   _TopSellingProductsState createState() => _TopSellingProductsState();
@@ -54,22 +56,22 @@ class _TopSellingProductsState extends State<TopSellingProducts> {
 
   buildProductList(context) {
     return FutureBuilder(
-        future: ProductRepository().getBestSellingProducts(),
-        builder: (context, AsyncSnapshot<ProductMiniResponse> snapshot) {
+        future: ProductRepository().getFilteredProducts(),
+        builder: (context, AsyncSnapshot<ProductResponse> snapshot) {
           if (snapshot.hasError) {
             //snapshot.hasError
             //print("product error");
             //print(snapshot.error.toString());
             return Container();
           } else if (snapshot.hasData) {
-            var productResponse = snapshot.data;
+            var homeData = snapshot.data;
             //print(productResponse.toString());
             return SingleChildScrollView(
               child: MasonryGridView.count(
                 crossAxisCount: 2,
                 mainAxisSpacing: 14,
                 crossAxisSpacing: 14,
-                itemCount: productResponse!.products!.length,
+                itemCount: homeData!.products!.length,
                 shrinkWrap: true,
                 padding:
                     EdgeInsets.only(top: 20.0, bottom: 10, left: 18, right: 18),
@@ -77,17 +79,18 @@ class _TopSellingProductsState extends State<TopSellingProducts> {
                 itemBuilder: (context, index) {
                   // 3
                   return ProductCard(
-                    id: productResponse.products![index].id,
-                    slug: productResponse.products![index].slug!,
-                    image: productResponse.products![index].thumbnail_image,
-                    name: productResponse.products![index].name,
-                    main_price: productResponse.products![index].main_price,
+                    id: homeData.products![index].id,
+                    slug: homeData.products![index].slug!,
+                    image: homeData.products![index].image!.imageDefault,
+                    name: homeData.products![index].productDetail!.title!,
+                    main_price: homeData.products![index].price,
                     stroked_price:
-                        productResponse.products![index].stroked_price,
-                    has_discount: productResponse.products![index].has_discount,
-                    discount: productResponse.products![index].discount,
-                    is_wholesale: productResponse.products![index].isWholesale,
+                        homeData.products![index].priceDiscounted,
+                    has_discount: true,
+                    discount: homeData.products![index].priceDiscounted,
+                    stock: homeData.products![index].stock,
                   );
+                  ;
                 },
               ),
             );

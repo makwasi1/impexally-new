@@ -25,20 +25,22 @@ class OrderRepository {
       },
     );
 
-    if(response.statusCode == 200){
-      List<Order> orders = json.decode(response.body);
-      return new OrderMiniResponse(
-        orders: orders,
-        status: 1,
-        success: true
-      );
-    }
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
 
-    return orderMiniResponseFromJson(response.body);
+      OrderMiniResponse orderMiniResponse = OrderMiniResponse.fromJson({
+        "data": jsonResponse, // Directly use the decoded JSON if it's already an array.
+        "success": true,
+        "status": 200, // Add appropriate value for meta
+      });
+
+      return orderMiniResponse;
+    }
   }
 
   //create order
-  Future<dynamic> createOrder(String? price_subtotal, String? price_shipping) async {
+  Future<dynamic> createOrder(
+      String? price_subtotal, String? price_shipping) async {
     String url = ("${AppConfig.BASE_URL}/order");
     const storage = FlutterSecureStorage();
     String? cart_id = await storage.read(key: 'cart_id');
@@ -51,18 +53,15 @@ class OrderRepository {
     };
     var body = jsonEncode(bodyObj);
     final response = await ApiRequest.post(
-      url: url,
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: body
-    );
+        url: url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: body);
 
-    if(response.statusCode == 200){
+    if (response.statusCode == 200) {
       return commonResponseFromJson(response.body);
     }
-
-
   }
 
   Future<dynamic> getOrderDetails({int? id = 0}) async {

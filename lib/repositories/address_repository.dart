@@ -3,6 +3,7 @@ import 'package:active_ecommerce_flutter/data_model/check_response_model.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:active_ecommerce_flutter/data_model/address_response.dart';
@@ -25,7 +26,9 @@ import 'package:http/http.dart' as http;
 
 class AddressRepository {
   Future<dynamic> getAddressList() async {
-    String url = ("${AppConfig.BASE_URL}/shipping-address/18");
+    const storage = FlutterSecureStorage();
+    String? user_id = await storage.read(key: "user_id");
+    String url = ("${AppConfig.BASE_URL}/shipping-address/$user_id");
     final response = await ApiRequest.get(
       url: url,
       headers: {
@@ -71,11 +74,13 @@ class AddressRepository {
       required String postal_code,
       required String email,
       required String phone}) async {
+        const storage =  FlutterSecureStorage();
+        String? user_id = await storage.read(key: "user_id");
     var post_body = jsonEncode({
       "title": "$address",
       "first_name": "$address",
       "last_name": "$address",
-      "user_id": user_id.$,
+      "user_id": user_id,
       "address": "$address",
       "country_id": "$country_id",
       "state_id": "$state_id",

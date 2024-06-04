@@ -305,13 +305,13 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
   }
 
   onPressProceed(context) async {
-    if (_seleted_shipping_address == 0) {
-      ToastComponent.showDialog(
-          LangText(context).local!.choose_an_address_or_pickup_point,
-          gravity: Toast.center,
-          duration: Toast.lengthLong);
-      return;
-    }
+    // if (_seleted_shipping_address == 0) {
+    //   ToastComponent.showDialog(
+    //       LangText(context).local!.choose_an_address_or_pickup_point,
+    //       gravity: Toast.center,
+    //       duration: Toast.lengthLong);
+    //   return;
+    // }
 
     late var addressUpdateInCartResponse;
 
@@ -322,13 +322,8 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
               address_id: _seleted_shipping_address);
     }
     if (addressUpdateInCartResponse.result == false) {
-      ToastComponent.showDialog(addressUpdateInCartResponse.message,
-          gravity: Toast.center, duration: Toast.lengthLong);
       return;
     }
-
-    ToastComponent.showDialog(addressUpdateInCartResponse.message,
-        gravity: Toast.center, duration: Toast.lengthLong);
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return Checkout(
@@ -778,12 +773,12 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
       builder: (context, AsyncSnapshot<ProductMiniDetail?> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return ShimmerHelper().buildListShimmer(
-              item_count: 5,
+              item_count: widget.cartList.length,
               item_height:
                   100.0); // Show loading indicator while waiting for data
         } else if (snapshot.hasError) {
           return Text(
-              "Error: ${snapshot.error}"); // Show error if something went wrong
+              "Failed to fatch items ${snapshot.error}"); // Show error if something went wrong
         } else if (snapshot.hasData) {
           var prod = snapshot.data; // Your product details object
           return Container(
@@ -808,7 +803,7 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
                 ),
                 Container(
                   //color: Colors.red,
-                  width: DeviceInfo(context).width! / 3,
+                  width: DeviceInfo(context).width! / 2,
                   child: Padding(
                     padding: EdgeInsets.symmetric(horizontal: 10.0),
                     child: Column(
@@ -825,7 +820,7 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
                               fontWeight: FontWeight.w400),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(top: 10.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
                           child: Row(
                             children: [
                               Text(
@@ -844,7 +839,7 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
                           ),
                         ),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
                             Chip(
                               label: Text(

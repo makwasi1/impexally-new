@@ -11,8 +11,6 @@ String orderMiniResponseToJson(OrderMiniResponse data) => json.encode(data.toJso
 class OrderMiniResponse {
   OrderMiniResponse({
     this.orders,
-    this.links,
-    this.meta,
     this.success,
     this.status,
   });
@@ -23,76 +21,148 @@ class OrderMiniResponse {
   bool? success;
   int? status;
 
-  factory OrderMiniResponse.fromJson(Map<String, dynamic> json) => OrderMiniResponse(
+  factory OrderMiniResponse.fromJson(Map<dynamic, dynamic> json) => OrderMiniResponse(
     orders: List<Order>.from(json["data"].map((x) => Order.fromJson(x))),
-    links: OrderMiniResponseLinks.fromJson(json["links"]),
-    meta: json["meta"] == null ? null : Meta.fromJson(json["meta"]),
     success: json["success"],
     status: json["status"],
   );
 
   Map<String, dynamic> toJson() => {
     "data": List<dynamic>.from(orders!.map((x) => x.toJson())),
-    "links": links!.toJson(),
-    "meta": meta == null ? null : meta!.toJson(),
     "success": success,
     "status": status,
   };
 }
 
 class Order {
+  final int id;
+  final String orderNumber;
+  final String buyerId;
+  final String buyerType;
+  final String priceSubtotal;
+  final String priceVat;
+  final String priceShipping;
+  final String priceTotal;
+  final String priceCurrency;
+  final String status;
+  final String paymentMethod;
+  final String paymentStatus;
+  final String updatedAt;
+  final String createdAt;
+  final List<OrderProduct> orderProducts;
+
   Order({
-    this.id,
-    this.code,
-    this.user_id,
-    this.payment_type,
-    this.payment_status,
-    this.payment_status_string,
-    this.delivery_status,
-    this.delivery_status_string,
-    this.grand_total,
-    this.date,
-    this.links,
+    required this.id,
+    required this.orderNumber,
+    required this.buyerId,
+    required this.buyerType,
+    required this.priceSubtotal,
+    required this.priceVat,
+    required this.priceShipping,
+    required this.priceTotal,
+    required this.priceCurrency,
+    required this.status,
+    required this.paymentMethod,
+    required this.paymentStatus,
+    required this.updatedAt,
+    required this.createdAt,
+    required this.orderProducts,
   });
 
-  int? id;
-  String? code;
-  int? user_id;
-  String?  payment_type;
-  String? payment_status;
-  String?  payment_status_string;
-  String? delivery_status;
-  String? delivery_status_string;
-  String? grand_total;
-  String? date;
-  OrderLinks? links;
+  factory Order.fromJson(Map<String, dynamic> json) {
+    var list = json['order_products'] as List;
+    List<OrderProduct> orderProductList =
+        list.map((i) => OrderProduct.fromJson(i)).toList();
 
-  factory Order.fromJson(Map<String, dynamic> json) => Order(
-    id: json["id"],
-    code: json["code"],
-    user_id: json["user_id"],
-    payment_type: json["payment_type"],
-    payment_status: json["payment_status"],
-    payment_status_string: json["payment_status_string"],
-    delivery_status: json["delivery_status"],
-    delivery_status_string: json["delivery_status_string"],
-    grand_total: json["grand_total"],
-    date: json["date"],
-    links: OrderLinks.fromJson(json["links"]),
-  );
+    return Order(
+      id: json['id'],
+      orderNumber: json['order_number'],
+      buyerId: json['buyer_id'],
+      buyerType: json['buyer_type'],
+      priceSubtotal: json['price_subtotal'],
+      priceVat: json['price_vat'],
+      priceShipping: json['price_shipping'],
+      priceTotal: json['price_total'],
+      priceCurrency: json['price_currency'],
+      status: json['status'],
+      paymentMethod: json['payment_method'],
+      paymentStatus: json['payment_status'],
+      updatedAt: json['updated_at'],
+      createdAt: json['created_at'],
+      orderProducts: orderProductList,
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     "id": id,
-    "code": code,
-    "user_id": user_id,
-    "payment_type":payment_type,
-    "payment_status": payment_status,
-    "payment_status_string": payment_status_string,
-    "delivery_status": delivery_status,
-    "delivery_status_string": delivery_status_string,
-    "grand_total": grand_total,
-    "date": date,
-    "links": links!.toJson(),
+    "order_number": orderNumber,
+    "buyer_id": buyerId,
+    "buyer_type": buyerType,
+    "price_subtotal": priceSubtotal,
+    "price_vat": priceVat,
+    "price_shipping": priceShipping,
+    "price_total": priceTotal,
+    "price_currency": priceCurrency,
+    "status": status,
+    "payment_method": paymentMethod,
+    "payment_status": paymentStatus,
+    "updated_at": updatedAt,
+    "created_at": createdAt,
+    "order_products": List<dynamic>.from(orderProducts.map((x) => x.toJson())),
+  };
+}
+
+class OrderProduct {
+  final int id;
+  final String orderId;
+  final String sellerId;
+  final String productType;
+  final String listingType;
+  final String productSlug;
+  final String productQuantity;
+  final String orderStatus;
+  final String updatedAt;
+  final String createdAt;
+
+  OrderProduct({
+    required this.id,
+    required this.orderId,
+    required this.sellerId,
+    required this.productType,
+    required this.listingType,
+    required this.productSlug,
+    required this.productQuantity,
+    required this.orderStatus,
+    required this.updatedAt,
+    required this.createdAt,
+  });
+
+  factory OrderProduct.fromJson(Map<String, dynamic> json) {
+    return OrderProduct(
+      id: json['id'],
+      orderId: json['order_id'],
+      sellerId: json['seller_id'],
+      productType: json['product_type'],
+      listingType: json['listing_type'],
+      productSlug: json['product_slug'],
+      productQuantity: json['product_quantity'],
+      orderStatus: json['order_status'],
+      updatedAt: json['updated_at'],
+      createdAt: json['created_at'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "order_id": orderId,
+    "seller_id": sellerId,
+    "product_type": productType,
+    "listing_type": listingType,
+    "product_slug": productSlug,
+    "product_quantity": productQuantity,
+    "order_status": orderStatus,
+    "updated_at": updatedAt,
+    "created_at": createdAt,
   };
 }
 

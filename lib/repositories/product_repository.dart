@@ -9,6 +9,7 @@ import 'package:active_ecommerce_flutter/data_model/variant_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
+import 'package:flutter/cupertino.dart';
 
 import '../data_model/product_detail.dart';
 import '../data_model/products_model.dart';
@@ -119,6 +120,16 @@ class ProductRepository {
     String url = ("${AppConfig.BASE_URL}/products");
 
     print(url.toString());
+    final response = await ApiRequest.get(url: url, headers: {
+      "Content-Type": "application/json",
+    });
+    return productResponseFromJson(response.body);
+  }
+
+
+  Future<ProductResponse> getFilteredProductsFromSeller(String? seller_id) async {
+    debugPrint("Seller ID: $seller_id");
+    String url = ("${AppConfig.BASE_URL}/products/user/$seller_id");
     final response = await ApiRequest.get(url: url, headers: {
       "Content-Type": "application/json",
     });

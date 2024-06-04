@@ -162,6 +162,23 @@ class _ProductVariantsState extends State<ProductVariants> {
     }   
   }
 
+  onPressBuyNow(context, snackbar) async {
+    LoginResponse loginResponse = await AuthHelper().getUserDetailsFromSharedPref();
+    if (loginResponse.result == false) {
+      ToastComponent.showDialog(
+          "Please login / register to add this product to cart",
+          gravity: Toast.center,
+          duration: Toast.lengthLong);
+           Navigator.push(context, MaterialPageRoute(builder: (context) {
+          return Login();
+        })).then((value) {
+          onPopped(value);
+        });
+    }else {
+       addToCart(mode: "buy_now", context: context, snackbar: snackbar);
+    }   
+  }
+
   addToCart(
       {mode,
       BuildContext? context,
@@ -182,14 +199,14 @@ class _ProductVariantsState extends State<ProductVariants> {
       Provider.of<CartCounter>(context!, listen: false).getCount();
 
       if (mode == "add_to_cart") {
-        if (snackbar != null && context != null) {
+        if (snackbar != null) {
           ScaffoldMessenger.of(context).showSnackBar(snackbar);
         }
         reset();
         // fetchAll();
       } else if (mode == 'buy_now') {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return ProductVariants(has_bottomnav: false, variation: variation);
+          return Cart(has_bottomnav: false);
         })).then((value) {
           onPopped(value);
         });
@@ -503,7 +520,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                   backgroundColor: MyTheme.accent_color,
                 ),
                 onPressed: () {
-                  // onPressBuyNow(context, _productDetails);
+                  onPressBuyNow(context, _addedToCartSnackbar);
                 },
                 child: Text(
                   "Place Order Now",

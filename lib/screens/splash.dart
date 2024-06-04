@@ -18,7 +18,7 @@ class _SplashState extends State<Splash> {
   PackageInfo _packageInfo = PackageInfo(
     appName: AppConfig.app_name,
     packageName: 'Unknown',
-    version: 'Unknown',
+    version: '1.0.2',
     buildNumber: 'Unknown',
   );
 
