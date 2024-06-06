@@ -169,7 +169,7 @@ var routes = GoRouter(
           GoRoute(
               path: "cart",
               pageBuilder: (BuildContext context, GoRouterState state) =>
-                  MaterialPage(child: AuthMiddleware(Cart()).next())),
+                  MaterialPage(child: Cart())),
           GoRoute(
               path: "categories",
               pageBuilder: (BuildContext context, GoRouterState state) =>

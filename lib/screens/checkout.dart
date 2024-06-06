@@ -48,7 +48,7 @@ class Checkout extends StatefulWidget {
   final String? title;
   var packageId;
   final String? cart_amount;
-  final String? delivery_fee;
+  final String? delivery_fee;zz
 
   Checkout(
       {Key? key,
@@ -140,15 +140,6 @@ class _CheckoutState extends State<Checkout> {
           title: "Mobile Money",
           offline_payment_id: 1,
           details: "Pay with Mobile Money"),
-      // PaymentTypeResponse(
-      //   payment_type: "11",
-      //   payment_type_key: "cash_on_delivery",
-      //   name: "Cash on Delivery",
-      //   image: "dummy_assets/cod.png",
-      //   title: "Cash on Delivery",
-      //   offline_payment_id: 2,
-      //   details: "Pay with Cash on Delivery"
-      // ),
     ];
 
     _paymentTypeList.addAll(paymentTypeResponseList);
@@ -1090,6 +1081,101 @@ class _CheckoutState extends State<Checkout> {
   }
 
 
+
+Column buildOptionsDropDown (BuildContext context) { 
+  return Column (
+      children: [
+        GestureDetector(
+          onTap: () {
+            onPaymentMethodItemTap(widget.index);
+          },
+          child: Stack(
+            children: [
+              AnimatedContainer(
+                duration: Duration(milliseconds: 400),
+                decoration: BoxDecorations.buildBoxDecoration_1().copyWith(
+                    border: Border.all(
+                        color: _selected_payment_method_key ==
+                                _paymentTypeList[widget.index].payment_type_key
+                            ? MyTheme.accent_color
+                            : MyTheme.light_grey,
+                        width: _selected_payment_method_key ==
+                                _paymentTypeList[widget.index].payment_type_key
+                            ? 2.0
+                            : 0.0)),
+                child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                          width: 100,
+                          height: 70,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Image.asset(
+                              _paymentTypeList[widget.index].image,
+                              fit: BoxFit.fitWidth,
+                            ),
+                          )),
+                      Container(
+                        width: 150,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(left: 8.0),
+                              child: Text(
+                                _paymentTypeList[widget.index].title,
+                                textAlign: TextAlign.left,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                    color: MyTheme.font_grey,
+                                    fontSize: 14,
+                                    height: 1.6,
+                                    fontWeight: FontWeight.w400),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: buildPaymentMethodCheckContainer(
+                            _selected_payment_method_key ==
+                                _paymentTypeList[widget.index].payment_type_key),
+                      )
+                    ]),
+              ),
+            ],
+          ),
+        ),
+        Visibility(
+          visible: _isDropdownVisible,
+          child: Container(
+            padding: EdgeInsets.all(16.0),
+            color: Colors.white,
+            child: Column(
+              children: List.generate(5, (index) {
+                return RadioListTile<int>(
+                  title: Text('Option ${index + 1}'),
+                  value: index,
+                  groupValue: _selectedOption,
+                  onChanged: (int? value) {
+                    setState(() {
+                      _selectedOption = value!;
+                    });
+                  },
+                );
+              }),
+            ),
+          ),
+        ),
+      ],
+    );
+}
+
+
   GestureDetector buildPaymentMethodItemCard(index) {
     return GestureDetector(
       onTap: () {
@@ -1313,19 +1399,6 @@ class _CheckoutState extends State<Checkout> {
         ),
       ),
     );
-    /* Visibility(
-      visible: check,
-      child: Container(
-        height: 16,
-        width: 16,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.0), color: Colors.green),
-        child: Padding(
-          padding: const EdgeInsets.all(3),
-          child: Icon(Icons.check, color: Colors.white, size: 10),
-        ),
-      ),
-    );*/
   }
 
   BottomAppBar buildBottomAppBar(BuildContext context) {

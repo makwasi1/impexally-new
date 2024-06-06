@@ -55,19 +55,26 @@ class _CartState extends State<Cart> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    /*print("user data");
-    print(is_logged_in.$);
-    print(access_token.value);
-    
-    print(user_name.$);*/
-    print("=====userid ${user_id.$}");
-
-    // if (is_logged_in.$ == true) {
+    checkUser();
     fetchData();
-    // }
   }
+
+  //check if user is logged in if not roiute to Login 
+  
+  checkUser() async {
+  //get user is logged in status
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+    if (res.result == false) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Login(),
+        ),
+      );
+    }
+  }
+
 
   @override
   void dispose() {
@@ -77,8 +84,6 @@ class _CartState extends State<Cart> {
 
   getCartCount() {
     Provider.of<CartCounter>(context, listen: false).getCount();
-    // var res = await CartRepository().getCartCount();
-    // widget.counter.controller.sink.add(res.count);
   }
 
   fetchData() async {

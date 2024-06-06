@@ -143,14 +143,6 @@ class _RegistrationState extends State<Registration> {
       AuthHelper().setUserData(signupResponse);
 
 
-      // redirect to main
-      // Navigator.pushAndRemoveUntil(context,
-      //     MaterialPageRoute(builder: (context) {
-      //       return Main();
-      //     }), (newRoute) => false);
-
-      // push notification starts
-      if (OtherConfig.USE_PUSH_NOTIFICATION) {
         final FirebaseMessaging _fcm = FirebaseMessaging.instance;
         await _fcm.requestPermission(
           alert: true,
@@ -167,13 +159,13 @@ class _RegistrationState extends State<Registration> {
         if (fcmToken != null) {
           print("--fcm token--");
           print(fcmToken);
-          if (is_logged_in.$ == true) {
+       
             // update device token
             var deviceTokenUpdateResponse = await ProfileRepository()
                 .getDeviceTokenUpdateResponse(fcmToken);
-          }
+          
         }
-      }
+      
 
 
       context.push("/");

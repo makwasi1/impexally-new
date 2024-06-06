@@ -113,7 +113,7 @@ class _LoginState extends State<Login> {
       AuthHelper().setUserData(loginResponse);
       AuthHelper().saveUserDetailsToSharedPref(loginResponse);
       // push notification starts
-      if (OtherConfig.USE_PUSH_NOTIFICATION) {
+
         final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
         await _fcm.requestPermission(
@@ -136,7 +136,7 @@ class _LoginState extends State<Login> {
                 .getDeviceTokenUpdateResponse(fcmToken);
           }
         }
-      }
+      
 
       // Navigator.pushAndRemoveUntil(context,
       //     MaterialPageRoute(builder: (context) {

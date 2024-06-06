@@ -3,6 +3,7 @@
 import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
@@ -36,4 +37,15 @@ String capitalize(String text){
 
   String getParameter (GoRouterState state,String key)=> state.pathParameters[key]??"";
 
- bool get userIsLogedIn=>SystemConfig.systemUser?.id !=null;
+  const storage = FlutterSecureStorage();
+
+  //get user is logged in status
+  
+
+//  bool get userIsLogedIn=> access_token.$ !=null;
+
+  //get user id
+  Future<String?> get userId async=> await storage.read(key: "user_id");
+
+  // ignore: unnecessary_null_comparison
+  bool get userIsLogedIn => userId != "";
