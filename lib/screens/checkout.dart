@@ -1,9 +1,7 @@
 import 'package:active_ecommerce_flutter/custom/box_decorations.dart';
 import 'package:active_ecommerce_flutter/custom/btn.dart';
 import 'package:active_ecommerce_flutter/custom/enum_classes.dart';
-import 'package:active_ecommerce_flutter/custom/lang_text.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
-import 'package:active_ecommerce_flutter/dummy_data/orders.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
@@ -13,23 +11,6 @@ import 'package:active_ecommerce_flutter/repositories/coupon_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/order_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/payment_repository.dart';
 import 'package:active_ecommerce_flutter/screens/order_list.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/amarpay_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/bkash_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/flutterwave_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/iyzico_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/khalti_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/my_fatoora_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/nagad_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/offline_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/online_pay.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/payfast_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/paypal_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/paystack_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/paytm_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/phonepay_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/razorpay_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/sslcommerz_screen.dart';
-import 'package:active_ecommerce_flutter/screens/payment_method_screen/stripe_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -41,24 +22,26 @@ import '../dummy_data/payment_methods.dart';
 
 class Checkout extends StatefulWidget {
   int? order_id; // only need when making manual payment from order details
-  String list;
+  String? list;
   //final OffLinePaymentFor offLinePaymentFor;
   final PaymentFor? paymentFor;
   final double rechargeAmount;
   final String? title;
   var packageId;
   final String? cart_amount;
-  final String? delivery_fee;zz
+  final String? delivery_fee;
 
   Checkout(
       {Key? key,
       this.order_id = 0,
       this.paymentFor,
-      this.list = "both",
+      this.list,
       //this.offLinePaymentFor,
       this.rechargeAmount = 0.0,
       this.title,
-      this.packageId = 0, this.cart_amount, this.delivery_fee})
+      this.packageId = 0,
+      this.cart_amount,
+      this.delivery_fee})
       : super(key: key);
 
   @override
@@ -69,6 +52,8 @@ class _CheckoutState extends State<Checkout> {
   var _selected_payment_method_index = 0;
   String? _selected_payment_method = "";
   String? _selected_payment_method_key = "";
+
+  bool selectedPay = false;
 
   ScrollController _mainScrollController = ScrollController();
   TextEditingController _couponController = TextEditingController();
@@ -96,7 +81,6 @@ class _CheckoutState extends State<Checkout> {
     /*print("user data");
     print(is_logged_in.$);
     print(access_token.value);*/
-
 
     fetchAll();
   }
@@ -137,7 +121,23 @@ class _CheckoutState extends State<Checkout> {
           payment_type_key: "mobile_money",
           name: "Checkout with Mobile Wallet",
           image: "assets/MTN-Momo.png",
-          title: "Mobile Money",
+          title: "MTN Mobile Money",
+          offline_payment_id: 1,
+          details: "Pay with Mobile Money"),
+      PaymentTypeResponse(
+          payment_type: "2",
+          payment_type_key: "mobile_money",
+          name: "Checkout with Mobile Wallet",
+          image: "assets/MTN-Momo.png",
+          title: "Airtel Money",
+          offline_payment_id: 1,
+          details: "Pay with Mobile Money"),
+      PaymentTypeResponse(
+          payment_type: "3",
+          payment_type_key: "mobile_money",
+          name: "Checkout with Mobile Wallet",
+          image: "assets/MTN-Momo.png",
+          title: "Orange Money",
           offline_payment_id: 1,
           details: "Pay with Mobile Money"),
     ];
@@ -243,6 +243,9 @@ class _CheckoutState extends State<Checkout> {
           AppLocalizations.of(context)!.please_choose_one_option_to_pay,
           gravity: Toast.center,
           duration: Toast.lengthLong);
+      setState(() {
+        selectedPay = true;
+      });
       return;
     }
     if (_grandTotalValue == 0.00) {
@@ -250,215 +253,8 @@ class _CheckoutState extends State<Checkout> {
           gravity: Toast.center, duration: Toast.lengthLong);
       return;
     }
-
     debugPrint("Selected Payment Method: " + _selected_payment_method!);
-
-    if (_selected_payment_method == "stripe_payment") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return StripeScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    }
-    if (_selected_payment_method == "aamarpay") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return AmarpayScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "paypal_payment") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return PaypalScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "razorpay") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return RazorpayScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "paystack") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return PaystackScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "iyzico") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return IyzicoScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "bkash") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return BkashScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "nagad") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return NagadScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "sslcommerz_payment") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return SslCommerzScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "flutterwave") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return FlutterwaveScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "paytm") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return PaytmScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "khalti") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return KhaltiScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "instamojo_payment") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return OnlinePay(
-          title: LangText(context).local.pay_with_instamojo,
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "payfast") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return PayfastScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "phonepe") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return PhonepayScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "myfatoorah") {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return MyFatooraScreen(
-          amount: _grandTotalValue,
-          payment_type: payment_type,
-          payment_method_key: _selected_payment_method_key,
-          package_id: widget.packageId.toString(),
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    } else if (_selected_payment_method == "1") {
-      onPaymentWithMobileMoney();
-    } else if (_selected_payment_method == "cash_payment") {
-      pay_by_cod();
-    } else if (_selected_payment_method == "manual_payment" &&
-        widget.paymentFor == PaymentFor.Order) {
-      pay_by_manual_payment();
-    } else if (_selected_payment_method == "manual_payment" &&
-        (widget.paymentFor == PaymentFor.ManualPayment ||
-            widget.paymentFor == PaymentFor.WalletRecharge ||
-            widget.paymentFor == PaymentFor.PackagePay)) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return OfflineScreen(
-          order_id: widget.order_id,
-          paymentInstruction:
-              _paymentTypeList[_selected_payment_method_index].details,
-          offline_payment_id: _paymentTypeList[_selected_payment_method_index]
-              .offline_payment_id,
-          rechargeAmount: widget.rechargeAmount,
-          offLinePaymentFor: widget.paymentFor,
-          paymentMethod: _paymentTypeList[_selected_payment_method_index].name,
-          packageId: widget.packageId,
-//          offLinePaymentFor: widget.offLinePaymentFor,
-        );
-      })).then((value) {
-        onPopped(value);
-      });
-    }
+    onPaymentWithMobileMoney();
   }
 
   pay_by_wallet() async {
@@ -494,12 +290,20 @@ class _CheckoutState extends State<Checkout> {
     }));
   }
 
-
   pay_by_mobile() async {
     const storage = FlutterSecureStorage();
+    if (_selected_payment_method == "") {
+      ToastComponent.showDialog("Please select a payment method",
+          gravity: Toast.center, duration: Toast.lengthLong);
+      setState(() {
+        selectedPay = true;
+      });
+      return;
+    }
     loading();
     var orderCreateResponse = await PaymentRepository()
-        .getOrderCreateResponseFromMomo(_phoneNumberController.text, "MTN", _grandTotalValue);
+        .getOrderCreateResponseFromMomo(_phoneNumberController.text,
+            _selected_payment_method, _grandTotalValue);
     Navigator.of(loadingcontext).pop();
     if (orderCreateResponse.result == false) {
       ToastComponent.showDialog(orderCreateResponse.message,
@@ -508,16 +312,18 @@ class _CheckoutState extends State<Checkout> {
       return;
     }
 
-    String? user_id = await storage.read(key: "user_id");
-    await OrderRepository().createOrder(widget.cart_amount, widget.delivery_fee);
-    await CartRepository().removeUserCart(int.tryParse(user_id!));
-
+    // if (widget.list!.isNotEmpty && widget.list == "offline") {
+      String? user_id = await storage.read(key: "user_id");
+      await OrderRepository()
+          .createOrder(widget.cart_amount, widget.delivery_fee);
+      await CartRepository().removeUserCart(int.tryParse(user_id!));
+    // }
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return OrderList(from_checkout: true);
-    })).whenComplete(() => 
-      ToastComponent.showDialog("Processing Payment... Please wait a moment.",
-          gravity: Toast.center, duration: Toast.lengthLong)
-    );
+    })).whenComplete(() => ToastComponent.showDialog(
+        "Processing Payment... Please wait a moment.",
+        gravity: Toast.center,
+        duration: Toast.lengthLong));
   }
 
   pay_by_manual_payment() async {
@@ -551,11 +357,7 @@ class _CheckoutState extends State<Checkout> {
     //print(_selected_payment_method_key);
   }
 
-  onPaymentWithMobileMoney(){
-    //create a dialog box with a text input for user to enter their phone number plus it should also show how mucch users is gonna pay 
-    //then user will click on the pay button to proceed to the payment gateway
-    //the payment gateway will then send a message to the user's phone to confirm the payment
-    
+  onPaymentWithMobileMoney() {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -569,7 +371,7 @@ class _CheckoutState extends State<Checkout> {
                 controller: _phoneNumberController,
                 decoration: InputDecoration(
                   labelText: 'Phone number',
-                  hintText: 'Enter your phone number',
+                  hintText: 'Enter your phone number ',
                 ),
               ),
               SizedBox(height: 20), // Add some spacing
@@ -607,8 +409,6 @@ class _CheckoutState extends State<Checkout> {
       },
     );
   }
-
-  
 
 //make payment with mobile money
 
@@ -820,11 +620,10 @@ class _CheckoutState extends State<Checkout> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                               Padding(
-                                      padding: const EdgeInsets.only(bottom: 26.0),
-                                      child: buildAvailableOffers(),
-                                    ),
-                                  
+                              Padding(
+                                padding: const EdgeInsets.only(bottom: 26.0),
+                                child: buildAvailableOffers(),
+                              ),
                               Text(
                                 "Choose Payment Method",
                                 style: TextStyle(
@@ -834,16 +633,18 @@ class _CheckoutState extends State<Checkout> {
                               ),
                             ],
                           ),
-                        ), 
+                        ),
                         Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: buildPaymentMethodList(),
                         ),
+                        buildOptionsDropDown(context),
                         Container(
                           height: 10,
                         ),
-                        Padding(padding: EdgeInsets.only(bottom: 16.0),
-                        child: buildCartSummaryDetails(context),
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 16.0),
+                          child: buildCartSummaryDetails(context),
                         )
                       ]),
                     )
@@ -986,7 +787,7 @@ class _CheckoutState extends State<Checkout> {
               height: 14,
             );
           },
-          itemCount: _paymentTypeList.length,
+          itemCount: 1,
           scrollDirection: Axis.vertical,
           physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
@@ -1009,7 +810,6 @@ class _CheckoutState extends State<Checkout> {
     }
   }
 
-
   //create a widget with 5 text rows but it should only show 3 the other two can be shown when user clicks show more
   Widget buildAvailableOffers() {
     return Container(
@@ -1024,7 +824,6 @@ class _CheckoutState extends State<Checkout> {
                     fontSize: 18,
                     fontWeight: FontWeight.bold),
               ),
-              
             ],
           ),
           SizedBox(
@@ -1033,17 +832,18 @@ class _CheckoutState extends State<Checkout> {
           Row(
             children: [
               Flexible(
-                 // Add some padding to the container
+                // Add some padding to the container
                 child: Container(
                   color: MyTheme.light_grey,
-                padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0),
                   child: Text(
                     "Get upto 25% discount on Impexally Pay using ICICI Bank Net banking or Cards",
                     style: TextStyle(
                         color: MyTheme.font_grey,
                         fontSize: 12,
                         fontWeight: FontWeight.w600),
-                    overflow: TextOverflow.fade, // Add this line to prevent text overflow
+                    overflow: TextOverflow
+                        .fade, // Add this line to prevent text overflow
                   ),
                 ),
               )
@@ -1055,23 +855,23 @@ class _CheckoutState extends State<Checkout> {
           Row(
             children: [
               Flexible(
-                 // Add some padding to the container
+                // Add some padding to the container
                 child: Container(
                   color: MyTheme.light_grey,
-                padding: EdgeInsets.all(8.0),
+                  padding: EdgeInsets.all(8.0),
                   child: Text(
                     "Enjoy upto 50% off and free delivery on online orders",
                     style: TextStyle(
                         color: MyTheme.font_grey,
                         fontSize: 12,
                         fontWeight: FontWeight.w600),
-                    overflow: TextOverflow.fade, // Add this line to prevent text overflow
+                    overflow: TextOverflow
+                        .fade, // Add this line to prevent text overflow
                   ),
                 ),
               )
             ],
           ),
-          
           SizedBox(
             height: 8,
           ),
@@ -1080,106 +880,51 @@ class _CheckoutState extends State<Checkout> {
     );
   }
 
-
-
-Column buildOptionsDropDown (BuildContext context) { 
-  return Column (
+  Column buildOptionsDropDown(BuildContext context) {
+    return Column(
       children: [
         GestureDetector(
           onTap: () {
-            onPaymentMethodItemTap(widget.index);
+            onPaymentMethodItemTap(1);
           },
           child: Stack(
-            children: [
-              AnimatedContainer(
-                duration: Duration(milliseconds: 400),
-                decoration: BoxDecorations.buildBoxDecoration_1().copyWith(
-                    border: Border.all(
-                        color: _selected_payment_method_key ==
-                                _paymentTypeList[widget.index].payment_type_key
-                            ? MyTheme.accent_color
-                            : MyTheme.light_grey,
-                        width: _selected_payment_method_key ==
-                                _paymentTypeList[widget.index].payment_type_key
-                            ? 2.0
-                            : 0.0)),
-                child: Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: <Widget>[
-                      Container(
-                          width: 100,
-                          height: 70,
-                          child: Padding(
-                            padding: const EdgeInsets.all(16.0),
-                            child: Image.asset(
-                              _paymentTypeList[widget.index].image,
-                              fit: BoxFit.fitWidth,
-                            ),
-                          )),
-                      Container(
-                        width: 150,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(left: 8.0),
-                              child: Text(
-                                _paymentTypeList[widget.index].title,
-                                textAlign: TextAlign.left,
-                                overflow: TextOverflow.ellipsis,
-                                maxLines: 2,
-                                style: TextStyle(
-                                    color: MyTheme.font_grey,
-                                    fontSize: 14,
-                                    height: 1.6,
-                                    fontWeight: FontWeight.w400),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 16.0),
-                        child: buildPaymentMethodCheckContainer(
-                            _selected_payment_method_key ==
-                                _paymentTypeList[widget.index].payment_type_key),
-                      )
-                    ]),
-              ),
-            ],
+            children: [],
           ),
         ),
         Visibility(
-          visible: _isDropdownVisible,
+          visible: selectedPay,
           child: Container(
-            padding: EdgeInsets.all(16.0),
+            padding: EdgeInsets.all(8.0),
             color: Colors.white,
             child: Column(
-              children: List.generate(5, (index) {
-                return RadioListTile<int>(
-                  title: Text('Option ${index + 1}'),
-                  value: index,
-                  groupValue: _selectedOption,
-                  onChanged: (int? value) {
+              children: paymentMethodList.map((paymentType) {
+                return RadioListTile<String>(
+                  title: Text(paymentType.name!),
+                  value: paymentType.key!,
+                  groupValue: _selected_payment_method,
+                  onChanged: (String? value) {
                     setState(() {
-                      _selectedOption = value!;
+                      _selected_payment_method = value;
+                      debugPrint("Selected Payment Method: $value");
                     });
                   },
                 );
-              }),
+              }).toList(),
             ),
           ),
         ),
       ],
     );
-}
-
+  }
 
   GestureDetector buildPaymentMethodItemCard(index) {
     return GestureDetector(
       onTap: () {
         onPaymentMethodItemTap(index);
+        setState(() {
+          selectedPay = !selectedPay;
+          debugPrint("Selected Payment Method: $selectedPay");
+        });
       },
       child: Stack(
         children: [
@@ -1214,12 +959,9 @@ Column buildOptionsDropDown (BuildContext context) {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Padding(
-                          padding: EdgeInsets.only(left: 8.0),
+                          padding: EdgeInsets.only(left: 0.0),
                           child: Text(
-                            _paymentTypeList[index].title,
-                            textAlign: TextAlign.left,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
+                            "Select Mobile Money Payment Option",
                             style: TextStyle(
                                 color: MyTheme.font_grey,
                                 fontSize: 14,
@@ -1244,15 +986,13 @@ Column buildOptionsDropDown (BuildContext context) {
     );
   }
 
-
   //build order details summary widget
   Widget buildCartSummaryDetails(BuildContext context) {
     return Padding(
-        padding: const EdgeInsets.only(left:16, right: 16.0),
+        padding: const EdgeInsets.only(left: 16, right: 16.0),
         child: Container(
           child: Column(
             children: [
-              
               Padding(
                   padding: const EdgeInsets.only(bottom: 8),
                   child: Row(
@@ -1260,7 +1000,7 @@ Column buildOptionsDropDown (BuildContext context) {
                       Container(
                         width: 120,
                         child: Text(
-                         "Order Total",
+                          "Order Total",
                           textAlign: TextAlign.start,
                           style: TextStyle(
                               color: MyTheme.font_grey,
@@ -1320,7 +1060,7 @@ Column buildOptionsDropDown (BuildContext context) {
                       ),
                       Spacer(),
                       Text(
-                       _coupon_applied! ? "GH₵ " : "No Coupon(s) Applied",
+                        _coupon_applied! ? "GH₵ " : "No Coupon(s) Applied",
                         style: TextStyle(
                             color: MyTheme.accent_color,
                             fontSize: 14,

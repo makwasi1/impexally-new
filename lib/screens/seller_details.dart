@@ -5,6 +5,7 @@ import 'package:active_ecommerce_flutter/custom/lang_text.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
 import 'package:active_ecommerce_flutter/data_model/shop_details_response.dart';
+import 'package:active_ecommerce_flutter/data_model/vendor_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
@@ -36,8 +37,8 @@ class _SellerDetailsState extends State<SellerDetails> {
   int _current_slider = 0;
   List<dynamic> _carouselImageList = [];
   bool _carouselInit = false;
-  Shop? _shopDetails ;
-
+  VendorDetails? _shopDetails;
+  VendorDetails? _vendorDetails;
   List<dynamic> _newArrivalProducts = [];
   bool _newArrivalProductInit = false;
   List<dynamic> _topProducts = [];
@@ -99,7 +100,8 @@ class _SellerDetailsState extends State<SellerDetails> {
   Future checkFollowed() async {
     if (SystemConfig.systemUser != null &&
         SystemConfig.systemUser!.id != null) {
-      var shopResponse = await ShopRepository().followedCheck(_shopDetails?.id??0);
+      var shopResponse =
+          await ShopRepository().followedCheck(_shopDetails?.id ?? 0);
       // print(shopResponse.result);
       // print(shopResponse.message);
 
@@ -110,17 +112,14 @@ class _SellerDetailsState extends State<SellerDetails> {
 
   @override
   void dispose() {
-
     // TODO: implement dispose
     _mainScrollController.dispose();
     super.dispose();
   }
 
   fetchAllProductData() async {
-    var productResponse = await ProductRepository().getShopProducts(
-      id: _shopDetails?.id??0,
-      page: _page,
-    );
+    var productResponse =
+        await ProductRepository().getFilteredProductsFromSeller(widget.slug);
     _allProductList.addAll(productResponse.products!);
     _isInitialAllProduct = false;
     setState(() {});
@@ -130,7 +129,7 @@ class _SellerDetailsState extends State<SellerDetails> {
     fetchShopDetails();
   }
 
-  fetchOthers(){
+  fetchOthers() {
     checkFollowed();
     fetchNewArrivalProducts();
     fetchTopProducts();
@@ -139,44 +138,52 @@ class _SellerDetailsState extends State<SellerDetails> {
   }
 
   fetchShopDetails() async {
-    var shopDetailsResponse = await ShopRepository().getShopInfo(widget.slug);
-
+    // var shopDetailsResponse = await ShopRepository().getShopInfo(widget.slug);
+    var vendorDetailsResponse =
+        await ProductRepository().getVendorDetails(id: widget.slug);
     //print('ss:' + shopDetailsResponse.toString());
-    if (shopDetailsResponse.shop != null) {
-      _shopDetails = shopDetailsResponse.shop;
+    if (vendorDetailsResponse != null) {
+      _shopDetails = vendorDetailsResponse;
     }
 
     if (_shopDetails != null) {
       fetchOthers();
-      _shopDetails?.sliders?.forEach((slider) {
-        _carouselImageList.add(slider);
-      });
+      // _shopDetails?.sliders?.forEach((slider) {
+      //   _carouselImageList.add(slider);
+      // });
     }
     _carouselInit = true;
 
     setState(() {});
   }
 
+  Future<VendorDetails?> fetchVendorDetails(String id) async {
+    var vendorDetailsResponse =
+        await ProductRepository().getVendorDetails(id: id);
+    _vendorDetails = vendorDetailsResponse;
+    return _vendorDetails;
+  }
+
   fetchNewArrivalProducts() async {
-    var newArrivalProductResponse =
-        await ShopRepository().getNewFromThisSellerProducts(id: _shopDetails?.id);
-    _newArrivalProducts.addAll(newArrivalProductResponse.products!);
+    var productResponse =
+        await ProductRepository().getFilteredProductsFromSeller(widget.slug);
+    _newArrivalProducts.addAll(productResponse.products!);
     _newArrivalProductInit = true;
 
     setState(() {});
   }
 
   fetchTopProducts() async {
-    var topProductResponse =
-        await ShopRepository().getTopFromThisSellerProducts(id: _shopDetails?.id);
-    _topProducts.addAll(topProductResponse.products!);
+    var productResponse =
+        await ProductRepository().getFilteredProductsFromSeller(widget.slug);
+    _topProducts.addAll(productResponse.products!);
     _topProductInit = true;
   }
 
   fetchFeaturedProducts() async {
-    var featuredProductResponse =
-        await ShopRepository().getfeaturedFromThisSellerProducts(id: _shopDetails?.id);
-    _featuredProducts.addAll(featuredProductResponse.products!);
+    var productResponse =
+        await ProductRepository().getFilteredProductsFromSeller(widget.slug);
+    _featuredProducts.addAll(productResponse.products!);
     _featuredProductInit = true;
   }
 
@@ -223,7 +230,7 @@ class _SellerDetailsState extends State<SellerDetails> {
               slivers: [
                 SliverList(
                   delegate: SliverChildListDelegate([
-                    buildCarouselSlider(context),
+                    // buildCarouselSlider(context),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(
                         18.0,
@@ -328,7 +335,7 @@ class _SellerDetailsState extends State<SellerDetails> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (_featuredProducts.isNotEmpty) buildFeaturedProductsSection(),
+        // if (_featuredProducts.isEmpty) buildFeaturedProductsSection(),
         Padding(
           padding: const EdgeInsets.fromLTRB(
             18.0,
@@ -646,9 +653,6 @@ class _SellerDetailsState extends State<SellerDetails> {
     }
   }
 
-
-
-
   Widget buildTopSellingProducts() {
     return MasonryGridView.count(
         crossAxisCount: 2,
@@ -660,15 +664,15 @@ class _SellerDetailsState extends State<SellerDetails> {
         physics: NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           return ProductCard(
-            id: _topProducts[index].id,
-            slug: _topProducts[index].slug,
-            image: _topProducts[index].thumbnail_image,
-            name: _topProducts[index].name,
-            main_price: _topProducts[index].main_price,
-            stroked_price: _topProducts[index].stroked_price,
-            has_discount: _topProducts[index].has_discount,
-            discount: _topProducts[index].discount,
-            is_wholesale: _topProducts[index].isWholesale,
+            id: _newArrivalProducts[index].id,
+            slug: _newArrivalProducts[index].slug,
+            image: _newArrivalProducts[index].image.imageDefault,
+            name: _newArrivalProducts[index].productDetail.title,
+            main_price: _newArrivalProducts[index].priceDiscounted,
+            stroked_price: _newArrivalProducts[index].price,
+            has_discount: true,
+            discount: _newArrivalProducts[index].priceDiscounted,
+            is_wholesale: true,
           );
         });
   }
@@ -690,13 +694,13 @@ class _SellerDetailsState extends State<SellerDetails> {
             return ProductCard(
               id: _newArrivalProducts[index].id,
               slug: _newArrivalProducts[index].slug,
-              image: _newArrivalProducts[index].thumbnail_image,
-              name: _newArrivalProducts[index].name,
-              main_price: _newArrivalProducts[index].main_price,
-              stroked_price: _newArrivalProducts[index].stroked_price,
-              has_discount: _newArrivalProducts[index].has_discount,
-              discount: _newArrivalProducts[index].discount,
-              is_wholesale: _newArrivalProducts[index].isWholesale,
+              image: _newArrivalProducts[index].image.imageDefault,
+              name: _newArrivalProducts[index].productDetail.title,
+              main_price: _newArrivalProducts[index].priceDiscounted,
+              stroked_price: _newArrivalProducts[index].price,
+              has_discount: true,
+              discount: _newArrivalProducts[index].priceDiscounted,
+              is_wholesale: true,
             );
           });
     } else if (_newArrivalProducts.length == 0) {
@@ -812,8 +816,8 @@ class _SellerDetailsState extends State<SellerDetails> {
                 borderRadius: BorderRadius.circular(5),
                 child: FadeInImage.assetNetwork(
                   placeholder: 'assets/placeholder.png',
-                  image: _shopDetails?.logo??"",
-                  fit: BoxFit.cover,
+                  image: "https://seller.impexally.com/${_shopDetails?.avatar}",
+                  fit: BoxFit.contain,
                   imageErrorBuilder: (BuildContext, Object, StackTrace) {
                     return Image.asset('assets/placeholder_rectangle.png');
                   },
@@ -829,7 +833,7 @@ class _SellerDetailsState extends State<SellerDetails> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    _shopDetails?.name??"",
+                    _shopDetails?.username ?? "",
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                     style: TextStyle(
@@ -839,65 +843,63 @@ class _SellerDetailsState extends State<SellerDetails> {
                   ),
                   buildRatingWithCountRow(),
                   Text(
-                    _shopDetails?.address??"",
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                    _shopDetails?.address ?? "",
                     style: TextStyle(
-                        color: MyTheme.font_grey,
+                        color: Colors.black,
                         fontSize: 10,
                         fontWeight: FontWeight.normal),
                   ),
                 ],
               ),
             ),
-            Spacer(),
-            Container(
-              height: 30,
-              width: 90,
-              decoration: BoxDecorations.buildBoxDecoration_1(),
-              child: Btn.basic(
-                padding: EdgeInsets.zero,
-                color: _isThisSellerFollowed != null && _isThisSellerFollowed!
-                    ? MyTheme.green_light
-                    : MyTheme.amber,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(6),
-                    side: BorderSide(
-                        color: _isThisSellerFollowed != null &&
-                                _isThisSellerFollowed!
-                            ? MyTheme.green
-                            : MyTheme.golden)),
-                onPressed: () {
-                  if (!is_logged_in.$) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return Login();
-                    }));
-                    return;
-                  }
-                  if (_isThisSellerFollowed != null) {
-                    if (_isThisSellerFollowed!) {
-                      removedFollow(_shopDetails?.id);
-                    } else {
-                      addFollow(_shopDetails?.id);
-                    }
-                  }
+            // Spacer(),
+            // Container(
+            //   height: 30,
+            //   width: 90,
+            //   decoration: BoxDecorations.buildBoxDecoration_1(),
+            //   child: Btn.basic(
+            //     padding: EdgeInsets.zero,
+            //     color: _isThisSellerFollowed != null && _isThisSellerFollowed!
+            //         ? MyTheme.green_light
+            //         : MyTheme.amber,
+            //     shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(6),
+            //         side: BorderSide(
+            //             color: _isThisSellerFollowed != null &&
+            //                     _isThisSellerFollowed!
+            //                 ? MyTheme.green
+            //                 : MyTheme.golden)),
+            //     onPressed: () {
+            //       if (!is_logged_in.$) {
+            //         Navigator.push(context,
+            //             MaterialPageRoute(builder: (context) {
+            //           return Login();
+            //         }));
+            //         return;
+            //       }
+            //       if (_isThisSellerFollowed != null) {
+            //         if (_isThisSellerFollowed!) {
+            //           removedFollow(_shopDetails?.id);
+            //         } else {
+            //           addFollow(_shopDetails?.id);
+            //         }
+            //       }
 
-                  ///TODO Seller
-                },
-                child: Text(
-                  _isThisSellerFollowed != null && _isThisSellerFollowed!
-                      ? LangText(context).local!.followed_ucf
-                      : LangText(context).local!.follow_ucf,
-                  style: TextStyle(
-                      fontSize: 10,
-                      color: _isThisSellerFollowed != null &&
-                              _isThisSellerFollowed!
-                          ? MyTheme.green
-                          : MyTheme.golden),
-                ),
-              ),
-            )
+            //       ///TODO Seller
+            //     },
+            //     child: Text(
+            //       _isThisSellerFollowed != null && _isThisSellerFollowed!
+            //           ? LangText(context).local!.followed_ucf
+            //           : LangText(context).local!.follow_ucf,
+            //       style: TextStyle(
+            //           fontSize: 10,
+            //           color: _isThisSellerFollowed != null &&
+            //                   _isThisSellerFollowed!
+            //               ? MyTheme.green
+            //               : MyTheme.golden),
+            //     ),
+            //   ),
+            // )
           ]),
     );
   }
@@ -950,7 +952,7 @@ class _SellerDetailsState extends State<SellerDetails> {
       Container(
         width: DeviceInfo(context).width! - 70,
         child: Text(
-          _shopDetails?.name??"",
+          _shopDetails?.username ?? "",
           overflow: TextOverflow.ellipsis,
           maxLines: 1,
           style: TextStyle(
@@ -968,7 +970,7 @@ class _SellerDetailsState extends State<SellerDetails> {
         RatingBar(
           itemSize: 14.0,
           ignoreGestures: true,
-          initialRating: double.parse((_shopDetails?.rating??0).toString()),
+          initialRating: double.parse((4.5).toString()),
           direction: Axis.horizontal,
           allowHalfRating: true,
           itemCount: 5,
@@ -997,15 +999,15 @@ class _SellerDetailsState extends State<SellerDetails> {
         physics: NeverScrollableScrollPhysics(),
         itemBuilder: (context, index) {
           return ProductCard(
-            id: _allProductList[index].id,
-            slug:_allProductList[index].slug,
-            image: _allProductList[index].thumbnail_image,
-            name: _allProductList[index].name,
-            main_price: _allProductList[index].main_price,
-            stroked_price: _allProductList[index].stroked_price,
-            has_discount: _allProductList[index].has_discount,
-            discount: _allProductList[index].discount,
-            is_wholesale: _allProductList[index].isWholesale,
+            id: _newArrivalProducts[index].id,
+            slug: _newArrivalProducts[index].slug,
+            image: _newArrivalProducts[index].image.imageDefault,
+            name: _newArrivalProducts[index].productDetail.title,
+            main_price: _newArrivalProducts[index].priceDiscounted,
+            stroked_price: _newArrivalProducts[index].price,
+            has_discount: true,
+            discount: _newArrivalProducts[index].priceDiscounted,
+            is_wholesale: true,
           );
         });
   }

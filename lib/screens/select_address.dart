@@ -45,7 +45,8 @@ class SelectAddress extends StatefulWidget {
   State<SelectAddress> createState() => _SelectAddressState();
 }
 
-class _SelectAddressState extends State<SelectAddress> with SingleTickerProviderStateMixin {
+class _SelectAddressState extends State<SelectAddress>
+    with SingleTickerProviderStateMixin {
   ScrollController _mainScrollController = ScrollController();
 
   // integer type variables
@@ -78,6 +79,8 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
 
   fetchAll() {
     fetchShippingAddressList();
+
+    debugPrint("cartAmount: ${widget.cartAmount}");
 
     _cartTotalString = int.tryParse(widget.cartAmount!);
     setState(() {});
@@ -334,8 +337,8 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
         cart_amount: _cartTotalString.toString(),
         delivery_fee: _shipping_cost_string.toString(),
         //offLinePaymentFor: OffLinePaymentFor.Order,
-        rechargeAmount:
-            double.parse(_cartTotalString.toString()), // this is for wallet recharge amount, so set 0 for order))
+        rechargeAmount: double.parse(_cartTotalString
+            .toString()), // this is for wallet recharge amount, so set 0 for order))
       );
     })).then((value) {
       onPopped(value);
@@ -843,20 +846,27 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
                           children: [
                             Chip(
                               label: Text(
-                                "Qty: " + widget.cartList[seller_index].quantity.toString(),
-                                style: TextStyle(color: Colors.black, fontSize: 12),
+                                "Qty: " +
+                                    widget.cartList[seller_index].quantity
+                                        .toString(),
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 12),
                               ),
                               backgroundColor: MyTheme.light_grey,
-                              padding: const EdgeInsets.only(top: 2.0, bottom: 2.0),
+                              padding:
+                                  const EdgeInsets.only(top: 2.0, bottom: 2.0),
                             ),
                             GestureDetector(
                               onTap: () {
-                               //navigate to cart screen
-                               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                 return Cart(has_bottomnav: false,);
-                               })).then((value) {
-                                 onPopped(value);
-                               });
+                                //navigate to cart screen
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  return Cart(
+                                    has_bottomnav: false,
+                                  );
+                                })).then((value) {
+                                  onPopped(value);
+                                });
                               },
                               child: Chip(
                                 label: Text(
@@ -885,7 +895,6 @@ class _SelectAddressState extends State<SelectAddress> with SingleTickerProvider
                   ),
                 ),
                 Spacer(),
-                
                 Padding(
                   padding: const EdgeInsets.all(14.0),
                   child: Column(

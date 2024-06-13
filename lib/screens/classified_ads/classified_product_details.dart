@@ -1115,7 +1115,7 @@ class _ClassifiedAdsDetailsState extends State<ClassifiedAdsDetails>
             width: 64,
             child: Scrollbar(
               controller: _imageScrollController,
-              showTrackOnHover: false,
+              trackVisibility: false,
               thickness: 4.0,
               child: Padding(
                 padding: app_language_rtl.$!

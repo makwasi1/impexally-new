@@ -17,9 +17,11 @@ import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
 import 'package:active_ecommerce_flutter/repositories/chat_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/product_repository.dart';
+import 'package:active_ecommerce_flutter/repositories/review_repositories.dart';
 import 'package:active_ecommerce_flutter/repositories/wishlist_repository.dart';
 import 'package:active_ecommerce_flutter/screens/cart.dart';
 import 'package:active_ecommerce_flutter/screens/chat.dart';
+import 'package:active_ecommerce_flutter/screens/product_reviews.dart';
 import 'package:active_ecommerce_flutter/screens/product_variants.dart';
 import 'package:active_ecommerce_flutter/screens/seller_details.dart';
 import 'package:active_ecommerce_flutter/ui_elements/list_product_card.dart';
@@ -27,6 +29,7 @@ import 'package:active_ecommerce_flutter/ui_elements/mini_product_card.dart';
 import 'package:active_ecommerce_flutter/ui_elements/product_card.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -36,7 +39,9 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
+import 'package:social_share/social_share.dart';
 import 'package:toast/toast.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../data_model/product_detail.dart';
@@ -90,7 +95,11 @@ class _ProductDetailsState extends State<ProductDetails>
   var _singlePriceString;
   int? _quantity = 1;
   int? _stock = 0;
-
+  List<dynamic> _reviewList = [];
+  bool _isInitial = true;
+  int _page = 1;
+  int? _totalData = 0;
+  double _my_rating_temp = 0.0;
   double opacity = 0;
 
   List<dynamic> _relatedProducts = [];
@@ -133,6 +142,7 @@ class _ProductDetailsState extends State<ProductDetails>
       setState(() {});
     });
     fetchAll();
+    fetchData();
     super.initState();
   }
 
@@ -155,10 +165,32 @@ class _ProductDetailsState extends State<ProductDetails>
     fetchTopProducts();
   }
 
+  fetchData() async {
+    var reviewResponse = await ReviewRepository().getReviewResponse(
+      widget.slug,
+      page: 1,
+    );
+    _reviewList.addAll(reviewResponse.reviews);
+    //user fold method to count all rating in the
+    //review list and then divide by the length of the list
+    //to get the average rating
+
+    if (_reviewList.length > 0) {
+      double totalRating = 0.0;
+      for (var review in _reviewList) {
+        totalRating += review.rating;
+      }
+      _my_rating_temp = totalRating / _reviewList.length;
+    }
+    _isInitial = false;
+    _totalData = _reviewList.length;
+    setState(() {});
+  }
+
   //get vendor details
   Future<VendorDetails?> fetchVendorDetails(String id) async {
-    var vendorDetailsResponse = await ProductRepository()
-        .getVendorDetails(id: id);
+    var vendorDetailsResponse =
+        await ProductRepository().getVendorDetails(id: id);
     _vendorDetails = vendorDetailsResponse;
     return _vendorDetails;
   }
@@ -431,6 +463,11 @@ class _ProductDetailsState extends State<ProductDetails>
     });
   }
 
+  createDynamicLink(String productId) async {
+    SocialShare.shareOptions(
+        'Check out this product: https://ghana.impexally.com/product/$productId');
+  }
+
   onPressShare(context) {
     return showDialog(
         context: context,
@@ -466,6 +503,8 @@ class _ProductDetailsState extends State<ProductDetails>
                           onPressed: () {
                             onCopyTap(setState);
                             Clipboard.setData(ClipboardData(text: ""));
+                            createDynamicLink(widget.slug);
+
                             // SocialShare.copyToClipboard(
                             //     text: _productDetails!.link, image: "");
                           },
@@ -496,7 +535,9 @@ class _ProductDetailsState extends State<ProductDetails>
                             style: TextStyle(color: Colors.white),
                           ),
                           onPressed: () {
-                            // SocialShare.shareOptions(_productDetails!.link!);
+                            createDynamicLink(widget.slug);
+                            SocialShare.shareOptions(
+                                _productDetails!.products!.slug!);
                           },
                         ),
                       ),
@@ -906,7 +947,7 @@ class _ProductDetailsState extends State<ProductDetails>
                       SizedBox(width: 15),
                       InkWell(
                         onTap: () {
-                          onPressShare(context);
+                          createDynamicLink(widget.slug);
                         },
                         child: Container(
                           decoration:
@@ -972,7 +1013,6 @@ class _ProductDetailsState extends State<ProductDetails>
                                   height: 30.0,
                                 ),
                         ),
-
                         Visibility(
                           visible: true,
                           child: Padding(
@@ -990,26 +1030,10 @@ class _ProductDetailsState extends State<ProductDetails>
                                     color: MyTheme.font_grey,
                                   ),
                                 ),
-                                Row(
-                                  children: [
-                                    Text(
-                                      "",
-                                      style: TextStyle(
-                                        fontSize: 13.0,
-                                        fontWeight: FontWeight.w700,
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                    SizedBox(width: 5.0),
-                                    Icon(Icons.arrow_forward_ios,
-                                        size: 13.0, color: MyTheme.font_grey),
-                                  ],
-                                ),
                               ],
                             ),
                           ),
                         ),
-
                         if (_productDetails != null &&
                             _productDetails!.products!.rating != null)
                           Padding(
@@ -1035,7 +1059,6 @@ class _ProductDetailsState extends State<ProductDetails>
                                   height: 20.0,
                                 ),
                         ),
-
                         Visibility(
                           visible: club_point_addon_installed.$,
                           child: Padding(
@@ -1072,7 +1095,7 @@ class _ProductDetailsState extends State<ProductDetails>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "Reviews" + " (0)",
+                                  "Reviews" + " (${_totalData.toString()})",
                                   style: TextStyle(
                                     fontSize: 14.0,
                                     fontWeight: FontWeight.bold,
@@ -1081,11 +1104,19 @@ class _ProductDetailsState extends State<ProductDetails>
                                 ),
                                 Row(
                                   children: [
-                                    Text(
-                                      "View All",
-                                      style: TextStyle(
-                                        fontSize: 13.0,
-                                        fontWeight: FontWeight.w500,
+                                    GestureDetector(
+                                      onTap: () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  ProductReviews(
+                                                      id: widget.slug))),
+                                      child: Text(
+                                        "View All",
+                                        style: TextStyle(
+                                          fontSize: 13.0,
+                                          fontWeight: FontWeight.w500,
+                                        ),
                                       ),
                                     ),
                                     SizedBox(width: 5.0),
@@ -1164,8 +1195,6 @@ class _ProductDetailsState extends State<ProductDetails>
                                   height: 50.0,
                                 ),
                         ),
-
-                      
                         Padding(
                           padding: EdgeInsets.only(top: 14, bottom: 14),
                           child: _productDetails != null
@@ -1242,7 +1271,9 @@ class _ProductDetailsState extends State<ProductDetails>
                             fontWeight: FontWeight.bold),
                       ),
                     ),
-                  (_productDetails?.products?.userId != null) ? buildProductList(context) : Container(),
+                    (_productDetails?.products?.userId != null)
+                        ? buildProductList(context)
+                        : Container(),
                   ]),
                 ),
 
@@ -1286,7 +1317,8 @@ class _ProductDetailsState extends State<ProductDetails>
 
   buildProductList(context) {
     return FutureBuilder(
-        future: ProductRepository().getFilteredProductsFromSeller(_productDetails!.products!.userId),
+        future: ProductRepository()
+            .getFilteredProductsFromSeller(_productDetails!.products!.userId),
         builder: (context, AsyncSnapshot<ProductResponse> snapshot) {
           if (snapshot.hasError) {
             return Container();
@@ -1314,9 +1346,7 @@ class _ProductDetailsState extends State<ProductDetails>
                     stroked_price: homeData.products![index].priceDiscounted,
                     has_discount: true,
                     discount: homeData.products![index].priceDiscounted,
-                    
                   );
-                  
                 },
               ),
             );
@@ -1532,48 +1562,45 @@ class _ProductDetailsState extends State<ProductDetails>
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-               InkWell(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => SellerDetails(
-                                      slug:
-                                           "",
-                                    )));
-                      },
-                      child: Padding(
-                        padding: app_language_rtl.$!
-                            ? EdgeInsets.only(left: 8.0)
-                            : EdgeInsets.only(right: 8.0),
-                        child: Container(
-                          width: 30,
-                          height: 30,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(6.0),
-                            border: Border.all(
-                                color: Color.fromRGBO(112, 112, 112, .3),
-                                width: 1),
-                            //shape: BoxShape.rectangle,
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(16.0),
-                            child: Image.asset(
-                              'assets/placeholder.png',
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
+              InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SellerDetails(
+                                slug: "",
+                              )));
+                },
+                child: Padding(
+                  padding: app_language_rtl.$!
+                      ? EdgeInsets.only(left: 8.0)
+                      : EdgeInsets.only(right: 8.0),
+                  child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(6.0),
+                      border: Border.all(
+                          color: Color.fromRGBO(112, 112, 112, .3), width: 1),
+                      //shape: BoxShape.rectangle,
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.0),
+                      child: Image.asset(
+                        'assets/placeholder.png',
+                        fit: BoxFit.cover,
                       ),
                     ),
+                  ),
+                ),
+              ),
               Container(
                 width: MediaQuery.of(context).size.width * (.5),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                        _vendorDetails != null ? _vendorDetails!.username! :
-                         "",
+                        _vendorDetails != null ? _vendorDetails!.username! : "",
                         style: TextStyle(
                           color: MyTheme.dark_font_grey,
                           fontSize: 16,
@@ -1636,7 +1663,7 @@ class _ProductDetailsState extends State<ProductDetails>
               Icon(Icons.location_pin, color: MyTheme.dark_grey, size: 26),
               SizedBox(width: 10),
               Text(
-                _vendorDetails?.address != null ? _vendorDetails!.address! :"",
+                _vendorDetails?.address != null ? _vendorDetails!.address! : "",
                 style: TextStyle(
                     color: Colors.grey[700],
                     fontSize: 14,
@@ -1652,7 +1679,7 @@ class _ProductDetailsState extends State<ProductDetails>
                   context,
                   MaterialPageRoute(
                       builder: (context) => SellerDetails(
-                            slug: _productDetails?.products!.slug ?? "",
+                            slug: _productDetails?.products!.userId ?? "1",
                           )));
             },
             child: Container(
@@ -1901,7 +1928,7 @@ class _ProductDetailsState extends State<ProductDetails>
             width: MediaQuery.of(context).size.width - (107 + 45),
             child: Scrollbar(
               controller: _variantScrollController,
-              showTrackOnHover: false,
+              trackVisibility: false,
               child: Wrap(
                 children: List.generate(
                     choice_options[choice_options_index].options.length,
@@ -2264,12 +2291,24 @@ class _ProductDetailsState extends State<ProductDetails>
           child: IconButton(
             icon: Icon(Icons.share_outlined, color: MyTheme.dark_grey),
             onPressed: () {
-              onPressShare(context);
+              createDynamicLink(_productDetails!.products!.id.toString());
             },
           ),
         ),
       ],
     );
+  }
+
+  Future<void> _makePhoneCall() async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: _vendorDetails!.phoneNumber!,
+    );
+    if (await canLaunch(launchUri.toString())) {
+      await launch(launchUri.toString());
+    } else {
+      throw 'Could not launch $launchUri';
+    }
   }
 
   Widget buildBottomAppBar(BuildContext context, _addedToCartSnackbar) {
@@ -2284,7 +2323,7 @@ class _ProductDetailsState extends State<ProductDetails>
               icon: Icon(Icons.call),
               color: MyTheme.dark_font_grey,
               onPressed: () {
-                // Add your chat functionality here
+                _makePhoneCall();
               },
             ),
           ),
@@ -2432,7 +2471,7 @@ class _ProductDetailsState extends State<ProductDetails>
             text: TextSpan(
               children: <TextSpan>[
                 TextSpan(
-                  text: _productDetails!.products!.rating.toString() + ".0",
+                  text: _my_rating_temp.toString(),
                   style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
                 TextSpan(
@@ -2446,8 +2485,7 @@ class _ProductDetailsState extends State<ProductDetails>
         RatingBar(
           itemSize: 15.0,
           ignoreGestures: true,
-          initialRating:
-              double.parse(_productDetails!.products!.rating.toString()),
+          initialRating: _my_rating_temp,
           direction: Axis.horizontal,
           allowHalfRating: false,
           itemCount: 5,
@@ -2594,27 +2632,24 @@ class _ProductDetailsState extends State<ProductDetails>
             ),
           ),
           Btn.basic(
-              onPressed: () async {
-                if (webViewHeight > 50) {
-                  webViewHeight = double.parse(
-                    (await controller.runJavaScriptReturningResult(
-                            "document.getElementById('scaled-frame').clientHeight"))
-                        .toString(),
-                  );
-                  print(webViewHeight);
-                  print(MediaQuery.of(context).devicePixelRatio);
+            onPressed: () async {
+              if (webViewHeight > 50) {
+                webViewHeight = double.parse(
+                  (await controller.runJavaScriptReturningResult(
+                          "document.getElementById('scaled-frame').clientHeight"))
+                      .toString(),
+                );
+                print(webViewHeight);
+                print(MediaQuery.of(context).devicePixelRatio);
 
-                  // webViewHeight =( webViewHeight / MediaQuery.of(context).devicePixelRatio)+400;
-                  print(webViewHeight);
-                } else {
-                  webViewHeight = 50;
-                }
-                setState(() {});
-              },
-              child: Text(
-                webViewHeight > 50 ? "Show More..." : "Less",
-                style: TextStyle(color: Colors.black),
-              ))
+                // webViewHeight =( webViewHeight / MediaQuery.of(context).devicePixelRatio)+400;
+                print(webViewHeight);
+              } else {
+                webViewHeight = 50;
+              }
+              setState(() {});
+            },
+          )
         ],
       ),
     );
@@ -2898,7 +2933,7 @@ class _ProductDetailsState extends State<ProductDetails>
             width: 350,
             child: Scrollbar(
               controller: _imageScrollController,
-              showTrackOnHover: false,
+              trackVisibility: false,
               thickness: 4.0,
               child: Padding(
                 padding: app_language_rtl.$!

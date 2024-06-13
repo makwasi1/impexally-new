@@ -4,7 +4,8 @@ class Vendor {
   Vendor({this.user});
 
   Vendor.fromJson(Map<String, dynamic> json) {
-    user = json['user'] != null ? new VendorDetails.fromJson(json['user']) : null;
+    user =
+        json['user'] != null ? new VendorDetails.fromJson(json['user']) : null;
   }
 
   Map<String, dynamic> toJson() {

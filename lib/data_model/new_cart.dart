@@ -2,7 +2,7 @@ import 'dart:convert';
 
 class CartModel {
     UserCart? cart;
-    int? cartTotal;
+    dynamic cartTotal;
 
     CartModel({
         this.cart,

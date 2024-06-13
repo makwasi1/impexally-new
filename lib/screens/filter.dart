@@ -295,14 +295,22 @@ class _FilterState extends State<Filter> {
   }
 
   _onSearchSubmit() {
-    reset();
-    if (_selectedFilter!.option_key == "sellers") {
-      resetShopList();
-      fetchShopData();
-    } else if (_selectedFilter!.option_key == "brands") {
-      resetBrandList();
-      fetchBrandData();
+    debugPrint("search key: " + _searchKey!);
+    var product = _productList
+        .where((element) => element.productDetail.title
+            .toLowerCase()
+            .contains(_searchKey!.toLowerCase()))
+        .toList();
+    debugPrint("==========" + product.toString());
+    if (product.length > 0) {
+      _productList.clear();
+      _productList.addAll(product);
+      _isProductInitial = false;
+      _totalProductData = 300;
+      _showProductLoadingContainer = false;
+      setState(() {});
     } else {
+      reset();
       resetProductList();
       fetchProductData();
     }
@@ -723,10 +731,12 @@ class _FilterState extends State<Filter> {
                   child: TypeAheadField(
                     suggestionsCallback: (pattern) async {
                       //return await BackendService.getSuggestions(pattern);
-                      var suggestions = await SearchRepository()
-                          .getSearchSuggestionListResponse(
-                              query_key: pattern,
-                              type: _selectedFilter!.option_key);
+                      var suggestions = _productList
+                          .where((element) => element.productDetail.title
+                              .toLowerCase()
+                              .contains(pattern.toLowerCase()))
+                          .toList();
+                      // _onSearchSubmit();
                       //print(suggestions.toString());
                       return suggestions;
                     },
@@ -741,27 +751,15 @@ class _FilterState extends State<Filter> {
                       );
                     },
                     itemBuilder: (context, dynamic suggestion) {
-                      //print(suggestion.toString());
-                      var subtitle =
-                          "${AppLocalizations.of(context)!.searched_for_all_lower} ${suggestion.count} ${AppLocalizations.of(context)!.times_all_lower}";
-                      if (suggestion.type != "search") {
-                        subtitle =
-                            "${suggestion.type_string} ${AppLocalizations.of(context)!.found_all_lower}";
-                      }
                       return ListTile(
                         dense: true,
                         title: Text(
-                          suggestion.query,
+                          suggestion.productDetail.title,
                           style: TextStyle(
-                              color: suggestion.type != "search"
+                              color: suggestion.productDetail.title != "search"
                                   ? MyTheme.accent_color
                                   : MyTheme.font_grey),
                         ),
-                        subtitle: Text(subtitle,
-                            style: TextStyle(
-                                color: suggestion.type != "search"
-                                    ? MyTheme.font_grey
-                                    : MyTheme.medium_grey)),
                       );
                     },
                     noItemsFoundBuilder: (context) {
@@ -777,6 +775,7 @@ class _FilterState extends State<Filter> {
                     onSuggestionSelected: (dynamic suggestion) {
                       _searchController.text = suggestion.query;
                       _searchKey = suggestion.query;
+                      debugPrint(wrapWidth: 1024, suggestion.query);
                       setState(() {});
                       _onSearchSubmit();
                     },
@@ -1154,6 +1153,7 @@ class _FilterState extends State<Filter> {
                     has_discount: true,
                     discount: _productList[index].discountRate + "%",
                     is_wholesale: true,
+                    stock: _productList[index].stock,
                   );
                 },
               )

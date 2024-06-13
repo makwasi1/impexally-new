@@ -60,10 +60,10 @@ class _CartState extends State<Cart> {
     fetchData();
   }
 
-  //check if user is logged in if not roiute to Login 
-  
+  //check if user is logged in if not roiute to Login
+
   checkUser() async {
-  //get user is logged in status
+    //get user is logged in status
     LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
     if (res.result == false) {
       Navigator.push(
@@ -74,7 +74,6 @@ class _CartState extends State<Cart> {
       );
     }
   }
-
 
   @override
   void dispose() {
@@ -130,9 +129,10 @@ class _CartState extends State<Cart> {
         // ToastComponent.showDialog("Updating Cart...",
         //     gravity: Toast.center, duration: Toast.lengthLong);
 
-        await CartRepository().getCartProcessResponse(
-            _shopList[seller_index].id.toString(),
-            _shopList[seller_index].quantity).then((value) => getSetCartTotal());
+        await CartRepository()
+            .getCartProcessResponse(_shopList[seller_index].id.toString(),
+                _shopList[seller_index].quantity)
+            .then((value) => getSetCartTotal());
         // fetchData();
         // setState(() {});
       } catch (e) {
@@ -156,9 +156,10 @@ class _CartState extends State<Cart> {
         }
         // ToastComponent.showDialog("Updating Cart...",
         //     gravity: Toast.center, duration: Toast.lengthLong);
-        await CartRepository().getCartProcessResponse(
-            _shopList[seller_index].id.toString(),
-            _shopList[seller_index].quantity).then((value) => getSetCartTotal());
+        await CartRepository()
+            .getCartProcessResponse(_shopList[seller_index].id.toString(),
+                _shopList[seller_index].quantity)
+            .then((value) => getSetCartTotal());
         // fetchData();
         // setState(() {});
       } catch (e) {
@@ -224,7 +225,6 @@ class _CartState extends State<Cart> {
 
       reset();
       fetchData();
-      
     } else {
       ToastComponent.showDialog(cartDeleteResponse.message,
           gravity: Toast.center, duration: Toast.lengthLong);
@@ -241,11 +241,9 @@ class _CartState extends State<Cart> {
 
   process({mode}) async {
     LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
-    if (res.result == false) {  
-      ToastComponent.showDialog(
-          "You must be logged in to proceed to shipping",
-          gravity: Toast.center,
-          duration: Toast.lengthLong);
+    if (res.result == false) {
+      ToastComponent.showDialog("You must be logged in to proceed to shipping",
+          gravity: Toast.center, duration: Toast.lengthLong);
       //navigate to login
       Navigator.push(
         context,
@@ -254,13 +252,10 @@ class _CartState extends State<Cart> {
         ),
       );
       return;
-      
     } else {
       if (_shopList.length == 0) {
-        ToastComponent.showDialog(
-            AppLocalizations.of(context)!.cart_is_empty,
-            gravity: Toast.center,
-            duration: Toast.lengthLong);
+        ToastComponent.showDialog(AppLocalizations.of(context)!.cart_is_empty,
+            gravity: Toast.center, duration: Toast.lengthLong);
         return;
       }
     }
@@ -596,8 +591,8 @@ class _CartState extends State<Cart> {
                 ),
                 GestureDetector(
                   onTap: () {
-                            onPressDelete(_shopList[seller_index].id);
-                          },
+                    onPressDelete(_shopList[seller_index].id);
+                  },
                   child: Container(
                     width: 32,
                     child: Column(

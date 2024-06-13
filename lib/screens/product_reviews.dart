@@ -1,4 +1,5 @@
 import 'package:active_ecommerce_flutter/custom/btn.dart';
+import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
@@ -8,6 +9,7 @@ import 'dart:async';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:toast/toast.dart';
 import 'package:flutter/services.dart';
 import 'package:expandable/expandable.dart';
@@ -17,8 +19,10 @@ import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import '../data_model/login_response.dart';
+
 class ProductReviews extends StatefulWidget {
-  int? id;
+  String? id;
 
   ProductReviews({Key? key, this.id}) : super(key: key);
 
@@ -32,11 +36,13 @@ class _ProductReviewsState extends State<ProductReviews> {
   ScrollController scrollController = ScrollController();
 
   double _my_rating = 0.0;
+  double _my_rating_temp = 0.0;
 
   List<dynamic> _reviewList = [];
   bool _isInitial = true;
   int _page = 1;
   int? _totalData = 0;
+  
   bool _showLoadingContainer = false;
 
   @override
@@ -67,8 +73,9 @@ class _ProductReviewsState extends State<ProductReviews> {
       page: _page,
     );
     _reviewList.addAll(reviewResponse.reviews);
+    
     _isInitial = false;
-    _totalData = reviewResponse.meta.total;
+    _totalData = _reviewList.length;
     _showLoadingContainer = false;
     setState(() {});
   }
@@ -89,9 +96,20 @@ class _ProductReviewsState extends State<ProductReviews> {
     fetchData();
   }
 
+  dateFormmatter(String date) {
+    var parsedDate = DateTime.parse(date);
+    var formatter = new intl.DateFormat('dd MMMM, yyyy');
+    String formatted = formatter.format(parsedDate);
+    return formatted;
+  }
+
   onTapReviewSubmit(context) async {
-    if (is_logged_in.$ == false) {
-      ToastComponent.showDialog("You need to login to give a review", gravity: Toast.center, duration: Toast.lengthLong);
+    AuthHelper authHelper = AuthHelper();
+    LoginResponse loginUser = await authHelper.getUserDetailsFromSharedPref();
+
+    if (loginUser.result == false) {
+      ToastComponent.showDialog("You need to login to give a review",
+          gravity: Toast.center, duration: Toast.lengthLong);
       return;
     }
 
@@ -100,8 +118,7 @@ class _ProductReviewsState extends State<ProductReviews> {
     //print(chatText);
     if (myReviewText == "") {
       ToastComponent.showDialog(
-          AppLocalizations.of(context)!
-              .review_can_not_empty_warning,
+          AppLocalizations.of(context)!.review_can_not_empty_warning,
           gravity: Toast.center,
           duration: Toast.lengthLong);
       return;
@@ -117,11 +134,13 @@ class _ProductReviewsState extends State<ProductReviews> {
         .getReviewSubmitResponse(widget.id, _my_rating.toInt(), myReviewText);
 
     if (reviewSubmitResponse.result == false) {
-      ToastComponent.showDialog(reviewSubmitResponse.message, gravity: Toast.center, duration: Toast.lengthLong);
+      ToastComponent.showDialog(reviewSubmitResponse.message,
+          gravity: Toast.center, duration: Toast.lengthLong);
       return;
     }
 
-    ToastComponent.showDialog(reviewSubmitResponse.message, gravity: Toast.center, duration: Toast.lengthLong);
+    // ToastComponent.showDialog(reviewSubmitResponse.message,
+    //     gravity: Toast.center, duration: Toast.lengthLong);
 
     reset();
     fetchData();
@@ -137,7 +156,7 @@ class _ProductReviewsState extends State<ProductReviews> {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
+      textDirection: TextDirection.ltr,
       child: Scaffold(
           backgroundColor: Colors.white,
           appBar: buildAppBar(context),
@@ -242,8 +261,8 @@ class _ProductReviewsState extends State<ProductReviews> {
       return Container(
         height: 300,
         child: Center(
-            child: Text(AppLocalizations.of(context)!
-                .no_reviews_yet_be_the_first)),
+            child: Text(
+                AppLocalizations.of(context)!.no_reviews_yet_be_the_first)),
       );
     } else {
       return Container(); // should never be happening
@@ -267,13 +286,11 @@ class _ProductReviewsState extends State<ProductReviews> {
                 //shape: BoxShape.rectangle,
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(35),
-                child: FadeInImage.assetNetwork(
-                  placeholder: 'assets/placeholder.png',
-                  image:  _reviewList[index].avatar,
-                  fit: BoxFit.cover,
-                ),
-              ),
+                  borderRadius: BorderRadius.circular(35),
+                  child: Image.asset(
+                    "assets/placeholder.png",
+                    fit: BoxFit.cover,
+                  )),
             ),
             Column(
               children: [
@@ -287,7 +304,7 @@ class _ProductReviewsState extends State<ProductReviews> {
                       mainAxisSize: MainAxisSize.max,
                       children: [
                         Text(
-                          _reviewList[index].user_name,
+                          "user",
                           textAlign: TextAlign.left,
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
@@ -300,7 +317,7 @@ class _ProductReviewsState extends State<ProductReviews> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 4.0),
                           child: Text(
-                            _reviewList[index].time,
+                            dateFormmatter(_reviewList[index].time),
                             style: TextStyle(color: MyTheme.medium_grey),
                           ),
                         ),
@@ -368,7 +385,9 @@ class _ProductReviewsState extends State<ProductReviews> {
                         var controller = ExpandableController.of(context)!;
                         return Btn.basic(
                           child: Text(
-                            !controller.expanded ? AppLocalizations.of(context)!.view_more_ucf : AppLocalizations.of(context)!.show_less_ucf,
+                            !controller.expanded
+                                ? AppLocalizations.of(context)!.view_more_ucf
+                                : AppLocalizations.of(context)!.show_less_ucf,
                             style: TextStyle(
                                 color: MyTheme.font_grey, fontSize: 11),
                           ),
@@ -439,7 +458,8 @@ class _ProductReviewsState extends State<ProductReviews> {
                 decoration: InputDecoration(
                     filled: true,
                     fillColor: Color.fromRGBO(251, 251, 251, 1),
-                    hintText: AppLocalizations.of(context)!.type_your_review_here,
+                    hintText:
+                        AppLocalizations.of(context)!.type_your_review_here,
                     hintStyle: TextStyle(
                         fontSize: 14.0, color: MyTheme.textfield_grey),
                     enabledBorder: OutlineInputBorder(

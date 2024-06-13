@@ -45,6 +45,9 @@ import 'package:provider/provider.dart';
 import 'package:shared_value/shared_value.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:uni_links/uni_links.dart';
+import 'package:upgrader/upgrader.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
 
 import 'app_config.dart';
@@ -69,9 +72,9 @@ main() async {
     systemNavigationBarDividerColor: Colors.transparent,
   ));
 
-await Firebase.initializeApp(
-  options: DefaultFirebaseOptions.currentPlatform,
-);
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     SharedValue.wrapApp(
@@ -244,10 +247,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  StreamSubscription? _sub;
   @override
   void deactivate() {
     // print("deactivate");
     // TODO: implement deactivate
+
     super.deactivate();
   }
 
@@ -260,6 +265,7 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    //  _initDeepLinkListener();
     routes.routerDelegate.addListener(() {
       // print("objectobject");
     });
@@ -302,31 +308,16 @@ class _MyAppState extends State<MyApp> {
         ],
         child: Consumer<LocaleProvider>(builder: (context, provider, snapshot) {
           return MaterialApp.router(
-            builder: (context, child) => OneContext().builder(
-              context,
-              child,
-              initialRoute: "/",
-              mediaQueryData: MediaQuery.of(context),
-              
-              // onGenerateRoute: (route) {
-              //   return MaterialPageRoute(builder: (context2) {
-              //     // OneContext().context = context2;
-              //     return Scaffold(
-              //       resizeToAvoidBottomInset: false,
-              //       body: Builder(
-              //         builder: (innerContext) {
-              //           OneContext().context = innerContext;
-              //           return child!;
-              //         },
-              //       ),
-              //     );
-              //   });
-              // },
-              // onUnknownRoute: (route) {
-              //   print("abc ${route.name}");
-              //   return MaterialPageRoute(builder: (context) => child!);
-              // },
-            ),
+            builder: (context, child) {
+              return UpgradeAlert(
+                child: OneContext().builder(
+                  context,
+                  child,
+                  initialRoute: "/",
+                  mediaQueryData: MediaQuery.of(context),
+                ),
+              );
+            },
             routerConfig: routes,
             title: AppConfig.app_name,
             debugShowCheckedModeBanner: false,

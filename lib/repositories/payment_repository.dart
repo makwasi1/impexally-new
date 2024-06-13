@@ -125,7 +125,6 @@ class PaymentRepository {
 
     String url = ("${AppConfig.BASE_URL}/payment/make");
     
-
     print(url);
     final response = await ApiRequest.post(
       url: url,

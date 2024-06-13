@@ -43,10 +43,10 @@ class _MainState extends State<Main> {
 
   void onTapped(int i) {
     fetchAll();
-    if (!is_logged_in.$ && (i == 2)) {
-      Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
-      return;
-    }
+    // if (!is_logged_in.$ && (i == 2)) {
+    //   Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+    //   return;
+    // }
 
     if (i == 3) {
       // context.go('/dashboard');
@@ -125,7 +125,6 @@ class _MainState extends State<Main> {
       return shouldPop;
     }
     return Future.value(false);
-    return widget.go_back;
   }
 
   @override

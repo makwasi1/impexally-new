@@ -66,16 +66,28 @@ class OrderRepository {
 
   Future<dynamic> getOrderDetails({int? id = 0}) async {
     String url =
-        ("${AppConfig.BASE_URL}/purchase-history-details/" + id.toString());
+        ("${AppConfig.BASE_URL}/orders/" + id.toString());
 
     Map<String, String> header = commonHeader;
 
-    header.addAll(authHeader);
-    header.addAll(currencyHeader);
+    // header.addAll(authHeader);
+    // header.addAll(currencyHeader);
 
     final response = await ApiRequest.get(
-        url: url, headers: header, middleware: BannedUser());
-    return orderDetailResponseFromJson(response.body);
+        url: url, headers: header);
+
+        if(response.statusCode == 200) {
+          var jsonResponse = jsonDecode(response.body);
+
+          OrderDetailResponse orderDetailResponse = OrderDetailResponse.fromJson({
+            "data": [jsonResponse], // Directly use the decoded JSON if it's already an array.
+            "success": true,
+            "status": 200, // Add appropriate value for meta
+          });
+
+          return orderDetailResponse;
+        }
+
   }
 
   Future<ReOrderResponse> reOrder({int? id = 0}) async {
@@ -108,16 +120,27 @@ class OrderRepository {
 
   Future<dynamic> getOrderItems({int? id = 0}) async {
     String url =
-        ("${AppConfig.BASE_URL}/purchase-history-items/" + id.toString());
+        ("${AppConfig.BASE_URL}/orders/" + id.toString());
     Map<String, String> header = commonHeader;
 
-    header.addAll(authHeader);
-    header.addAll(currencyHeader);
+    // header.addAll(authHeader);
+    // header.addAll(currencyHeader);
 
     final response = await ApiRequest.get(
-        url: url, headers: header, middleware: BannedUser());
+        url: url, headers: header);
 
-    return orderItemlResponseFromJson(response.body);
+    if(response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+
+      OrderItemResponse orderItemResponse = OrderItemResponse.fromJson({
+        "data": jsonResponse["order_products"], // Directly use the decoded JSON if it's already an array.
+        "success": true,
+        "status": 200, // Add appropriate value for meta
+      });
+
+      return orderItemResponse;
+    }
+    
   }
 
   Future<dynamic> getPurchasedDigitalProducts({

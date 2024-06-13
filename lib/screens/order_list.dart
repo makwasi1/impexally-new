@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart' as date; 
+import 'package:intl/intl.dart' as date;
 import 'package:one_context/one_context.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -171,7 +171,7 @@ class _OrderListState extends State<OrderList> {
   fetchData() async {
     const storage = FlutterSecureStorage();
 
-    String? user_id =  await storage.read(key: 'user_id');
+    String? user_id = await storage.read(key: 'user_id');
     var orderResponse = await OrderRepository().getOrderList(user_id);
     //print("or:"+orderResponse.toJson().toString());
     _orderList.addAll(orderResponse.orders);
@@ -452,7 +452,8 @@ class _OrderListState extends State<OrderList> {
   }
 
   buildOrderListItemCard(int index) {
-    String formattedDate = date.DateFormat('yyyy-MM-dd – kk:mm').format(DateTime.parse(_orderList[index].createdAt));
+    String formattedDate = date.DateFormat('yyyy-MM-dd – kk:mm')
+        .format(DateTime.parse(_orderList[index].createdAt));
     return Container(
       decoration: BoxDecorations.buildBoxDecoration_1(),
       child: Padding(
@@ -463,7 +464,7 @@ class _OrderListState extends State<OrderList> {
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
               child: Text(
-                _orderList[index].orderNumber,
+                "Order Number: " + _orderList[index].orderNumber,
                 style: TextStyle(
                     color: MyTheme.accent_color,
                     fontSize: 13,
@@ -474,12 +475,12 @@ class _OrderListState extends State<OrderList> {
               padding: const EdgeInsets.only(bottom: 4.0),
               child: Row(
                 children: [
-                  Text(formattedDate,
+                  Text("Order Date: " + formattedDate,
                       style: TextStyle(
                           color: MyTheme.dark_font_grey, fontSize: 12)),
                   Spacer(),
                   Text(
-                    _orderList[index].priceTotal,
+                    "GH₵ "+_orderList[index].priceTotal,
                     style: TextStyle(
                         color: MyTheme.accent_color,
                         fontSize: 16,
