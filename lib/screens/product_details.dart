@@ -76,7 +76,7 @@ class _ProductDetailsState extends State<ProductDetails>
   WebViewController controller = WebViewController()
     ..setJavaScriptMode(JavaScriptMode.unrestricted)
     ..enableZoom(false);
-  double webViewHeight = 150.0;
+  double webViewHeight = 350.0;
 
   CarouselController _carouselController = CarouselController();
   late BuildContext loadingcontext;
@@ -2626,7 +2626,7 @@ class _ProductDetailsState extends State<ProductDetails>
         children: [
           Container(
             width: DeviceInfo(context).width,
-            height: webViewHeight,
+            height: webViewHeight * 2,
             child: WebViewWidget(
               controller: controller,
             ),

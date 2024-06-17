@@ -313,10 +313,11 @@ class _CheckoutState extends State<Checkout> {
     }
 
     // if (widget.list!.isNotEmpty && widget.list == "offline") {
-      String? user_id = await storage.read(key: "user_id");
-      await OrderRepository()
-          .createOrder(widget.cart_amount, widget.delivery_fee);
-      await CartRepository().removeUserCart(int.tryParse(user_id!));
+    String? user_id = await storage.read(key: "user_id");
+    await OrderRepository()
+        .createOrder(widget.cart_amount, widget.delivery_fee);
+    await storage.delete(key: "cart_id");    
+    await CartRepository().removeUserCart(int.tryParse(user_id!));
     // }
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return OrderList(from_checkout: true);

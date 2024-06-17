@@ -23,6 +23,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../presenter/cart_counter.dart';
 
@@ -190,26 +191,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .featured_categories_ucf,
-                                          style: TextStyle(
-                                              fontSize: 18,
-                                              fontWeight: FontWeight.w700),
-                                        ),
-                                      ],
+                                      children: [],
                                     ),
                                   ),
                                 ]),
                               ),
-                              SliverToBoxAdapter(
-                                child: SizedBox(
-                                  height: 154,
-                                  child: buildHomeFeaturedCategories(
-                                      context, homeData),
-                                ),
-                              ),
+                              // SliverToBoxAdapter(
+                              //   child: SizedBox(
+                              //     height: 154,
+                              //     child: buildHomeFeaturedCategories(
+                              //         context, homeData),
+                              //   ),
+                              // ),
                               SliverList(
                                 delegate: SliverChildListDelegate([
                                   Container(
@@ -434,12 +427,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         child: ClipRRect(
                             borderRadius: BorderRadius.horizontal(
                                 left: Radius.circular(6), right: Radius.zero),
-                            child: homeData.featuredCategoryList[index].image != "" ? FadeInImage.assetNetwork(
-                              placeholder: 'assets/placeholder.png',
-                              image: "https://seller.impexally.com/" +
-                                  homeData.featuredCategoryList[index].image,
-                              fit: BoxFit.cover,
-                            ): Image.asset('assets/placeholder.png', fit: BoxFit.cover,))),
+                            child:
+                                homeData.featuredCategoryList[index].image != ""
+                                    ? FadeInImage.assetNetwork(
+                                        placeholder: 'assets/placeholder.png',
+                                        image: "https://seller.impexally.com/" +
+                                            homeData.featuredCategoryList[index]
+                                                .image,
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.asset(
+                                        'assets/placeholder.png',
+                                        fit: BoxFit.cover,
+                                      ))),
                     Flexible(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -825,11 +825,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       height: 180,
                       child: InkWell(
                         onTap: () {
-                          // var url =
-                          //     i.url?.split(AppConfig.DOMAIN_PATH).last ?? "";
-                          var url = i.url;
-                          print(url);
-                          GoRouter.of(context).go(url!);
+                          Navigator.push(context,
+                              MaterialPageRoute(builder: (context) {
+                            return Filter();
+                          }));
                         },
                         child: AIZImage.radiusImage(i.photo, 6),
                       ),
@@ -883,140 +882,190 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             Expanded(
-              child: Column(
-                children: [
-                  Container(
-                    height: 100,
-                    padding: EdgeInsets.only(left: 10),
-                    child: Image.network(
-                      "https://image.impexally.com/images/agents/riderz.png",
-                      // Adjust the height as needed
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return CategoryProducts(
+                      slug: homeData.featuredCategoryList[0].id.toString(),
+                      // category_name: homeData.featuredCategoryList[index].name,
+                    );
+                  }));
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      height: 70,
+                      padding: EdgeInsets.only(left: 10),
+                      child: Image.network(
+                        "https://image.impexally.com/images/agents/riderz.png",
+                        // Adjust the height as needed
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Get Riders",
-                      style: TextStyle(
-                          overflow: TextOverflow.ellipsis,
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Get Riders",
+                        style: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
             SizedBox(
               width: 5,
             ),
             Expanded(
-              child: Column(
-                children: [
-                  Container(
-                    height: 100,
-                    padding: EdgeInsets.only(left: 10),
-                    child: Image.network(
-                      "https://image.impexally.com/images/ae/home-page/z0.png",
-                      // Adjust the height as needed
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return CategoryProducts(
+                      slug: homeData.featuredCategoryList[1].id.toString(),
+                      // category_name: homeData.featuredCategoryList[index].name,
+                    );
+                  }));
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      height: 70,
+                      padding: EdgeInsets.only(left: 10),
+                      child: Image.network(
+                        "https://image.impexally.com/images/ae/home-page/z0.png",
+                        // Adjust the height as needed
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Under 49",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Under 49",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
             SizedBox(
               width: 5,
             ),
             Expanded(
-              child: Column(
-                children: [
-                  Container(
-                    height: 100,
-                    padding: EdgeInsets.only(left: 10),
-                    child: Image.network(
-                      "https://image.impexally.com/images/ae/home-page/z5.png",
-                      // Adjust the height as needed
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return CategoryProducts(
+                      slug: homeData.featuredCategoryList[2].id.toString(),
+                      // category_name: homeData.featuredCategoryList[index].name,
+                    );
+                  }));
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      height: 70,
+                      padding: EdgeInsets.only(left: 10),
+                      child: Image.network(
+                        "https://image.impexally.com/images/ae/home-page/z5.png",
+                        // Adjust the height as needed
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Deals",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Deals",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
             SizedBox(
               width: 5,
             ),
             Expanded(
-              child: Column(
-                children: [
-                  Container(
-                    height: 100,
-                    padding: EdgeInsets.only(right: 10),
-                    child: Image.network(
-                      "https://image.impexally.com/images/ae/home-page/12.png",
-                      // Adjust the height as needed
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return CategoryProducts(
+                      slug: homeData.featuredCategoryList[3].id.toString(),
+                      // category_name: homeData.featuredCategoryList[index].name,
+                    );
+                  }));
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      height: 70,
+                      padding: EdgeInsets.only(right: 10),
+                      child: Image.network(
+                        "https://image.impexally.com/images/ae/home-page/12.png",
+                        // Adjust the height as needed
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Featured",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Featured",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
             SizedBox(
               width: 5,
             ),
             Expanded(
-              child: Column(
-                children: [
-                  Container(
-                    height: 100,
-                    padding: EdgeInsets.only(right: 10),
-                    child: Image.network(
-                      "https://image.impexally.com/images/ae/home-page/z2.png",
-                      // Adjust the height as needed
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return CategoryProducts(
+                      slug: homeData.featuredCategoryList[4].id.toString(),
+                      // category_name: homeData.featuredCategoryList[index].name,
+                    );
+                  }));
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      height: 70,
+                      padding: EdgeInsets.only(right: 10),
+                      child: Image.network(
+                        "https://image.impexally.com/images/ae/home-page/z2.png",
+                        // Adjust the height as needed
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Special Offer",
-                      style: TextStyle( 
-                          overflow: TextOverflow.ellipsis,
-                          color: Colors.black,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Special Offer",
+                        style: TextStyle(
+                            overflow: TextOverflow.ellipsis,
+                            color: Colors.black,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
               ),
             )
           ],
@@ -1032,59 +1081,80 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Expanded(
-              child: Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return CategoryProducts(
+                      slug: homeData.featuredCategoryList[2].id.toString(),
+                      // category_name: homeData.featuredCategoryList[index].name,
+                    );
+                  }));
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.only(left: 10),
+                      child: Image.network(
+                        "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp",
+                        // Adjust the height as needed
+                      ),
                     ),
-                    padding: EdgeInsets.only(left: 10),
-                    child: Image.network(
-                      "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp",
-                      // Adjust the height as needed
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Pickup & Delivery Ghana",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Pickup & Delivery Ghana",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
               ),
             ),
             SizedBox(
               width: 10,
             ),
             Expanded(
-              child: Column(
-                children: [
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
+              child: GestureDetector(
+                //open link
+                onTap: () async {
+                  const url = 'https://seller.impexally.com/';
+                  if (await canLaunch(url)) {
+                    await launch(url);
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+                child: Column(
+                  children: [
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.only(right: 10),
+                      child: Image.network(
+                        "https://image.impexally.com/images/app/impexally/make-mone-online.png",
+                        // Adjust the height as needed
+                      ),
                     ),
-                    padding: EdgeInsets.only(right: 10),
-                    child: Image.network(
-                      "https://image.impexally.com/images/app/impexally/make-mone-online.png",
-                      // Adjust the height as needed
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      "Start Selling now & Get Money",
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  )
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Text(
+                        "Start Selling now & Get Money",
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
               ),
             )
           ],

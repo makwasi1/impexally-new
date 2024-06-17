@@ -146,37 +146,39 @@ class _ProductVariantsState extends State<ProductVariants> {
   }
 
   onPressAddToCart(context, snackbar) async {
-    LoginResponse loginResponse = await AuthHelper().getUserDetailsFromSharedPref();
+    LoginResponse loginResponse =
+        await AuthHelper().getUserDetailsFromSharedPref();
     if (loginResponse.result == false) {
       ToastComponent.showDialog(
           "Please login / register to add this product to cart",
           gravity: Toast.center,
           duration: Toast.lengthLong);
-           Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return Login();
-        })).then((value) {
-          onPopped(value);
-        });
-    }else {
-       addToCart(mode: "add_to_cart", context: context, snackbar: snackbar);
-    }   
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return Login();
+      })).then((value) {
+        onPopped(value);
+      });
+    } else {
+      addToCart(mode: "add_to_cart", context: context, snackbar: snackbar);
+    }
   }
 
   onPressBuyNow(context, snackbar) async {
-    LoginResponse loginResponse = await AuthHelper().getUserDetailsFromSharedPref();
+    LoginResponse loginResponse =
+        await AuthHelper().getUserDetailsFromSharedPref();
     if (loginResponse.result == false) {
       ToastComponent.showDialog(
           "Please login / register to add this product to cart",
           gravity: Toast.center,
           duration: Toast.lengthLong);
-           Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return Login();
-        })).then((value) {
-          onPopped(value);
-        });
-    }else {
-       addToCart(mode: "buy_now", context: context, snackbar: snackbar);
-    }   
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return Login();
+      })).then((value) {
+        onPopped(value);
+      });
+    } else {
+      addToCart(mode: "buy_now", context: context, snackbar: snackbar);
+    }
   }
 
   addToCart(
@@ -908,7 +910,8 @@ class _ProductVariantsState extends State<ProductVariants> {
                     ),
                   ),
                   SizedBox(height: 5),
-                  variation.labelNames == "Color"
+                  variation.labelNames == "Color" ||
+                          variation.labelNames == "color"
                       ? Wrap(
                           spacing: 8,
                           children:
@@ -983,7 +986,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                                   itemSelectedVariations[index] = {
                                     "variation_id": variation.id,
                                     "variation_option_id": option.id,
-                                  }; 
+                                  };
                                 });
                               },
                             );
