@@ -428,6 +428,9 @@ class _FilterState extends State<Filter> {
     return AppBar(
         backgroundColor: Colors.white.withOpacity(0.95),
         automaticallyImplyLeading: false,
+        leading: Builder(
+            builder: (context) =>
+                UsefulElements.backToMain(context, go_back: false)),
         actions: [
           new Container(),
         ],
@@ -1146,8 +1149,8 @@ class _FilterState extends State<Filter> {
                   return ProductCard(
                     id: _productList[index].id,
                     slug: _productList[index].slug,
-                    image: _productList[index].image.imageDefault,
-                    name: _productList[index].productDetail.title,
+                    image: _productList[index].image?.imageDefault ?? "",
+                    name: _productList[index].productDetail?.title,
                     main_price: _productList[index].priceDiscounted,
                     stroked_price: _productList[index].price,
                     has_discount: true,

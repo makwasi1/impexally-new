@@ -73,8 +73,12 @@ class _ProductCardState extends State<ProductCard> {
                         top: Radius.circular(6), bottom: Radius.zero),
                     child: FadeInImage.assetNetwork(
                       placeholder: 'assets/placeholder.png',
-                      image: "https://seller.impexally.com/uploads/images/"+widget.image!,
+                      image: "https://seller.impexally.com/uploads/images/" +
+                          widget.image!,
                       fit: BoxFit.cover,
+                      imageErrorBuilder: (context, error, stackTrace) {
+                        return Image.asset('assets/placeholder.png');
+                      },
                     ),
                   ),
                 ),
@@ -88,7 +92,7 @@ class _ProductCardState extends State<ProductCard> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
                       child: Text(
-                        widget.name!,
+                        widget.name ?? "",
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: TextStyle(
@@ -98,7 +102,6 @@ class _ProductCardState extends State<ProductCard> {
                             fontWeight: FontWeight.w400),
                       ),
                     ),
-                   
                     Padding(
                       padding: EdgeInsets.fromLTRB(16, 0, 16, 2),
                       child: Text(
@@ -113,55 +116,54 @@ class _ProductCardState extends State<ProductCard> {
                       ),
                     ),
                     Padding(
-                  padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                  child: Text(
-                    "Like it, Buy it now! Sameday Delivery",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500),
-                  ),
-                ),
-                Row(
-                  children: [
-                    Padding(
                       padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                      child: Image.network(
-                          height: 20,
-                     
-                          "https://image.flylandexpress.com/images/home-page/flylan-express-officia-1.webp"),
+                      child: Text(
+                        "Like it, Buy it now! Sameday Delivery",
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500),
+                      ),
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Icon(
-                          Icons.star,
-                          color: Colors.yellow,
-                          size: 20,
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          child: Image.network(
+                              height: 20,
+                              "https://image.flylandexpress.com/images/home-page/flylan-express-officia-1.webp"),
                         ),
-                        Icon(
-                          Icons.star,
-                          color: Colors.yellow,
-                          size: 20,
-                        ),
-                        Icon(
-                          Icons.star,
-                          color: Colors.grey[300],
-                          size: 20,
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 20,
+                            ),
+                            Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 20,
+                            ),
+                            Icon(
+                              Icons.star,
+                              color: Colors.grey[300],
+                              size: 20,
+                            )
+                          ],
                         )
                       ],
+                    ),
+                    SizedBox(
+                      height: 10,
                     )
-                  ],
-                ),
-                SizedBox(height: 10,)
                   ],
                 ),
               ),
             ]),
-
-            
           ],
         ),
       ),

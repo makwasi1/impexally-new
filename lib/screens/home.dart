@@ -368,8 +368,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             return ProductCard(
               id: homeData.allProductList[index].id,
               slug: homeData.allProductList[index].slug,
-              image: homeData.allProductList[index].image.imageDefault,
-              name: homeData.allProductList[index].productDetail.title,
+              image: homeData.allProductList[index].image?.imageDefault ?? "",
+              name: homeData.allProductList[index].productDetail?.title,
               main_price: homeData.allProductList[index].price,
               stroked_price: homeData.allProductList[index].priceDiscounted,
               has_discount: true,

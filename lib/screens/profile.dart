@@ -9,27 +9,20 @@ import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
-import 'package:active_ecommerce_flutter/repositories/profile_repository.dart';
 import 'package:active_ecommerce_flutter/screens/address.dart';
 import 'package:active_ecommerce_flutter/screens/auction_products.dart';
-import 'package:active_ecommerce_flutter/screens/change_language.dart';
 import 'package:active_ecommerce_flutter/screens/classified_ads/classified_ads.dart';
 import 'package:active_ecommerce_flutter/screens/classified_ads/my_classified_ads.dart';
 import 'package:active_ecommerce_flutter/screens/club_point.dart';
 import 'package:active_ecommerce_flutter/screens/coupons.dart';
 import 'package:active_ecommerce_flutter/screens/currency_change.dart';
-import 'package:active_ecommerce_flutter/screens/digital_product/digital_products.dart';
-import 'package:active_ecommerce_flutter/screens/digital_product/purchased_digital_produts.dart';
 import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/followed_sellers.dart';
-import 'package:active_ecommerce_flutter/screens/login.dart';
-import 'package:active_ecommerce_flutter/screens/main.dart';
 import 'package:active_ecommerce_flutter/screens/messenger_list.dart';
 import 'package:active_ecommerce_flutter/screens/order_list.dart';
 import 'package:active_ecommerce_flutter/screens/profile_edit.dart';
 import 'package:active_ecommerce_flutter/screens/refund_request.dart';
 import 'package:active_ecommerce_flutter/screens/top_selling_products.dart';
-import 'package:active_ecommerce_flutter/screens/uploads/upload_file.dart';
 import 'package:active_ecommerce_flutter/screens/wallet.dart';
 import 'package:active_ecommerce_flutter/screens/wishlist.dart';
 import 'package:flutter/material.dart';
@@ -120,16 +113,19 @@ class _ProfileState extends State<Profile> {
   }
 
   getCartCount() async {
-   int cartCount = await Provider.of<CartCounter>(context, listen: false).getCount();
-   int orderCount = await Provider.of<CartCounter>(context, listen: false).getOrderCount();
+    int cartCount =
+        await Provider.of<CartCounter>(context, listen: false).getCount();
+    int orderCount =
+        await Provider.of<CartCounter>(context, listen: false).getOrderCount();
 
     setState(() {
       _cartCounter = cartCount;
       _orderCounter = orderCount;
-      _cartCounterString = counterText(_cartCounter.toString(), default_length: 2);
-      _orderCounterString = counterText(_orderCounter.toString(), default_length: 2);
+      _cartCounterString =
+          counterText(_cartCounter.toString(), default_length: 2);
+      _orderCounterString =
+          counterText(_orderCounter.toString(), default_length: 2);
     });
-    
   }
 
   // fetchCounters() async {
@@ -366,7 +362,6 @@ class _ProfileState extends State<Profile> {
             ],
           ),
 
-        
           buildBottomVerticalCardListItem(
               "assets/coupon.png", LangText(context).local.coupons_ucf,
               onPressed: () {
@@ -705,7 +700,6 @@ class _ProfileState extends State<Profile> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          
           InkWell(
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -1018,17 +1012,17 @@ class _ProfileState extends State<Profile> {
                       }
                     : () => null),
           // if (conversation_system_status.$)
-            buildSettingAndAddonsHorizontalMenuItem(
-                "assets/messages.png",
-                AppLocalizations.of(context)!.messages_ucf,
-                is_logged_in
-                    ? () {
-                        Navigator.push(context,
-                            MaterialPageRoute(builder: (context) {
-                          return MessengerList();
-                        }));
-                      }
-                    : () => null),
+          buildSettingAndAddonsHorizontalMenuItem(
+              "assets/new-chat.png",
+              AppLocalizations.of(context)!.messages_ucf,
+              is_logged_in
+                  ? () {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return MessengerList();
+                      }));
+                    }
+                  : () => null),
           // if (auction_addon_installed.$)
           if (false)
             buildSettingAndAddonsHorizontalMenuItem(
@@ -1054,9 +1048,6 @@ class _ProfileState extends State<Profile> {
                         }));
                       }
                     : () => null),
-
-          
-         
         ],
       ),
     );
@@ -1079,11 +1070,8 @@ class _ProfileState extends State<Profile> {
           children: [
             Image.asset(
               img,
-              width: 16,
-              height: 16,
-              color: is_logged_in
-                  ? MyTheme.dark_font_grey
-                  : MyTheme.medium_grey_50,
+              width: 18,
+              height: 18,
             ),
             SizedBox(
               height: 10,

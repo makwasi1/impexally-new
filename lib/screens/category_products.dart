@@ -14,8 +14,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import '../data_model/category_mini_response.dart';
 
 class CategoryProducts extends StatefulWidget {
-  CategoryProducts({Key? key,required this.slug})
-      : super(key: key);
+  CategoryProducts({Key? key, required this.slug}) : super(key: key);
   final String slug;
 
   @override
@@ -38,17 +37,16 @@ class _CategoryProductsState extends State<CategoryProducts> {
   Category? categoryInfo;
 
   getSubCategory() async {
-    var res =
-        await CategoryRepository().getCategories(parent_id: widget.slug);
+    var res = await CategoryRepository().getCategories(parent_id: widget.slug);
     print(res.categories.toString());
     // _subCategoryList.addAll(res.categories);
     setState(() {});
   }
+
   getCategoryInfo() async {
-    var res =
-        await CategoryRepository().getCategoryInfo(widget.slug);
+    var res = await CategoryRepository().getCategoryInfo(widget.slug);
     print(res.categories.toString());
-    if(res.categories?.isNotEmpty??false) {
+    if (res.categories?.isNotEmpty ?? false) {
       // categoryInfo = res.categories?.first ?? null;
     }
     setState(() {});
@@ -85,11 +83,11 @@ class _CategoryProductsState extends State<CategoryProducts> {
   }
 
   fetchData() async {
-    var productResponse = await ProductRepository().getCategoryProducts(
-        id: widget.slug, page: _page, name: _searchKey);
+    var productResponse = await ProductRepository()
+        .getCategoryProducts(id: widget.slug, page: _page, name: _searchKey);
     _productList.addAll(productResponse.products!);
     _isInitial = false;
-    _totalData =300;
+    _totalData = 300;
     _showLoadingContainer = false;
     setState(() {});
   }
@@ -215,7 +213,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
             padding: EdgeInsets.only(left: 10),
             width: DeviceInfo(context).width! / 2,
             child: Text(
-              categoryInfo?.titleMetaTag??"",
+              categoryInfo?.titleMetaTag ?? "",
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -273,7 +271,7 @@ class _CategoryProductsState extends State<CategoryProducts> {
           filled: true,
           fillColor: MyTheme.white.withOpacity(0.6),
           hintText: "${AppLocalizations.of(context)!.search_products_from} : " +
-              ""//widget.category_name!
+              "" //widget.category_name!
           ,
           hintStyle: TextStyle(fontSize: 14.0, color: MyTheme.font_grey),
           enabledBorder: OutlineInputBorder(
@@ -362,15 +360,15 @@ class _CategoryProductsState extends State<CategoryProducts> {
               // 3
               return ProductCard(
                   id: _productList[index].id,
-                  slug:_productList[index].slug,
-                  image: _productList[index].image.imageDefault,
-                  name: _productList[index].productDetail.title,
+                  slug: _productList[index].slug,
+                  image: _productList[index].image?.imageDefault ?? "",
+                  name: _productList[index].productDetail?.title,
                   main_price: _productList[index].priceDiscounted,
                   stroked_price: _productList[index].price,
                   discount: _productList[index].discountRate + "%",
                   stock: _productList[index].stock,
                   is_wholesale: true,
-                  has_discount:true);
+                  has_discount: true);
             },
           ),
         ),

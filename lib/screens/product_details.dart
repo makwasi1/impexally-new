@@ -2330,7 +2330,7 @@ class _ProductDetailsState extends State<ProductDetails>
           Container(
             padding: EdgeInsets.all(1.0),
             child: IconButton(
-              icon: Icon(Icons.chat),
+              icon: Image.asset("assets/new-chat.png"),
               color: MyTheme.dark_font_grey,
               onPressed: () {
                 onPressAddToCart(context, _addedToCartSnackbar);

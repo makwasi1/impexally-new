@@ -61,6 +61,11 @@ class _ProductVariantsState extends State<ProductVariants> {
   int? _selectedVariationOption;
   int? _selectedVariationOption2;
 
+  String? _initialImage;
+  String? _initialTitle;
+  String? _initialPrice;
+  String? _initialDidcountedPrice;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -138,6 +143,12 @@ class _ProductVariantsState extends State<ProductVariants> {
 
       variationsWithOptions.add(variationDetail);
     }
+
+    //set inital product image and price
+    _initialImage = widget.variation!.image![0].imageDefault!;
+    _initialTitle = widget.variation!.productDetails![0].title!;
+    _initialDidcountedPrice = widget.variation!.products!.priceDiscounted!;
+    _initialPrice = widget.variation!.products!.price!;
 
     // Now you have a list of variations with their options, each including IDs
     print(variationsWithOptions);
@@ -789,7 +800,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                     child: FadeInImage.assetNetwork(
                       placeholder: 'assets/placeholder.png',
                       image: "https://seller.impexally.com/uploads/images/" +
-                          widget.variation!.image![0].imageDefault!,
+                          _initialImage!,
                       fit: BoxFit.cover,
                     ))),
             Container(
@@ -803,7 +814,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                   children: [
                     Text(
                       widget.variation != null
-                          ? widget.variation!.productDetails![0].title!
+                          ? _initialTitle!
                           : "",
                       maxLines: 2,
                       style: TextStyle(
@@ -818,7 +829,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                           Text(
                             SystemConfig.currency +
                                 " " +
-                                widget.variation!.products!.priceDiscounted!,
+                                _initialDidcountedPrice!,
                             style: TextStyle(
                                 color: MyTheme.accent_color,
                                 fontSize: 14,
@@ -828,7 +839,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                           Text(
                             SystemConfig.currency +
                                 " " +
-                                widget.variation!.products!.price!,
+                                _initialPrice!,
                             style: TextStyle(
                                 decoration: TextDecoration.lineThrough,
                                 color: MyTheme.accent_color,
@@ -937,6 +948,8 @@ class _ProductVariantsState extends State<ProductVariants> {
                                     "variation_id": variation.id,
                                     "variation_option_id": option.id,
                                   };
+                                  _initialImage = option.imageVariation!.imageDefault;
+                                  _initialDidcountedPrice = option.discountRate!;
                                 });
                               },
                               child: Container(
@@ -987,6 +1000,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                                     "variation_id": variation.id,
                                     "variation_option_id": option.id,
                                   };
+                                  // _initialDidcountedPrice = option.discountRate!;
                                 });
                               },
                             );

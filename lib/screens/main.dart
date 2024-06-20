@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:active_ecommerce_flutter/custom/aiz_route.dart';
+import 'package:active_ecommerce_flutter/dummy_data/products.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/main.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
@@ -7,6 +8,7 @@ import 'package:active_ecommerce_flutter/presenter/bottom_appbar_index.dart';
 import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
 import 'package:active_ecommerce_flutter/screens/cart.dart';
 import 'package:active_ecommerce_flutter/screens/category_list.dart';
+import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/home.dart';
 import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:active_ecommerce_flutter/screens/profile.dart';
@@ -72,11 +74,7 @@ class _MainState extends State<Main> {
         slug: "",
         is_base_category: true,
       ),
-      Cart(
-        has_bottomnav: true,
-        from_navigation: true,
-        counter: counter,
-      ),
+      Filter(),
       Profile()
     ];
     fetchAll();
@@ -87,7 +85,7 @@ class _MainState extends State<Main> {
     super.initState();
   }
 
-  Future<bool> willPop()  async {
+  Future<bool> willPop() async {
     print(_currentIndex);
     if (_currentIndex != 0) {
       fetchAll();
@@ -102,10 +100,10 @@ class _MainState extends State<Main> {
         builder: (BuildContext context) {
           return Directionality(
             textDirection:
-            app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
+                app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
             child: AlertDialog(
-              content: Text(
-                  AppLocalizations.of(context)!.do_you_want_close_the_app),
+              content:
+                  Text(AppLocalizations.of(context)!.do_you_want_close_the_app),
               actions: [
                 TextButton(
                     onPressed: () {
@@ -182,35 +180,12 @@ class _MainState extends State<Main> {
                 BottomNavigationBarItem(
                     icon: Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
-                      child: badges.Badge(
-                        badgeStyle: badges.BadgeStyle(
-                          shape: badges.BadgeShape.circle,
-                          badgeColor: MyTheme.accent_color,
-                          borderRadius: BorderRadius.circular(10),
-                          padding: EdgeInsets.all(5),
-                        ),
-                        badgeAnimation: badges.BadgeAnimation.slide(
-                          toAnimate: false,
-                        ),
-                        child: Image.asset(
-                          "assets/cart.png",
-                          color: _currentIndex == 2
-                              ? MyTheme.accent_color
-                              : Color.fromRGBO(153, 153, 153, 1),
-                          height: 16,
-                        ),
-                        badgeContent: Consumer<CartCounter>(
-                          builder: (context, cart, child) {
-                            return Text(
-                              "${cart.cartCounter}",
-                              style:
-                                  TextStyle(fontSize: 10, color: Colors.white),
-                            );
-                          },
-                        ),
+                      child: Image.asset(
+                        "assets/new-market-place-icon.png",
+                        height: 18,
                       ),
                     ),
-                    label: AppLocalizations.of(context)!.cart_ucf),
+                    label: "Market"),
                 BottomNavigationBarItem(
                   icon: Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
