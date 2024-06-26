@@ -30,6 +30,7 @@ import 'package:active_ecommerce_flutter/screens/package/packages.dart';
 import 'package:active_ecommerce_flutter/screens/product_details.dart';
 import 'package:active_ecommerce_flutter/screens/profile.dart';
 import 'package:active_ecommerce_flutter/screens/registration.dart';
+import 'package:active_ecommerce_flutter/screens/seller_admin.dart';
 import 'package:active_ecommerce_flutter/screens/seller_details.dart';
 import 'package:active_ecommerce_flutter/screens/todays_deal_products.dart';
 import 'package:active_ecommerce_flutter/services/push_notification_service.dart';
@@ -134,10 +135,14 @@ var routes = GoRouter(
               pageBuilder: (BuildContext context, GoRouterState state) =>
                   MaterialPage(child: Registration())),
           GoRoute(
-              path: "dashboard",
-              name: "Profile",
+              path: "profile",
               pageBuilder: (BuildContext context, GoRouterState state) =>
                   AIZRoute.rightTransition(Profile())),
+          GoRoute(
+              path: "dashboard",
+              name: "sell",
+              pageBuilder: (BuildContext context, GoRouterState state) =>
+                  AIZRoute.rightTransition(SellerMain())),        
           GoRoute(
               path: "auction-products",
               pageBuilder: (BuildContext context, GoRouterState state) =>

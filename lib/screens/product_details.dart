@@ -812,7 +812,6 @@ class _ProductDetailsState extends State<ProductDetails>
         messenger_title: conversationCreateResponse.title,
         messenger_image: conversationCreateResponse.shop_logo,
       );
-      ;
     })).then((value) {
       onPopped(value);
     });
@@ -848,7 +847,7 @@ class _ProductDetailsState extends State<ProductDetails>
       child: Scaffold(
           extendBody: true,
           bottomNavigationBar: buildBottomAppBar(context, _addedToCartSnackbar),
-          //appBar: buildAppBar(statusBarHeight, context),
+          appBar: buildAppBar(statusBarHeight, context),
           body: RefreshIndicator(
             color: MyTheme.accent_color,
             backgroundColor: Colors.white,
@@ -866,27 +865,6 @@ class _ProductDetailsState extends State<ProductDetails>
                   //titleSpacing: 0,
                   title: Row(
                     children: [
-                      Builder(
-                        builder: (context) => InkWell(
-                          onTap: () {
-                            return Navigator.of(context).pop();
-                          },
-                          child: Container(
-                            decoration: BoxDecorations
-                                .buildCircularButtonDecoration_1(),
-                            width: 36,
-                            height: 36,
-                            child: Center(
-                              child: Icon(
-                                CupertinoIcons.arrow_left,
-                                color: MyTheme.dark_font_grey,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
                       //Show product name in appbar
                       AnimatedOpacity(
                           opacity: _scrollPosition > 350 ? 1 : 0,
@@ -897,53 +875,12 @@ class _ProductDetailsState extends State<ProductDetails>
                               child: Text(
                                 "${_productDetails != null ? _productDetails!.productDetails![0].title : ''}",
                                 style: TextStyle(
-                                    color: MyTheme.dark_font_grey,
+                                    color: MyTheme.noColor,
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold),
                               ))),
                       Spacer(),
-                      InkWell(
-                        onTap: () {
-                          Navigator.push(context,
-                              MaterialPageRoute(builder: (context) {
-                            return Cart(has_bottomnav: false);
-                          })).then((value) {
-                            onPopped(value);
-                          });
-                        },
-                        child: Container(
-                          decoration:
-                              BoxDecorations.buildCircularButtonDecoration_1(),
-                          width: 36,
-                          height: 36,
-                          padding: EdgeInsets.all(8),
-                          child: badges.Badge(
-                            badgeStyle: badges.BadgeStyle(
-                              shape: badges.BadgeShape.circle,
-                              badgeColor: MyTheme.accent_color,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            badgeAnimation: badges.BadgeAnimation.slide(
-                              toAnimate: true,
-                            ),
-                            stackFit: StackFit.loose,
-                            child: Image.asset(
-                              "assets/cart.png",
-                              color: MyTheme.dark_font_grey,
-                              height: 16,
-                            ),
-                            badgeContent: Consumer<CartCounter>(
-                              builder: (context, cart, child) {
-                                return Text(
-                                  "${cart.cartCounter}",
-                                  style: TextStyle(
-                                      fontSize: 12, color: Colors.white),
-                                );
-                              },
-                            ),
-                          ),
-                        ),
-                      ),
+
                       SizedBox(width: 15),
                       InkWell(
                         onTap: () {
@@ -986,7 +923,7 @@ class _ProductDetailsState extends State<ProductDetails>
                       ),
                     ],
                   ),
-                  expandedHeight: 375.0,
+                  expandedHeight: 305.0,
                   flexibleSpace: FlexibleSpaceBar(
                     background: buildProductSliderImageSection(),
                   ),
@@ -2278,21 +2215,51 @@ class _ProductDetailsState extends State<ProductDetails>
             child: Padding(
               padding: const EdgeInsets.only(top: 22.0),
               child: Text(
-                _appbarPriceString!,
-                style: TextStyle(fontSize: 16, color: MyTheme.font_grey),
+                _productDetails?.productDetails![0].title ?? "",
+                style: TextStyle(fontSize: 16, color: MyTheme.black),
               ),
             )),
       ),
       elevation: 0.0,
       titleSpacing: 0,
       actions: <Widget>[
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
-          child: IconButton(
-            icon: Icon(Icons.share_outlined, color: MyTheme.dark_grey),
-            onPressed: () {
-              createDynamicLink(_productDetails!.products!.id.toString());
-            },
+        InkWell(
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return Cart(has_bottomnav: false);
+            })).then((value) {
+              onPopped(value);
+            });
+          },
+          child: Container(
+            decoration: BoxDecorations.buildCircularButtonDecoration_1(),
+            width: 36,
+            height: 36,
+            padding: EdgeInsets.all(8),
+            child: badges.Badge(
+              badgeStyle: badges.BadgeStyle(
+                shape: badges.BadgeShape.circle,
+                badgeColor: MyTheme.accent_color,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              badgeAnimation: badges.BadgeAnimation.slide(
+                toAnimate: true,
+              ),
+              stackFit: StackFit.loose,
+              child: Image.asset(
+                "assets/cart.png",
+                color: MyTheme.dark_font_grey,
+                height: 16,
+              ),
+              badgeContent: Consumer<CartCounter>(
+                builder: (context, cart, child) {
+                  return Text(
+                    "${cart.cartCounter}",
+                    style: TextStyle(fontSize: 10, color: Colors.white),
+                  );
+                },
+              ),
+            ),
           ),
         ),
       ],
@@ -2626,30 +2593,34 @@ class _ProductDetailsState extends State<ProductDetails>
         children: [
           Container(
             width: DeviceInfo(context).width,
-            height: webViewHeight * 2,
+            height: webViewHeight,
             child: WebViewWidget(
               controller: controller,
             ),
           ),
           Btn.basic(
-            onPressed: () async {
-              if (webViewHeight > 50) {
-                webViewHeight = double.parse(
-                  (await controller.runJavaScriptReturningResult(
-                          "document.getElementById('scaled-frame').clientHeight"))
-                      .toString(),
-                );
-                print(webViewHeight);
-                print(MediaQuery.of(context).devicePixelRatio);
+              onPressed: () async {
+                if (webViewHeight > 50) {
+                  webViewHeight = double.parse(
+                    (await controller.runJavaScriptReturningResult(
+                            "document.getElementById('scaled-frame').clientHeight"))
+                        .toString(),
+                  );
+                  print(webViewHeight);
+                  print(MediaQuery.of(context).devicePixelRatio);
 
-                // webViewHeight =( webViewHeight / MediaQuery.of(context).devicePixelRatio)+400;
-                print(webViewHeight);
-              } else {
-                webViewHeight = 50;
-              }
-              setState(() {});
-            },
-          )
+                  // webViewHeight =( webViewHeight / MediaQuery.of(context).devicePixelRatio)+400;
+                  print(webViewHeight);
+                } else {
+                  webViewHeight = 50;
+                }
+
+                setState(() {});
+              },
+              child: Text(
+                webViewHeight > 50 ? "Show More..." : "Less",
+                style: TextStyle(color: Colors.black),
+              ))
         ],
       ),
     );
@@ -2991,7 +2962,7 @@ class _ProductDetailsState extends State<ProductDetails>
   Widget buildProductSliderImageSection() {
     if (_productImageList.length == 0) {
       return ShimmerHelper().buildBasicShimmer(
-        height: 190.0,
+        height: 120.0,
       );
     } else {
       return CarouselSlider(

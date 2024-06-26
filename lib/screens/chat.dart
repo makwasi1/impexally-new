@@ -17,7 +17,6 @@ import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shimmer/shimmer.dart';
 
-
 class Chat extends StatefulWidget {
   Chat({
     Key? key,
@@ -51,16 +50,15 @@ class _ChatState extends State<Chat> {
   bool _showLoadingContainer = false;
   int? _last_id = 0;
   Timer? timer;
-  String _message="";
+  String _message = "";
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
 
-    fetchData();
+    // fetchData();
   }
-
 
   fetchData() async {
     var messageResponse = await ChatRepository().getMessageResponse(
@@ -150,30 +148,30 @@ class _ChatState extends State<Chat> {
     setState(() {});
 
     // if new message comes in
-    if( messageResponse.data.length > 0){
+    if (messageResponse.data.length > 0) {
       _xcrollController.animateTo(
         _xcrollController.position.maxScrollExtent + 100,
         curve: Curves.easeOut,
         duration: const Duration(milliseconds: 500),
       );
     }
-
   }
 
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
+      textDirection:
+          app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
-          backgroundColor: Colors.white,
-          appBar: buildAppBar2(context),
-          body:  Stack(
-            children: [
-              !_isInitial ? conversations(): chatShimmer(),
-              typeSmsSection(),
-            ],
-          ),
-         /* Stack(
+        backgroundColor: Colors.white,
+        appBar: buildAppBar2(context),
+        body: Stack(
+          children: [
+            !_isInitial ? conversations() : chatShimmer(),
+            typeSmsSection(),
+          ],
+        ),
+        /* Stack(
             children: [
               CustomScrollView(
                 controller: _xcrollController,
@@ -253,7 +251,7 @@ class _ChatState extends State<Chat> {
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
-backgroundColor: Colors.white,
+      backgroundColor: Colors.white,
       toolbarHeight: 75,
       leading: Builder(
         builder: (context) => IconButton(
@@ -282,7 +280,7 @@ backgroundColor: Colors.white,
                         borderRadius: BorderRadius.circular(35),
                         child: FadeInImage.assetNetwork(
                           placeholder: 'assets/placeholder.png',
-                          image:  widget.messenger_image!,
+                          image: widget.messenger_image!,
                           fit: BoxFit.contain,
                         )),
                   ),
@@ -339,7 +337,6 @@ backgroundColor: Colors.white,
     );
   }
 
-
   AppBar buildAppBar2(BuildContext context) {
     return AppBar(
       leadingWidth: 40,
@@ -357,14 +354,17 @@ backgroundColor: Colors.white,
                   margin: EdgeInsets.only(right: 14),
                   child: Stack(
                     children: [
-                      UsefulElements.roundImageWithPlaceholder(elevation: 1,
+                      UsefulElements.roundImageWithPlaceholder(
+                          elevation: 1,
                           borderWidth: 1,
-                          url: widget.messenger_image, width: 35.0, height: 35.0, fit: BoxFit.cover,borderRadius:BorderRadius.circular(16)),
-
+                          url: widget.messenger_image,
+                          width: 35.0,
+                          height: 35.0,
+                          fit: BoxFit.cover,
+                          borderRadius: BorderRadius.circular(16)),
                     ],
                   ),
                 ),
-
                 Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -372,7 +372,7 @@ backgroundColor: Colors.white,
                       Container(
                         width: DeviceInfo(context).width! / 3,
                         child: Text(
-                          widget.messenger_name!,
+                          "widget.messenger_name!",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -443,7 +443,8 @@ backgroundColor: Colors.white,
         ),
       );
     } else if (_totalData == 0) {
-      return Center(child: Text(AppLocalizations.of(context)!.no_data_is_available));
+      return Center(
+          child: Text(AppLocalizations.of(context)!.no_data_is_available));
     } else {
       return Container(); // should never be happening
     }
@@ -589,12 +590,11 @@ backgroundColor: Colors.white,
         ),
       );
 
-
   conversations() {
     return SingleChildScrollView(
       reverse: true,
       child: Container(
-        margin:const EdgeInsets.only(bottom: 60),
+        margin: const EdgeInsets.only(bottom: 60),
         child: ListView.builder(
           reverse: true,
           itemCount: _list.length,
@@ -604,25 +604,31 @@ backgroundColor: Colors.white,
           itemBuilder: (context, index) {
             //print(_messages[index+1].year.toString());
             return Container(
-              padding:
-              const EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
+              padding: const EdgeInsets.only(
+                  left: 14, right: 14, top: 10, bottom: 10),
               //margin: EdgeInsets.only(right: messages[index].messageType == "receiver"?0:50,left:messages[index].messageType == "receiver"? 50:0),
               child: Column(
                 children: [
-                  (index==_list.length-1) || _list[index].year!=_list[index+1].year || _list[index].month!=_list[index+1].month?
-                  UsefulElements().customContainer(
-                    width: 100,
-                    height: 20,
-                    borderRadius: 5,
-                    borderColor: MyTheme.light_grey,
-                    child: Text(""+
-                        _list[index].date.toString(),
-                      style:const TextStyle(fontSize: 8, color: Colors.grey),
-                    ),
-                  ):Container(),
-                  const SizedBox(height: 5,),
+                  (index == _list.length - 1) ||
+                          _list[index].year != _list[index + 1].year ||
+                          _list[index].month != _list[index + 1].month
+                      ? UsefulElements().customContainer(
+                          width: 100,
+                          height: 20,
+                          borderRadius: 5,
+                          borderColor: MyTheme.light_grey,
+                          child: Text(
+                            "" + _list[index].date.toString(),
+                            style: const TextStyle(
+                                fontSize: 8, color: Colors.grey),
+                          ),
+                        )
+                      : Container(),
+                  const SizedBox(
+                    height: 5,
+                  ),
                   Align(
-                    alignment: (_list[index].sendType=="customer"
+                    alignment: (_list[index].sendType == "customer"
                         ? Alignment.topRight
                         : Alignment.topLeft),
                     child: smsContainer(index),
@@ -637,25 +643,25 @@ backgroundColor: Colors.white,
   }
 
   Container smsContainer(int index) {
-
     return Container(
       constraints: BoxConstraints(
         minWidth: 80,
-        maxWidth: DeviceInfo(context).width!/1.6,
+        maxWidth: DeviceInfo(context).width! / 1.6,
       ),
       padding: const EdgeInsets.only(top: 8, bottom: 3, right: 10, left: 10),
       decoration: BoxDecoration(
-        border: Border.all(width: 1,color:MyTheme.noColor),
+        border: Border.all(width: 1, color: MyTheme.noColor),
         borderRadius: BorderRadius.only(
-
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
-          bottomLeft:
-          _list[index].sendType=="customer" ? Radius.circular(16) : Radius.circular(0),
-          bottomRight:
-          _list[index].sendType=="customer" ? Radius.circular(0) : Radius.circular(16),
+          bottomLeft: _list[index].sendType == "customer"
+              ? Radius.circular(16)
+              : Radius.circular(0),
+          bottomRight: _list[index].sendType == "customer"
+              ? Radius.circular(0)
+              : Radius.circular(16),
         ),
-        color: (_list[index].sendType=="customer"
+        color: (_list[index].sendType == "customer"
             ? MyTheme.accent_color
             : MyTheme.light_grey),
       ),
@@ -663,24 +669,31 @@ backgroundColor: Colors.white,
         children: [
           Positioned(
               bottom: 2,
-              right: _list[index].sendType=="customer" ? 2 : null,
-              left: _list[index].sendType=="customer" ? null : 2,
-              child: Text(_list[index].dayOfMonth.toString()
-                  +" "+_list[index].time.toString(),
-                style: TextStyle(fontSize: 8, color:  (_list[index].sendType=="customer"
-                    ? MyTheme.light_grey
-                    : MyTheme.grey_153),
+              right: _list[index].sendType == "customer" ? 2 : null,
+              left: _list[index].sendType == "customer" ? null : 2,
+              child: Text(
+                _list[index].dayOfMonth.toString() +
+                    " " +
+                    _list[index].time.toString(),
+                style: TextStyle(
+                  fontSize: 8,
+                  color: (_list[index].sendType == "customer"
+                      ? MyTheme.light_grey
+                      : MyTheme.grey_153),
                 ),
               )),
           Padding(
             padding: const EdgeInsets.only(bottom: 15.0),
-            child: Text(" "+
-                _list[index].message.toString(),
-              style: TextStyle(fontSize: 12, color:  (_list[index].sendType=="customer"
-                  ? MyTheme.white
-                  : Colors.black),
+            child: Text(
+              " " + _list[index].message.toString(),
+              style: TextStyle(
+                fontSize: 12,
+                color: (_list[index].sendType == "customer"
+                    ? MyTheme.white
+                    : Colors.black),
               ),
-            ),)
+            ),
+          )
         ],
       ),
     );
@@ -690,7 +703,7 @@ backgroundColor: Colors.white,
     return Align(
       alignment: Alignment.bottomLeft,
       child: Container(
-        padding:const EdgeInsets.only(left: 10, bottom: 10, top: 10),
+        padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
         height: 60,
         width: double.infinity,
         color: MyTheme.white,
@@ -698,14 +711,14 @@ backgroundColor: Colors.white,
           children: <Widget>[
             Expanded(
               child: Container(
-                padding:const EdgeInsets.only(left: 10, right: 10),
+                padding: const EdgeInsets.only(left: 10, right: 10),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(20),
                   color: MyTheme.light_grey,
                 ),
                 child: TextField(
                   controller: _chatTextController,
-                  decoration:const InputDecoration(
+                  decoration: const InputDecoration(
                       hintText: "Write message...",
                       hintStyle: TextStyle(color: Colors.black54),
                       border: InputBorder.none),
@@ -716,11 +729,13 @@ backgroundColor: Colors.white,
               width: 15,
             ),
             FloatingActionButton(
-              onPressed: _chatTextController.text.trim().isNotEmpty?() {
-                onTapSendMessage();
-                //sendMessage();
-              }:null,
-              child:const Icon(
+              onPressed: _chatTextController.text.trim().isNotEmpty
+                  ? () {
+                      onTapSendMessage();
+                      //sendMessage();
+                    }
+                  : null,
+              child: const Icon(
                 Icons.send,
                 color: Colors.white,
                 size: 18,
@@ -734,11 +749,11 @@ backgroundColor: Colors.white,
     );
   }
 
-  chatShimmer(){
+  chatShimmer() {
     return SingleChildScrollView(
       reverse: true,
       child: Container(
-        margin:const EdgeInsets.only(bottom: 60),
+        margin: const EdgeInsets.only(bottom: 60),
         child: ListView.builder(
           reverse: true,
           itemCount: 10,
@@ -748,13 +763,12 @@ backgroundColor: Colors.white,
           itemBuilder: (context, index) {
             //print(_messages[index+1].year.toString());
             return Container(
-              padding:
-              const EdgeInsets.only(left: 14, right: 14, top: 10, bottom: 10),
+              padding: const EdgeInsets.only(
+                  left: 14, right: 14, top: 10, bottom: 10),
               //margin: EdgeInsets.only(right: messages[index].messageType == "receiver"?0:50,left:messages[index].messageType == "receiver"? 50:0),
               child: Align(
-                alignment: (index.isOdd
-                    ? Alignment.topRight
-                    : Alignment.topLeft),
+                alignment:
+                    (index.isOdd ? Alignment.topRight : Alignment.topLeft),
                 child: smsShimmer(index),
               ),
             );
@@ -771,22 +785,20 @@ backgroundColor: Colors.white,
       child: Container(
         constraints: BoxConstraints(
           minWidth: 150,
-          maxWidth: DeviceInfo(context).width!/1.6,
+          maxWidth: DeviceInfo(context).width! / 1.6,
         ),
         padding: const EdgeInsets.only(top: 8, bottom: 3, right: 10, left: 10),
         decoration: BoxDecoration(
-          border: Border.all(width: 1,color:index.isOdd? MyTheme.accent_color: MyTheme.grey_153),
+          border: Border.all(
+              width: 1,
+              color: index.isOdd ? MyTheme.accent_color : MyTheme.grey_153),
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(16),
             topRight: Radius.circular(16),
-            bottomLeft:
-            index.isOdd? Radius.circular(16) : Radius.circular(0),
-            bottomRight:
-            index.isOdd? Radius.circular(0) : Radius.circular(16),
+            bottomLeft: index.isOdd ? Radius.circular(16) : Radius.circular(0),
+            bottomRight: index.isOdd ? Radius.circular(0) : Radius.circular(16),
           ),
-          color: (index.isOdd
-              ? MyTheme.accent_color
-              : MyTheme.accent_color),
+          color: (index.isOdd ? MyTheme.accent_color : MyTheme.accent_color),
         ),
         child: Stack(
           children: [
@@ -796,19 +808,22 @@ backgroundColor: Colors.white,
                 left: index.isOdd ? null : 2,
                 child: Text(
                   "    ",
-                  style: TextStyle(fontSize: 8, color:  (index.isOdd
-                      ? MyTheme.light_grey
-                      : MyTheme.grey_153),
+                  style: TextStyle(
+                    fontSize: 8,
+                    color:
+                        (index.isOdd ? MyTheme.light_grey : MyTheme.grey_153),
                   ),
                 )),
             Padding(
               padding: const EdgeInsets.only(bottom: 15.0),
-              child: Text("    ",
-                style: TextStyle(fontSize: 12, color:  (index.isOdd
-                    ? MyTheme.white
-                    : Colors.black),
+              child: Text(
+                "    ",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: (index.isOdd ? MyTheme.white : Colors.black),
                 ),
-              ),)
+              ),
+            )
           ],
         ),
       ),

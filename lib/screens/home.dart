@@ -9,6 +9,7 @@ import 'package:active_ecommerce_flutter/screens/cart.dart';
 import 'package:active_ecommerce_flutter/screens/category_products.dart';
 import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/flash_deal_list.dart';
+import 'package:active_ecommerce_flutter/screens/profile.dart';
 import 'package:active_ecommerce_flutter/screens/todays_deal_products.dart';
 import 'package:active_ecommerce_flutter/screens/top_sellers.dart';
 import 'package:active_ecommerce_flutter/ui_elements/mini_product_card.dart';
@@ -25,6 +26,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../custom/common_functions.dart';
 import '../presenter/cart_counter.dart';
 
 class Home extends StatefulWidget {
@@ -75,7 +77,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
     return WillPopScope(
       onWillPop: () async {
-        //CommonFunctions(context).appExitDialog();
+        CommonFunctions(context).appExitDialog();
         print("Will scope home");
         return widget.go_back;
       },
@@ -84,7 +86,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
         child: SafeArea(
           child: Scaffold(
-              //key: homeData.scaffoldKey,
+              key: homeData.scaffoldKey,
               appBar: PreferredSize(
                 preferredSize: Size.fromHeight(50),
                 child: buildAppBar(statusBarHeight, context),
@@ -160,12 +162,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                   buildHomeCarouselSlider(context, homeData),
                                   // buildPromoItems(),
                                   // buildHomeMenuRow1(context, homeData),
-                                  Padding(
-                                    padding: const EdgeInsets.only(
-                                      bottom: 10.0,
-                                    ),
-                                    child: buildPromoItems(),
-                                  ),
+
+                                  buildPromoItems(),
+
                                   buildHomeRow(),
                                   // buildHomeBannerOne(context, homeData),
                                   Padding(
@@ -764,15 +763,22 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
       height: 40,
       color: MyTheme.white,
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Padding(
-            padding: const EdgeInsets.only(left: 8.0),
+            padding: const EdgeInsets.only(left: 1.0),
+            child: Image.asset(
+              "assets/loaction_pin.jpg",
+              height: 30,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 5.0),
             child: Text(
-              "📍 🇬🇭 Impexpress - Sameday Delivery in Accra",
+              "🇬🇭 Impexpress - Sameday Delivery Across Ghana Accra City",
               style: TextStyle(
                   color: Colors.black,
-                  fontSize: 16,
+                  fontSize: 12,
                   fontWeight: FontWeight.normal),
             ),
           ),
@@ -882,7 +888,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     return Column(
       children: [
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Expanded(
               child: GestureDetector(
@@ -905,22 +911,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(1.0),
                       child: Text(
                         "Get Riders",
                         style: TextStyle(
                             overflow: TextOverflow.ellipsis,
                             color: Colors.black,
-                            fontSize: 12,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold),
                       ),
                     )
                   ],
                 ),
               ),
-            ),
-            SizedBox(
-              width: 5,
             ),
             Expanded(
               child: GestureDetector(
@@ -943,21 +946,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(1.0),
                       child: Text(
                         "Under 49",
                         style: TextStyle(
                             color: Colors.black,
-                            fontSize: 12,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold),
                       ),
                     )
                   ],
                 ),
               ),
-            ),
-            SizedBox(
-              width: 5,
             ),
             Expanded(
               child: GestureDetector(
@@ -980,21 +980,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(1.0),
                       child: Text(
                         "Deals",
                         style: TextStyle(
                             color: Colors.black,
-                            fontSize: 12,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold),
                       ),
                     )
                   ],
                 ),
               ),
-            ),
-            SizedBox(
-              width: 5,
             ),
             Expanded(
               child: GestureDetector(
@@ -1017,21 +1014,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(1.0),
                       child: Text(
                         "Featured",
                         style: TextStyle(
                             color: Colors.black,
-                            fontSize: 12,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold),
                       ),
                     )
                   ],
                 ),
               ),
-            ),
-            SizedBox(
-              width: 5,
             ),
             Expanded(
               child: GestureDetector(
@@ -1054,13 +1048,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(8.0),
+                      padding: const EdgeInsets.all(1.0),
                       child: Text(
                         "Special Offer",
                         style: TextStyle(
                             overflow: TextOverflow.ellipsis,
                             color: Colors.black,
-                            fontSize: 12,
+                            fontSize: 10,
                             fontWeight: FontWeight.bold),
                       ),
                     )
@@ -1075,91 +1069,95 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   Widget buildHomeRow() {
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return CategoryProducts(
-                      slug: homeData.featuredCategoryList[2].id.toString(),
-                      // category_name: homeData.featuredCategoryList[index].name,
-                    );
-                  }));
-                },
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
+    return Container(
+      padding: EdgeInsets.only(top: 10, bottom: 10),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) {
+                      return CategoryProducts(
+                        slug: homeData.featuredCategoryList[2].id.toString(),
+                        // category_name: homeData.featuredCategoryList[index].name,
+                      );
+                    }));
+                  },
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.only(left: 10),
+                        child: Image.network(
+                          "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp",
+                          // Adjust the height as needed
+                        ),
                       ),
-                      padding: EdgeInsets.only(left: 10),
-                      child: Image.network(
-                        "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp",
-                        // Adjust the height as needed
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Pickup & Delivery Ghana",
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Pickup & Delivery Ghana",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-            SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: GestureDetector(
-                //open link
-                onTap: () async {
-                  const url = 'https://seller.impexally.com/';
-                  if (await canLaunch(url)) {
-                    await launch(url);
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      padding: EdgeInsets.only(right: 10),
-                      child: Image.network(
-                        "https://image.impexally.com/images/app/impexally/make-mone-online.png",
-                        // Adjust the height as needed
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        "Start Selling now & Get Money",
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                            color: Colors.black,
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    )
-                  ],
-                ),
+              SizedBox(
+                width: 10,
               ),
-            )
-          ],
-        ),
-      ],
+              Expanded(
+                child: GestureDetector(
+                  //open link
+                  onTap: () async {
+                    const url = 'https://seller.impexally.com/';
+                    if (await canLaunch(url)) {
+                      await launch(url);
+                    } else {
+                      throw 'Could not launch $url';
+                    }
+                  },
+                  child: Column(
+                    children: [
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.only(right: 10),
+                        child: Image.network(
+                          "https://image.impexally.com/images/app/impexally/make-mone-online.png",
+                          // Adjust the height as needed
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          "Start Selling now & Get Money",
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -1333,37 +1331,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     return GestureDetector(
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return Cart(has_bottomnav: false);
+            return Profile();
           }));
         },
         child: Container(
-          decoration: BoxDecorations.buildCircularButtonDecoration_1(),
           width: 36,
           height: 36,
           padding: EdgeInsets.all(8),
-          child: badges.Badge(
-            badgeStyle: badges.BadgeStyle(
-              shape: badges.BadgeShape.circle,
-              badgeColor: MyTheme.accent_color,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            badgeAnimation: badges.BadgeAnimation.slide(
-              toAnimate: true,
-            ),
-            stackFit: StackFit.loose,
-            child: Image.asset(
-              "assets/cart.png",
-              color: MyTheme.dark_font_grey,
-              height: 16,
-            ),
-            badgeContent: Consumer<CartCounter>(
-              builder: (context, cart, child) {
-                return Text(
-                  "${cart.cartCounter}",
-                  style: TextStyle(fontSize: 12, color: Colors.white),
-                );
-              },
-            ),
+          child: Icon(
+            Icons.person_outlined,
+            color: const Color.fromARGB(255, 46, 41, 41),
+            size: 25,
           ),
         ));
   }

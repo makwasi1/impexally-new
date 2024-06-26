@@ -428,9 +428,6 @@ class _FilterState extends State<Filter> {
     return AppBar(
         backgroundColor: Colors.white.withOpacity(0.95),
         automaticallyImplyLeading: false,
-        leading: Builder(
-            builder: (context) =>
-                UsefulElements.backToMain(context, go_back: false)),
         actions: [
           new Container(),
         ],

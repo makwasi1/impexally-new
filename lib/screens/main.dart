@@ -8,10 +8,12 @@ import 'package:active_ecommerce_flutter/presenter/bottom_appbar_index.dart';
 import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
 import 'package:active_ecommerce_flutter/screens/cart.dart';
 import 'package:active_ecommerce_flutter/screens/category_list.dart';
+import 'package:active_ecommerce_flutter/screens/chat.dart';
 import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/home.dart';
 import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:active_ecommerce_flutter/screens/profile.dart';
+import 'package:active_ecommerce_flutter/screens/seller_admin.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -75,7 +77,8 @@ class _MainState extends State<Main> {
         is_base_category: true,
       ),
       Filter(),
-      Profile()
+      SellerMain(),
+      Chat()
     ];
     fetchAll();
     // TODO: implement initState
@@ -176,7 +179,7 @@ class _MainState extends State<Main> {
                         height: 16,
                       ),
                     ),
-                    label: AppLocalizations.of(context)!.categories_ucf),
+                    label: "Category"),
                 BottomNavigationBarItem(
                     icon: Padding(
                       padding: const EdgeInsets.only(bottom: 8.0),
@@ -187,17 +190,23 @@ class _MainState extends State<Main> {
                     ),
                     label: "Market"),
                 BottomNavigationBarItem(
+                    icon: Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Image.asset(
+                        "assets/sale_nomal.png",
+                        height: 18,
+                      ),
+                    ),
+                    label: "Sell"),
+                BottomNavigationBarItem(
                   icon: Padding(
                     padding: const EdgeInsets.only(bottom: 8.0),
                     child: Image.asset(
-                      "assets/profile.png",
-                      color: _currentIndex == 3
-                          ? MyTheme.accent_color
-                          : Color.fromRGBO(153, 153, 153, 1),
+                      "assets/new-chat.png",
                       height: 16,
                     ),
                   ),
-                  label: AppLocalizations.of(context)!.profile_ucf,
+                  label: "Chats",
                 ),
               ],
             ),

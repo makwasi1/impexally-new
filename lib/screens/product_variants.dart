@@ -475,7 +475,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.only(top: 5.0, left: 16.0),
                           child: buildVariationsSection(),
                         ),
                         Container(
@@ -554,6 +554,7 @@ class _ProductVariantsState extends State<ProductVariants> {
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: Colors.white,
+      centerTitle: true,
       leading: Builder(
         builder: (context) => widget.from_navigation
             ? UsefulElements.backToMain(context, go_back: false)
@@ -673,7 +674,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                           color: Colors.red, // Border color
                         ),
                         color: Color.fromARGB(
-                            255, 241, 199, 199), // Background color
+                            255, 248, 234, 234), // Background color
                       ),
                       child: Text(
                         "Select Product " +
@@ -786,14 +787,14 @@ class _ProductVariantsState extends State<ProductVariants> {
   buildCartSellerItemCard() {
     // print("Variation ${widget.variation!.image!.imageDefault}");
     return Container(
-      height: 120,
+      height: 80,
       decoration: BoxDecorations.buildBoxDecoration_1(),
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             Container(
-                width: DeviceInfo(context).width! / 4,
-                height: 120,
+                width: 50,
+                height: 50,
                 child: ClipRRect(
                     borderRadius: BorderRadius.horizontal(
                         left: Radius.circular(6), right: Radius.zero),
@@ -801,7 +802,10 @@ class _ProductVariantsState extends State<ProductVariants> {
                       placeholder: 'assets/placeholder.png',
                       image: "https://seller.impexally.com/uploads/images/" +
                           _initialImage!,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
+                      imageErrorBuilder: (context, error, stackTrace) {
+                        return Image.asset('assets/placeholder.png');
+                      },
                     ))),
             Container(
               //color: Colors.red,
@@ -813,17 +817,15 @@ class _ProductVariantsState extends State<ProductVariants> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      widget.variation != null
-                          ? _initialTitle!
-                          : "",
+                      widget.variation != null ? _initialTitle! : "",
                       maxLines: 2,
                       style: TextStyle(
                           color: MyTheme.dark_font_grey,
-                          fontSize: 16,
+                          fontSize: 12,
                           fontWeight: FontWeight.w400),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 18.0),
+                      padding: const EdgeInsets.only(top: 1.0),
                       child: Row(
                         children: [
                           Text(
@@ -837,9 +839,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                           ),
                           SizedBox(width: 10),
                           Text(
-                            SystemConfig.currency +
-                                " " +
-                                _initialPrice!,
+                            SystemConfig.currency + " " + _initialPrice!,
                             style: TextStyle(
                                 decoration: TextDecoration.lineThrough,
                                 color: MyTheme.accent_color,
@@ -877,8 +877,8 @@ class _ProductVariantsState extends State<ProductVariants> {
   }
 
   Widget buildSizeSelection() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
+    return Container(
+      // padding: const EdgeInsets.only(8.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -909,7 +909,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5),
                       border: Border.all(color: Colors.red),
-                      color: Color.fromARGB(255, 241, 199, 199),
+                      color: Color.fromARGB(255, 240, 219, 219),
                     ),
                     child: Text(
                       "Select Product ${variation.labelNames!}",
@@ -948,8 +948,11 @@ class _ProductVariantsState extends State<ProductVariants> {
                                     "variation_id": variation.id,
                                     "variation_option_id": option.id,
                                   };
-                                  _initialImage = option.imageVariation!.imageDefault;
-                                  _initialDidcountedPrice = option.discountRate!;
+                                  _initialImage =
+                                      option.imageVariation!.imageDefault;
+                                  if (option.discountRate! != "0")
+                                    _initialDidcountedPrice =
+                                        option.discountRate!;
                                 });
                               },
                               child: Container(
@@ -1000,7 +1003,9 @@ class _ProductVariantsState extends State<ProductVariants> {
                                     "variation_id": variation.id,
                                     "variation_option_id": option.id,
                                   };
-                                  // _initialDidcountedPrice = option.discountRate!;
+                                  if (option.discountRate! != "0")
+                                    _initialDidcountedPrice =
+                                        option.discountRate!;
                                 });
                               },
                             );
@@ -1029,7 +1034,7 @@ class _ProductVariantsState extends State<ProductVariants> {
               border: Border.all(
                 color: Colors.red, // Border color
               ),
-              color: Color.fromARGB(255, 241, 199, 199), // Background color
+              color: Color.fromARGB(255, 243, 215, 215), // Background color
             ),
             child: Text(
               "Select Product Qty.",
