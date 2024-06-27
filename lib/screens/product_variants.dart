@@ -950,9 +950,9 @@ class _ProductVariantsState extends State<ProductVariants> {
                                   };
                                   _initialImage =
                                       option.imageVariation!.imageDefault;
-                                  if (option.discountRate! != "0")
+                                  if (option.priceDiscounted! != "0")
                                     _initialDidcountedPrice =
-                                        option.discountRate!;
+                                        option.priceDiscounted!;
                                 });
                               },
                               child: Container(
@@ -1003,9 +1003,9 @@ class _ProductVariantsState extends State<ProductVariants> {
                                     "variation_id": variation.id,
                                     "variation_option_id": option.id,
                                   };
-                                  if (option.discountRate! != "0")
+                                  if (option.priceDiscounted! != "0")
                                     _initialDidcountedPrice =
-                                        option.discountRate!;
+                                        option.priceDiscounted!;
                                 });
                               },
                             );

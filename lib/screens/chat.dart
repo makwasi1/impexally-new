@@ -1,8 +1,12 @@
 import 'package:active_ecommerce_flutter/custom/device_info.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
+import 'package:active_ecommerce_flutter/data_model/login_response.dart';
+import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
+import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart' as intl;
 import 'package:flutter/painting.dart';
@@ -20,13 +24,11 @@ import 'package:shimmer/shimmer.dart';
 class Chat extends StatefulWidget {
   Chat({
     Key? key,
-    this.conversation_id,
     this.messenger_name,
     this.messenger_title,
     this.messenger_image,
   }) : super(key: key);
 
-  final int? conversation_id;
   final String? messenger_name;
   final String? messenger_title;
   final String? messenger_image;
@@ -41,7 +43,9 @@ class _ChatState extends State<Chat> {
   final ScrollController _xcrollController = ScrollController();
   final lastKey = GlobalKey();
 
-  var uid = user_id;
+  int? uid;
+
+  String conversation_id = "";
 
   List<dynamic> _list = [];
   bool _isInitial = true;
@@ -54,15 +58,52 @@ class _ChatState extends State<Chat> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
 
+    //check if user is loged in
+    checkUser();
+    startChatSession();
     // fetchData();
   }
 
+  checkUser() async {
+    //get user is logged in status
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+    if (res.result == false) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Login(),
+        ),
+      );
+    } else {
+      setState(() {
+        uid = res.user!.id;
+      });
+      debugPrint("user_id: ${uid}");
+    }
+  }
+
+  //start a chat if no chat id is provided
+  startChatSession() async {
+    //check if the user has no chat id in shared preference
+    const storage = FlutterSecureStorage();
+    String? conversation = await storage.read(key: "conversation_id");
+
+    if (conversation == null || conversation == "null") {
+      var chatResponse = await ChatRepository().startChatSession();
+      conversation_id = chatResponse.data.id.toString();
+      storage.write(key: "conversation_id", value: conversation_id);
+      fetchData();
+    } else {
+      conversation_id = conversation;
+      fetchData();
+    }
+  }
+
   fetchData() async {
-    var messageResponse = await ChatRepository().getMessageResponse(
-        conversation_id: widget.conversation_id, page: _page);
+    var messageResponse = await ChatRepository()
+        .getMessageResponse(conversation_id: conversation_id, page: _page);
     _list.addAll(messageResponse.data);
     _isInitial = false;
     //_totalData = messageResponse.;
@@ -97,6 +138,9 @@ class _ChatState extends State<Chat> {
   }
 
   onTapSendMessage() async {
+    const storage = FlutterSecureStorage();
+
+    String? conversation = await storage.read(key: "conversation_id");
     var chatText = _chatTextController.text.toString();
     _chatTextController.clear();
     //print(chatText);
@@ -108,7 +152,7 @@ class _ChatState extends State<Chat> {
       final String formatted_time = time_formatter.format(now);
 
       var messageResponse = await ChatRepository().getInserMessageResponse(
-          conversation_id: widget.conversation_id, message: chatText);
+          conversation_id: conversation, message: chatText, receiver_id: "1");
       _list = [
         messageResponse.data,
         _list,
@@ -138,17 +182,31 @@ class _ChatState extends State<Chat> {
   }
 
   get_new_message() async {
-    var messageResponse = await ChatRepository().getNewMessageResponse(
-        conversation_id: widget.conversation_id, last_message_id: _last_id);
-    _list = [
-      messageResponse.data,
-      _list,
-    ].expand((x) => x).toList(); //prepend
-    _last_id = _list[0].id;
-    setState(() {});
+    var messageResponse = await ChatRepository()
+        .getMessageResponse(conversation_id: conversation_id);
 
-    // if new message comes in
-    if (messageResponse.data.length > 0) {
+    // Assuming each message has a unique 'id' and '_list' is a list of message objects
+    var existingMessageIds = _list.map((m) => m.id).toSet();
+
+    // Filter out messages that are already in '_list'
+    var newMessages = messageResponse.data
+        .where((m) => !existingMessageIds.contains(m.id))
+        .toList();
+
+    if (newMessages.isNotEmpty) {
+      // Prepend new messages
+      _list = [
+        newMessages,
+        _list,
+      ].expand((x) => x).toList();
+
+      // Update '_last_id' with the id of the newest message
+      _last_id = _list[0].id;
+
+      // Trigger UI update
+      setState(() {});
+
+      // Scroll to the bottom to show the newest message
       _xcrollController.animateTo(
         _xcrollController.position.maxScrollExtent + 100,
         curve: Curves.easeOut,
@@ -279,10 +337,14 @@ class _ChatState extends State<Chat> {
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(35),
                         child: FadeInImage.assetNetwork(
-                          placeholder: 'assets/placeholder.png',
-                          image: widget.messenger_image!,
-                          fit: BoxFit.contain,
-                        )),
+                            placeholder: 'assets/placeholder.png',
+                            image: widget.messenger_image!,
+                            fit: BoxFit.contain,
+                            imageErrorBuilder: (context, error, stackTrace) =>
+                                Image.asset(
+                                  'assets/placeholder.png',
+                                  fit: BoxFit.contain,
+                                ))),
                   ),
                   Container(
                     width: 220,
@@ -372,7 +434,7 @@ class _ChatState extends State<Chat> {
                       Container(
                         width: DeviceInfo(context).width! / 3,
                         child: Text(
-                          "widget.messenger_name!",
+                          "Admin Impexally",
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
@@ -451,7 +513,7 @@ class _ChatState extends State<Chat> {
   }
 
   buildChatItem(index) {
-    return _list[index].user_id == uid
+    return _list[index].userId == uid
         ? getSenderView(ChatBubbleClipper5(type: BubbleType.sendBubble),
             context, _list[index].message, _list[index].date, _list[index].time)
         : getReceiverView(
@@ -549,7 +611,9 @@ class _ChatState extends State<Chat> {
                   text,
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                      color: MyTheme.font_grey, fontSize: 13, wordSpacing: 1),
+                      color: const Color.fromARGB(255, 10, 93, 135),
+                      fontSize: 13,
+                      wordSpacing: 1),
                 ),
               ),
               Text(date + " " + time,
@@ -564,7 +628,7 @@ class _ChatState extends State<Chat> {
       ChatBubble(
         elevation: 0.0,
         clipper: clipper,
-        backGroundColor: Color.fromRGBO(239, 239, 239, 1),
+        backGroundColor: Color.fromRGBO(102, 6, 6, 1),
         margin: EdgeInsets.only(top: 10),
         child: Container(
           constraints: BoxConstraints(
@@ -580,7 +644,9 @@ class _ChatState extends State<Chat> {
                   text,
                   textAlign: TextAlign.left,
                   style: TextStyle(
-                      color: MyTheme.font_grey, fontSize: 13, wordSpacing: 1),
+                      color: Color.fromARGB(255, 4, 74, 109),
+                      fontSize: 13,
+                      wordSpacing: 1),
                 ),
               ),
               Text(date + " " + time,
@@ -609,26 +675,11 @@ class _ChatState extends State<Chat> {
               //margin: EdgeInsets.only(right: messages[index].messageType == "receiver"?0:50,left:messages[index].messageType == "receiver"? 50:0),
               child: Column(
                 children: [
-                  (index == _list.length - 1) ||
-                          _list[index].year != _list[index + 1].year ||
-                          _list[index].month != _list[index + 1].month
-                      ? UsefulElements().customContainer(
-                          width: 100,
-                          height: 20,
-                          borderRadius: 5,
-                          borderColor: MyTheme.light_grey,
-                          child: Text(
-                            "" + _list[index].date.toString(),
-                            style: const TextStyle(
-                                fontSize: 8, color: Colors.grey),
-                          ),
-                        )
-                      : Container(),
                   const SizedBox(
                     height: 5,
                   ),
                   Align(
-                    alignment: (_list[index].sendType == "customer"
+                    alignment: (_list[index].userId == uid
                         ? Alignment.topRight
                         : Alignment.topLeft),
                     child: smsContainer(index),
@@ -654,14 +705,14 @@ class _ChatState extends State<Chat> {
         borderRadius: BorderRadius.only(
           topLeft: Radius.circular(16),
           topRight: Radius.circular(16),
-          bottomLeft: _list[index].sendType == "customer"
+          bottomLeft: _list[index].userId == uid
               ? Radius.circular(16)
               : Radius.circular(0),
-          bottomRight: _list[index].sendType == "customer"
+          bottomRight: _list[index].userId == uid
               ? Radius.circular(0)
               : Radius.circular(16),
         ),
-        color: (_list[index].sendType == "customer"
+        color: (_list[index].userId == uid
             ? MyTheme.accent_color
             : MyTheme.light_grey),
       ),
@@ -669,15 +720,15 @@ class _ChatState extends State<Chat> {
         children: [
           Positioned(
               bottom: 2,
-              right: _list[index].sendType == "customer" ? 2 : null,
-              left: _list[index].sendType == "customer" ? null : 2,
+              right: _list[index].userId == uid ? 2 : null,
+              left: _list[index].userId == uid ? null : 2,
               child: Text(
                 _list[index].dayOfMonth.toString() +
                     " " +
                     _list[index].time.toString(),
                 style: TextStyle(
                   fontSize: 8,
-                  color: (_list[index].sendType == "customer"
+                  color: (_list[index].userId == uid
                       ? MyTheme.light_grey
                       : MyTheme.grey_153),
                 ),
@@ -688,9 +739,8 @@ class _ChatState extends State<Chat> {
               " " + _list[index].message.toString(),
               style: TextStyle(
                 fontSize: 12,
-                color: (_list[index].sendType == "customer"
-                    ? MyTheme.white
-                    : Colors.black),
+                color:
+                    (_list[index].userId == uid ? MyTheme.white : Colors.black),
               ),
             ),
           )
@@ -710,18 +760,20 @@ class _ChatState extends State<Chat> {
         child: Row(
           children: <Widget>[
             Expanded(
-              child: Container(
-                padding: const EdgeInsets.only(left: 10, right: 10),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(20),
-                  color: MyTheme.light_grey,
-                ),
-                child: TextField(
-                  controller: _chatTextController,
-                  decoration: const InputDecoration(
-                      hintText: "Write message...",
-                      hintStyle: TextStyle(color: Colors.black54),
-                      border: InputBorder.none),
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.only(left: 10, right: 10),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: MyTheme.light_grey,
+                  ),
+                  child: TextField(
+                    controller: _chatTextController,
+                    decoration: const InputDecoration(
+                        hintText: "Write message...",
+                        hintStyle: TextStyle(color: Colors.black54),
+                        border: InputBorder.none),
+                  ),
                 ),
               ),
             ),

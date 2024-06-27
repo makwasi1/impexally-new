@@ -9,7 +9,6 @@ import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
 class MessengerList extends StatefulWidget {
   @override
   _MessengerListState createState() => _MessengerListState();
@@ -47,7 +46,8 @@ class _MessengerListState extends State<MessengerList> {
   }
 
   fetchData() async {
-    var conversatonResponse = await ChatRepository().getConversationResponse(page: _page);
+    var conversatonResponse =
+        await ChatRepository().getConversationResponse(page: _page);
     _list.addAll(conversatonResponse.conversation_item_list);
     _isInitial = false;
     _totalData = conversatonResponse.meta.total;
@@ -72,7 +72,8 @@ class _MessengerListState extends State<MessengerList> {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
+      textDirection:
+          app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.white,
         appBar: buildAppBar(context),
@@ -100,7 +101,8 @@ class _MessengerListState extends State<MessengerList> {
               ),
             ),
             Align(
-                alignment: Alignment.bottomCenter, child: buildLoadingContainer())
+                alignment: Alignment.bottomCenter,
+                child: buildLoadingContainer())
           ],
         ),
       ),
@@ -122,17 +124,14 @@ class _MessengerListState extends State<MessengerList> {
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
-backgroundColor: Colors.white,
-      centerTitle: false,
-      leading: Builder(
-        builder: (context) => IconButton(
-          icon: UsefulElements.backButton(context),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-      ),
+      backgroundColor: Colors.white,
+      centerTitle: true,
       title: Text(
         AppLocalizations.of(context)!.messages_ucf,
-        style: TextStyle(fontSize: 16, color: MyTheme.dark_font_grey,fontWeight: FontWeight.bold),
+        style: TextStyle(
+            fontSize: 16,
+            color: MyTheme.dark_font_grey,
+            fontWeight: FontWeight.bold),
       ),
       elevation: 0.0,
       titleSpacing: 0,
@@ -140,32 +139,22 @@ backgroundColor: Colors.white,
   }
 
   buildMessengerList() {
-    if (_isInitial && _list.length == 0) {
-      return SingleChildScrollView(
-          child: ShimmerHelper()
-              .buildListShimmer(item_count: 10, item_height: 100.0));
-    } else if (_list.length > 0) {
-      return SingleChildScrollView(
-        child: ListView.builder(
-          itemCount: _list.length,
-          scrollDirection: Axis.vertical,
-          padding: EdgeInsets.all(0.0),
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(
-                  top: 4.0, bottom: 4.0, left: 16.0, right: 16.0),
-              child: buildMessengerItemCard(index),
-            );
-          },
-        ),
-      );
-    } else if (_totalData == 0) {
-      return Center(child: Text("No data is available"));
-    } else {
-      return Container(); // should never be happening
-    }
+    return SingleChildScrollView(
+      child: ListView.builder(
+        itemCount: 1,
+        scrollDirection: Axis.vertical,
+        padding: EdgeInsets.all(0.0),
+        physics: NeverScrollableScrollPhysics(),
+        shrinkWrap: true,
+        itemBuilder: (context, index) {
+          return Padding(
+            padding: const EdgeInsets.only(
+                top: 4.0, bottom: 4.0, left: 16.0, right: 16.0),
+            child: buildMessengerItemCard(index),
+          );
+        },
+      ),
+    );
   }
 
   buildMessengerItemCard(index) {
@@ -173,10 +162,9 @@ backgroundColor: Colors.white,
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return Chat(
-            conversation_id: _list[index].id,
-            messenger_name: _list[index].shop_name,
-            messenger_title: _list[index].title,
-            messenger_image: _list[index].shop_logo,
+            messenger_name: "_list[index].shop_name",
+            messenger_title: "_list[index].title",
+            messenger_image: "",
           );
         }));
       },
@@ -196,10 +184,14 @@ backgroundColor: Colors.white,
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(35),
                 child: FadeInImage.assetNetwork(
-                  placeholder: 'assets/placeholder.png',
-                  image:  _list[index].shop_logo,
-                  fit: BoxFit.contain,
-                )),
+                    placeholder: 'assets/placeholder.png',
+                    image: "",
+                    fit: BoxFit.contain,
+                    imageErrorBuilder: (context, error, stackTrace) =>
+                        Image.asset(
+                          'assets/placeholder.png',
+                          fit: BoxFit.contain,
+                        ))),
           ),
           Container(
             height: 50,
@@ -215,7 +207,7 @@ backgroundColor: Colors.white,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        _list[index].shop_name,
+                        "Admin",
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -226,7 +218,7 @@ backgroundColor: Colors.white,
                             fontWeight: FontWeight.w600),
                       ),
                       Text(
-                        _list[index].title,
+                        "Contact Admin",
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -242,12 +234,14 @@ backgroundColor: Colors.white,
             ),
           ),
           Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: MyTheme.medium_grey,
-              size: 14,
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: MyTheme.medium_grey,
+                size: 14,
+              ),
             ),
           )
         ]),

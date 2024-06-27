@@ -6,6 +6,8 @@ import 'package:active_ecommerce_flutter/data_model/message_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../data_model/conversation_create_response.dart';
 
 class ChatRepository {
@@ -21,10 +23,95 @@ class ChatRepository {
     return conversationResponseFromJson(response.body);
   }
 
+  //start chat conversation
+
   Future<dynamic> getMessageResponse(
       {required conversation_id, page = 1}) async {
+    String url = ("${AppConfig.BASE_URL}/chats/${conversation_id}");
+    final response = await ApiRequest.get(
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+    );
+    if (response.statusCode == 200) {
+      var responseJson = jsonDecode(response.body);
+
+      MessageResponse messageResponse = MessageResponse.fromJson({
+        "data": responseJson["messages"],
+        "success": true,
+        "status": 200,
+      });
+      return messageResponse;
+    } else {
+      return null;
+    }
+  }
+
+  Future<dynamic> getInserMessageResponse(
+      {required conversation_id,
+      required String message,
+      String? receiver_id}) async {
+    const storage = FlutterSecureStorage();
+    String? user_id = await storage.read(key: "user_id");
+
+    var post_body = jsonEncode({
+      "sender_id": "${user_id}",
+      "receiver_id": "${receiver_id}",
+      "message": "${message}"
+    });
+
+    String url = ("${AppConfig.BASE_URL}/chats/$conversation_id/messages");
+    final response = await ApiRequest.post(
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: post_body,
+    );
+    if (response.statusCode == 201) {
+      var responseJson = jsonDecode(response.body);
+      MessageResponse msgResponse = MessageResponse.fromJson({
+        "data": [responseJson],
+        "success": true,
+        "status": 200,
+      });
+      return msgResponse;
+    }
+  }
+
+  Future<dynamic> startChatSession({int? product_id}) async {
+    const storage = FlutterSecureStorage();
+    String? user_id = await storage.read(key: "user_id");
+    var post_body = jsonEncode({
+      "sender_id": "${user_id}",
+      "receiver_id": "1", //hardcoded admin id
+      "subject": "Product Inquiry",
+      "product_id": product_id ?? 0
+    });
+
+    String url = ("${AppConfig.BASE_URL}/chats");
+    final response = await ApiRequest.post(
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: post_body,
+    );
+    //get the id from the json response
+    var conversation_id = jsonDecode(response.body)["id"];
+
+    debugPrint("conversation_id: $conversation_id");
+    //store in shared preference
+    await storage.write(
+        key: "conversation_id", value: conversation_id.toString());
+    return conversation_id;
+  }
+
+  Future<dynamic> getNewMessageResponse(
+      {required conversation_id, required last_message_id}) async {
     String url =
-        ("${AppConfig.BASE_URL}/chat/messages/${conversation_id}?page=${page}");
+        ("${AppConfig.BASE_URL}/chat/get-new-messages/${conversation_id}/${last_message_id}");
     final response = await ApiRequest.get(
         url: url,
         headers: {
@@ -32,41 +119,6 @@ class ChatRepository {
           "App-Language": app_language.$!
         },
         middleware: BannedUser());
-    return messageResponseFromJson(response.body);
-  }
-
-  Future<dynamic> getInserMessageResponse(
-      {required conversation_id, required String message}) async {
-    var post_body = jsonEncode({
-      "user_id": "${user_id.$}",
-      "conversation_id": "${conversation_id}",
-      "message": "${message}"
-    });
-
-    String url = ("${AppConfig.BASE_URL}/chat/insert-message");
-    final response = await ApiRequest.post(
-        url: url,
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer ${access_token.$}",
-          "App-Language": app_language.$!
-        },
-        body: post_body,
-        middleware: BannedUser());
-    return messageResponseFromJson(response.body);
-  }
-
-  Future<dynamic> getNewMessageResponse(
-      {required conversation_id, required last_message_id}) async {
-    String url=(
-        "${AppConfig.BASE_URL}/chat/get-new-messages/${conversation_id}/${last_message_id}");
-    final response = await ApiRequest.get(url:url,
-      headers: {
-        "Authorization": "Bearer ${access_token.$}",
-        "App-Language": app_language.$!
-      },
-      middleware: BannedUser()
-    );
     return messageResponseFromJson(response.body);
   }
 

@@ -12,6 +12,7 @@ import 'package:active_ecommerce_flutter/screens/chat.dart';
 import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/home.dart';
 import 'package:active_ecommerce_flutter/screens/login.dart';
+import 'package:active_ecommerce_flutter/screens/messenger_list.dart';
 import 'package:active_ecommerce_flutter/screens/profile.dart';
 import 'package:active_ecommerce_flutter/screens/seller_admin.dart';
 import 'package:badges/badges.dart' as badges;
@@ -78,7 +79,7 @@ class _MainState extends State<Main> {
       ),
       Filter(),
       SellerMain(),
-      Chat()
+      MessengerList()
     ];
     fetchAll();
     // TODO: implement initState

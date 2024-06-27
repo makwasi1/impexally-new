@@ -8,7 +8,9 @@ import 'package:active_ecommerce_flutter/custom/device_info.dart';
 import 'package:active_ecommerce_flutter/custom/quantity_input.dart';
 import 'package:active_ecommerce_flutter/custom/text_styles.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
+import 'package:active_ecommerce_flutter/data_model/login_response.dart';
 import 'package:active_ecommerce_flutter/data_model/products_model.dart';
+import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/color_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
@@ -770,6 +772,25 @@ class _ProductDetailsState extends State<ProductDetails>
         duration: Toast.lengthLong);
   }
 
+  checkIfUserLoggedIn(BuildContext ctx) async {
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+    if (res.result == false) {
+      showLoginWarning();
+      return;
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+            builder: (context) => Chat(
+                  messenger_name: "Product Inquiry",
+                  messenger_title:
+                      "Inquiry about ${_productDetails!.products!.id}",
+                  messenger_image: "",
+                )),
+      );
+    }
+  }
+
   onPressSendMessage() async {
     if (!is_logged_in.$) {
       showLoginWarning();
@@ -807,7 +828,6 @@ class _ProductDetailsState extends State<ProductDetails>
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return Chat(
-        conversation_id: conversationCreateResponse.conversation_id,
         messenger_name: conversationCreateResponse.shop_name,
         messenger_title: conversationCreateResponse.title,
         messenger_image: conversationCreateResponse.shop_logo,
@@ -1201,7 +1221,7 @@ class _ProductDetailsState extends State<ProductDetails>
                         0.0,
                       ),
                       child: Text(
-                        "Recommended For You",
+                        "Related Products",
                         style: TextStyle(
                             color: MyTheme.dark_font_grey,
                             fontSize: 18,
@@ -1267,7 +1287,7 @@ class _ProductDetailsState extends State<ProductDetails>
                 crossAxisCount: 2,
                 mainAxisSpacing: 14,
                 crossAxisSpacing: 14,
-                itemCount: homeData!.products!.length,
+                itemCount: 4,
                 shrinkWrap: true,
                 padding:
                     EdgeInsets.only(top: 20.0, bottom: 10, left: 18, right: 18),
@@ -1275,14 +1295,14 @@ class _ProductDetailsState extends State<ProductDetails>
                 itemBuilder: (context, index) {
                   // 3
                   return MiniProductCard(
-                    id: homeData.products![index].id,
-                    slug: homeData.products![index].slug!,
-                    image: homeData.products![index].image!.imageDefault,
-                    name: homeData.products![index].productDetail!.title!,
-                    main_price: homeData.products![index].price,
-                    stroked_price: homeData.products![index].priceDiscounted,
+                    id: homeData?.products![index].id,
+                    slug: "",
+                    image: homeData?.products![index].image!.imageDefault,
+                    name: homeData?.products![index].productDetail!.title!,
+                    main_price: homeData?.products![index].price,
+                    stroked_price: homeData?.products![index].priceDiscounted,
                     has_discount: true,
-                    discount: homeData.products![index].priceDiscounted,
+                    discount: homeData?.products![index].priceDiscounted,
                   );
                 },
               ),
@@ -1630,7 +1650,7 @@ class _ProductDetailsState extends State<ProductDetails>
                 "Visit Seller Store",
                 style: TextStyle(
                     color: Colors.black,
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600),
               ),
             ),
@@ -2300,7 +2320,7 @@ class _ProductDetailsState extends State<ProductDetails>
               icon: Image.asset("assets/new-chat.png"),
               color: MyTheme.dark_font_grey,
               onPressed: () {
-                onPressAddToCart(context, _addedToCartSnackbar);
+                checkIfUserLoggedIn(context);
               },
             ),
           ),

@@ -13,8 +13,10 @@ import 'package:active_ecommerce_flutter/screens/chat.dart';
 import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/home.dart';
 import 'package:active_ecommerce_flutter/screens/seller_account.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
@@ -123,6 +125,7 @@ class SellerAdminWebViewAdmin extends StatefulWidget {
 
 class _SellerAdminWebViewAdminState extends State<SellerAdminWebViewAdmin> {
   late final WebViewController _controller;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
@@ -159,11 +162,11 @@ class _SellerAdminWebViewAdminState extends State<SellerAdminWebViewAdmin> {
           },
           onWebResourceError: (WebResourceError error) {
             debugPrint('''
-Page resource error:
-  code: ${error.errorCode}
-  description: ${error.description}
-  errorType: ${error.errorType}
-  isForMainFrame: ${error.isForMainFrame}
+              Page resource error:
+                code: ${error.errorCode}
+                description: ${error.description}
+                errorType: ${error.errorType}
+                isForMainFrame: ${error.isForMainFrame}
           ''');
           },
           onNavigationRequest: (NavigationRequest request) {
@@ -204,6 +207,27 @@ Page resource error:
     // #enddocregion platform_features
 
     _controller = controller;
+
+    initFilePicker();
+  }
+
+  initFilePicker() async {
+    if (Platform.isAndroid) {
+      final androidController =
+          (_controller.platform as AndroidWebViewController);
+      await androidController.setOnShowFileSelector(_androidFilePicker);
+    }
+  }
+
+  Future<List<String>> _androidFilePicker(params) async {
+    try {
+      final attachment = await FilePicker.platform.pickFiles();
+      if (attachment == null) return [];
+      File file = File(attachment.files.single.path!);
+      return [file.uri.toString()];
+    } catch (e) {
+      return [];
+    }
   }
 
   @override

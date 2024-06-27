@@ -87,6 +87,9 @@ dependencies:
   uni_links: 
   upgrader: ^10.3.0
   webview_flutter: ^4.8.0
+  flutter_inappwebview: ^6.0.0
+  webview_flutter_plus: ^0.4.5
+  
 
 dev_dependencies:
   flutter_test:

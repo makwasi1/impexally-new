@@ -87,10 +87,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         child: SafeArea(
           child: Scaffold(
               key: homeData.scaffoldKey,
-              appBar: PreferredSize(
-                preferredSize: Size.fromHeight(50),
-                child: buildAppBar(statusBarHeight, context),
-              ),
+              appBar: buildAppBar(statusBarHeight, context)
+              // preferredSize: Size.fromHeight(50),
+              ,
               //drawer: MainDrawer(),
               body: ListenableBuilder(
                   listenable: homeData,
@@ -1076,14 +1075,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
+              Flexible(
                 child: GestureDetector(
                   onTap: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
                       return CategoryProducts(
                         slug: homeData.featuredCategoryList[2].id.toString(),
-                        // category_name: homeData.featuredCategoryList[index].name,
                       );
                     }));
                   },
@@ -1102,10 +1100,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          "Pickup & Delivery Ghana",
+                          "Pickup & Delivery",
                           style: TextStyle(
                               color: Colors.black,
-                              fontSize: 14,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold),
                         ),
                       )
@@ -1116,9 +1114,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               SizedBox(
                 width: 10,
               ),
-              Expanded(
+              Flexible(
                 child: GestureDetector(
-                  //open link
                   onTap: () async {
                     const url = 'https://seller.impexally.com/';
                     if (await canLaunch(url)) {
@@ -1142,11 +1139,11 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(
-                          "Start Selling now & Get Money",
+                          "Start Selling now",
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                               color: Colors.black,
-                              fontSize: 14,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold),
                         ),
                       )

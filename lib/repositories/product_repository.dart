@@ -126,14 +126,15 @@ class ProductRepository {
     return productResponseFromJson(response.body);
   }
 
-
-  Future<ProductResponse> getFilteredProductsFromSeller(String? seller_id) async {
+  Future<ProductResponse> getFilteredProductsFromSeller(
+      String? seller_id) async {
     debugPrint("Seller ID: $seller_id");
     String url = ("${AppConfig.BASE_URL}/products/user/$seller_id");
     final response = await ApiRequest.get(url: url, headers: {
       "Content-Type": "application/json",
     });
-    return productResponseFromJson(response.body);
+    var jsonResponse = jsonDecode(response.body);
+    return ProductResponse.fromJson(jsonResponse['products']);
   }
 
   Future<ProductMiniResponse> getFilteredProducts2(
@@ -261,8 +262,7 @@ class ProductRepository {
     return variantPriceResponseFromJson(response.body);
   }
 
-
-  //get vendor 
+  //get vendor
   Future<VendorDetails> getVendorDetails({String? id}) async {
     String url = ("${AppConfig.BASE_URL}/user/" + id.toString());
 
@@ -271,10 +271,9 @@ class ProductRepository {
     });
 
     if (response.statusCode == 200) {
-     
-        Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+      Map<String, dynamic> jsonResponse = jsonDecode(response.body);
 
-        return VendorDetails.fromJson(jsonResponse['user']);
+      return VendorDetails.fromJson(jsonResponse['user']);
     } else {
       throw Exception('Failed to load vendor details');
     }

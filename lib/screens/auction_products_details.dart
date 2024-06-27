@@ -555,7 +555,6 @@ class _AuctionProductsDetailsState extends State<AuctionProductsDetails>
 
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return Chat(
-        conversation_id: conversationCreateResponse.conversation_id,
         messenger_name: conversationCreateResponse.shop_name,
         messenger_title: conversationCreateResponse.title,
         messenger_image: conversationCreateResponse.shop_logo,
