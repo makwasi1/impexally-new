@@ -6,20 +6,15 @@ import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
 import 'package:active_ecommerce_flutter/data_model/confirm_code_response.dart';
 import 'package:active_ecommerce_flutter/data_model/login_response.dart';
-import 'package:active_ecommerce_flutter/data_model/logout_response.dart';
 import 'package:active_ecommerce_flutter/data_model/password_confirm_response.dart';
 import 'package:active_ecommerce_flutter/data_model/password_forget_response.dart';
 import 'package:active_ecommerce_flutter/data_model/resend_code_response.dart';
-import 'package:active_ecommerce_flutter/data_model/signup_response.dart';
-import 'package:active_ecommerce_flutter/data_model/user_by_token.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
-import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
 class AuthRepository {
   Future<LoginResponse> getLoginResponse(String? email, String password,String loginBy) async {
     var post_body = jsonEncode({
-      "email": "${email}",
+      "phone_number": "${email}",
       "password": "$password",
     });
 
@@ -97,6 +92,7 @@ class AuthRepository {
     String name,
     String? email_or_phone,
     String password,
+    String phone_number,
   ) async {
     var post_body = jsonEncode({
       "username": "$name",
@@ -104,6 +100,7 @@ class AuthRepository {
       "password": "$password",
       "first_name": "$name",
       "last_name": "$name",
+      "phone_number": "${phone_number}",
       // "register_by": "$register_by",
       // "g-recaptcha-response": "$capchaKey",
     });

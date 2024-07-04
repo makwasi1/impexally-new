@@ -5,13 +5,11 @@ import 'package:active_ecommerce_flutter/data_model/cart_add_response.dart';
 import 'package:active_ecommerce_flutter/data_model/cart_count_response.dart';
 import 'package:active_ecommerce_flutter/data_model/cart_delete_response.dart';
 import 'package:active_ecommerce_flutter/data_model/cart_process_response.dart';
-import 'package:active_ecommerce_flutter/data_model/cart_response.dart';
 import 'package:active_ecommerce_flutter/data_model/cart_summary_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
 import '../data_model/new_cart.dart';

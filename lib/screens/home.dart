@@ -5,29 +5,24 @@ import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/presenter/home_presenter.dart';
-import 'package:active_ecommerce_flutter/screens/cart.dart';
 import 'package:active_ecommerce_flutter/screens/category_products.dart';
 import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/flash_deal_list.dart';
 import 'package:active_ecommerce_flutter/screens/profile.dart';
+import 'package:active_ecommerce_flutter/screens/seller_admin.dart';
 import 'package:active_ecommerce_flutter/screens/todays_deal_products.dart';
-import 'package:active_ecommerce_flutter/screens/top_sellers.dart';
 import 'package:active_ecommerce_flutter/ui_elements/mini_product_card.dart';
 import 'package:active_ecommerce_flutter/ui_elements/product_card.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:badges/badges.dart' as badges;
-import 'package:flutter/widgets.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:go_router/go_router.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../custom/common_functions.dart';
-import '../presenter/cart_counter.dart';
 
 class Home extends StatefulWidget {
   Home({
@@ -883,6 +878,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
     }
   }
 
+  Future<void> _makePhoneCall() async {
+    final Uri launchUri = Uri(
+      scheme: 'tel',
+      path: '+233533181114',
+    );
+    if (await canLaunch(launchUri.toString())) {
+      await launch(launchUri.toString());
+    } else {
+      throw 'Could not launch $launchUri';
+    }
+  }
+
   Widget buildPromoItems() {
     return Column(
       children: [
@@ -892,12 +899,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return CategoryProducts(
-                      slug: homeData.featuredCategoryList[0].id.toString(),
-                      // category_name: homeData.featuredCategoryList[index].name,
-                    );
-                  }));
+                  _makePhoneCall();
                 },
                 child: Column(
                   children: [
@@ -1078,12 +1080,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               Flexible(
                 child: GestureDetector(
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return CategoryProducts(
-                        slug: homeData.featuredCategoryList[2].id.toString(),
-                      );
-                    }));
+                    _makePhoneCall();
                   },
                   child: Column(
                     children: [
@@ -1117,12 +1114,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               Flexible(
                 child: GestureDetector(
                   onTap: () async {
-                    const url = 'https://seller.impexally.com/';
-                    if (await canLaunch(url)) {
-                      await launch(url);
-                    } else {
-                      throw 'Could not launch $url';
-                    }
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SellerMain()),
+                    );
                   },
                   child: Column(
                     children: [
@@ -1296,6 +1291,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
 
   AppBar buildAppBar(double statusBarHeight, BuildContext context) {
     return AppBar(
+      systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: Colors.red, // <-- SEE HERE
+        statusBarIconBrightness:
+            Brightness.dark, //<-- For Android SEE HERE (dark icons)
+        statusBarBrightness:
+            Brightness.light, //<-- For iOS SEE HERE (dark icons)
+      ),
       automaticallyImplyLeading: false,
       // Don't show the leading button
       backgroundColor: Colors.white,

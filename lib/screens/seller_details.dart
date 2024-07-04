@@ -4,7 +4,6 @@ import 'package:active_ecommerce_flutter/custom/device_info.dart';
 import 'package:active_ecommerce_flutter/custom/lang_text.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
-import 'package:active_ecommerce_flutter/data_model/shop_details_response.dart';
 import 'package:active_ecommerce_flutter/data_model/vendor_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
@@ -12,7 +11,6 @@ import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/repositories/product_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/shop_repository.dart';
-import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:active_ecommerce_flutter/ui_elements/product_card.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
@@ -67,7 +65,7 @@ class _SellerDetailsState extends State<SellerDetails> {
           _mainScrollController.position.maxScrollExtent) {
         if (tabOptionIndex == 2) {
           ToastComponent.showDialog(
-              LangText(context).local!.loading_more_products_ucf);
+              LangText(context).local.loading_more_products_ucf);
           setState(() {
             _page++;
           });
@@ -84,17 +82,17 @@ class _SellerDetailsState extends State<SellerDetails> {
     _isThisSellerFollowed = shopResponse.result;
     setState(() {});
     //}
-    ToastComponent.showDialog(shopResponse.message!);
+    ToastComponent.showDialog(shopResponse.message);
   }
 
   Future removedFollow(id) async {
     var shopResponse = await ShopRepository().followedRemove(id);
 
-    if (shopResponse.result!) {
+    if (shopResponse.result) {
       _isThisSellerFollowed = false;
       setState(() {});
     }
-    ToastComponent.showDialog(shopResponse.message!);
+    ToastComponent.showDialog(shopResponse.message);
   }
 
   Future checkFollowed() async {
@@ -142,10 +140,8 @@ class _SellerDetailsState extends State<SellerDetails> {
     var vendorDetailsResponse =
         await ProductRepository().getVendorDetails(id: widget.slug);
     //print('ss:' + shopDetailsResponse.toString());
-    if (vendorDetailsResponse != null) {
-      _shopDetails = vendorDetailsResponse;
-    }
-
+    _shopDetails = vendorDetailsResponse;
+  
     if (_shopDetails != null) {
       fetchOthers();
       // _shopDetails?.sliders?.forEach((slider) {
@@ -391,7 +387,7 @@ class _SellerDetailsState extends State<SellerDetails> {
           Padding(
             padding: const EdgeInsets.only(left: 18.0, top: 20),
             child: Text(
-              LangText(context).local!.featured_products_ucf,
+              LangText(context).local.featured_products_ucf,
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -488,17 +484,17 @@ class _SellerDetailsState extends State<SellerDetails> {
           buildTabOptionItem(
             context,
             0,
-            LangText(context).local!.store_home_ucf,
+            LangText(context).local.store_home_ucf,
           ),
           buildTabOptionItem(
             context,
             1,
-            LangText(context).local!.top_selling_products_ucf,
+            LangText(context).local.top_selling_products_ucf,
           ),
           buildTabOptionItem(
             context,
             2,
-            LangText(context).local!.all_products_ucf,
+            LangText(context).local.all_products_ucf,
           ),
         ],
       ),

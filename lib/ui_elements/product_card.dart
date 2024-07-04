@@ -1,10 +1,8 @@
 import 'package:active_ecommerce_flutter/custom/box_decorations.dart';
-import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/screens/product_details.dart';
 import 'package:flutter/material.dart';
 
-import '../helpers/shared_value_helper.dart';
 import '../screens/auction_products_details.dart';
 
 class ProductCard extends StatefulWidget {
@@ -75,7 +73,7 @@ class _ProductCardState extends State<ProductCard> {
                       placeholder: 'assets/placeholder.png',
                       image: "https://seller.impexally.com/uploads/images/" +
                           widget.image!,
-                      fit: BoxFit.cover,
+                      fit: BoxFit.contain,
                       imageErrorBuilder: (context, error, stackTrace) {
                         return Image.asset('assets/placeholder.png');
                       },
@@ -90,7 +88,7 @@ class _ProductCardState extends State<ProductCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: EdgeInsets.fromLTRB(16, 8, 16, 0),
+                      padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
                       child: Text(
                         widget.name ?? "",
                         overflow: TextOverflow.ellipsis,
@@ -105,7 +103,7 @@ class _ProductCardState extends State<ProductCard> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(16, 0, 16, 2),
                       child: Text(
-                        "GH₵ ${widget.main_price!} - ${widget.stock} Units(s) Left",
+                        "GH₵ ${widget.discount!} - ${widget.stock} Units(s) Left",
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,

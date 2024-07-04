@@ -9,7 +9,6 @@ import '../data_model/auction_product_details_response.dart';
 import '../data_model/auction_purchase_history_response.dart';
 import '../data_model/product_mini_response.dart';
 import '../helpers/shared_value_helper.dart';
-import '../helpers/system_config.dart';
 
 class AuctionProductsRepository {
   Future<ProductMiniResponse> getAuctionProducts({page = 1}) async {

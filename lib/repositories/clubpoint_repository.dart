@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
-import 'package:flutter/foundation.dart';
 import 'package:active_ecommerce_flutter/data_model/clubpoint_response.dart';
 import 'package:active_ecommerce_flutter/data_model/clubpoint_to_wallet_response.dart';
 

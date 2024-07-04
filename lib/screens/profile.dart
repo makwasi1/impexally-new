@@ -150,28 +150,26 @@ class _ProfileState extends State<Profile> {
     loading();
     var response = await AuthRepository().getAccountDeleteResponse();
 
-    if (response.result!) {
+    if (response.result) {
       AuthHelper().clearUserData();
       Navigator.pop(loadingcontext);
       context.go("/");
     }
-    ToastComponent.showDialog(response.message!);
+    ToastComponent.showDialog(response.message);
   }
 
   String counterText(String txt, {default_length = 3}) {
     var blank_zeros = default_length == 3 ? "000" : "00";
     var leading_zeros = "";
-    if (txt != null) {
-      if (default_length == 3 && txt.length == 1) {
-        leading_zeros = "00";
-      } else if (default_length == 3 && txt.length == 2) {
-        leading_zeros = "0";
-      } else if (default_length == 2 && txt.length == 1) {
-        leading_zeros = "0";
-      }
+    if (default_length == 3 && txt.length == 1) {
+      leading_zeros = "00";
+    } else if (default_length == 3 && txt.length == 2) {
+      leading_zeros = "0";
+    } else if (default_length == 2 && txt.length == 1) {
+      leading_zeros = "0";
     }
-
-    var newtxt = (txt == null || txt == "" || txt == null.toString())
+  
+    var newtxt = (txt == "" || txt == null.toString())
         ? blank_zeros
         : txt;
 
@@ -332,14 +330,14 @@ class _ProfileState extends State<Profile> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 buildBottomVerticalCardListItem(
-                    "assets/coupon.png", LangText(context).local!.coupons_ucf,
+                    "assets/coupon.png", LangText(context).local.coupons_ucf,
                     onPressed: () {}),
                 Divider(
                   thickness: 1,
                   color: MyTheme.light_grey,
                 ),
                 buildBottomVerticalCardListItem("assets/favoriteseller.png",
-                    LangText(context).local!.favorite_seller_ucf,
+                    LangText(context).local.favorite_seller_ucf,
                     onPressed: () {}),
                 Divider(
                   thickness: 1,
@@ -379,7 +377,7 @@ class _ProfileState extends State<Profile> {
             Column(
               children: [
                 buildBottomVerticalCardListItem("assets/auction.png",
-                    LangText(context).local!.on_auction_products_ucf,
+                    LangText(context).local.on_auction_products_ucf,
                     onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return AuctionProducts();
@@ -395,7 +393,7 @@ class _ProfileState extends State<Profile> {
             Column(
               children: [
                 buildBottomVerticalCardListItem("assets/classified_product.png",
-                    LangText(context).local!.classified_ads_ucf, onPressed: () {
+                    LangText(context).local.classified_ads_ucf, onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return ClassifiedAds();
                   }));
@@ -412,7 +410,7 @@ class _ProfileState extends State<Profile> {
             Column(
               children: [
                 buildBottomVerticalCardListItem("assets/auction.png",
-                    LangText(context).local!.on_auction_products_ucf,
+                    LangText(context).local.on_auction_products_ucf,
                     onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return AuctionProducts();
@@ -457,7 +455,7 @@ class _ProfileState extends State<Profile> {
                                   ),
                                 ),
                                 Text(
-                                  LangText(context).local!.auction_ucf,
+                                  LangText(context).local.auction_ucf,
                                   style: TextStyle(
                                       fontSize: 12,
                                       color: MyTheme.dark_font_grey),
@@ -499,7 +497,7 @@ class _ProfileState extends State<Profile> {
                                         ),
                                       ),
                                       Text(
-                                        " ${LangText(context).local!.on_auction_products_ucf}",
+                                        " ${LangText(context).local.on_auction_products_ucf}",
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: MyTheme.dark_font_grey,
@@ -530,7 +528,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                             ),
                                             Text(
-                                              " ${LangText(context).local!.bidded_products_ucf}",
+                                              " ${LangText(context).local.bidded_products_ucf}",
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: MyTheme.dark_font_grey,
@@ -558,7 +556,7 @@ class _ProfileState extends State<Profile> {
                                               ),
                                             ),
                                             Text(
-                                              " ${LangText(context).local!.purchase_history_ucf}",
+                                              " ${LangText(context).local.purchase_history_ucf}",
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: MyTheme.dark_font_grey,
@@ -595,7 +593,7 @@ class _ProfileState extends State<Profile> {
             Column(
               children: [
                 buildBottomVerticalCardListItem("assets/shop.png",
-                    LangText(context).local!.browse_all_sellers_ucf,
+                    LangText(context).local.browse_all_sellers_ucf,
                     onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return Filter(
@@ -614,7 +612,7 @@ class _ProfileState extends State<Profile> {
             Column(
               children: [
                 buildBottomVerticalCardListItem("assets/shop.png",
-                    LangText(context).local!.followed_sellers_ucf,
+                    LangText(context).local.followed_sellers_ucf,
                     onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return FollowedSellers();
@@ -631,7 +629,7 @@ class _ProfileState extends State<Profile> {
             Column(
               children: [
                 buildBottomVerticalCardListItem("assets/delete.png",
-                    LangText(context).local!.delete_my_account, onPressed: () {
+                    LangText(context).local.delete_my_account, onPressed: () {
                   deleteWarningDialog();
 
                   // Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -651,7 +649,7 @@ class _ProfileState extends State<Profile> {
 
           if (false)
             buildBottomVerticalCardListItem(
-                "assets/blog.png", LangText(context).local!.blogs_ucf,
+                "assets/blog.png", LangText(context).local.blogs_ucf,
                 onPressed: () {}),
         ],
       ),
@@ -804,11 +802,11 @@ class _ProfileState extends State<Profile> {
         context: context,
         builder: (context) => AlertDialog(
               title: Text(
-                LangText(context).local!.delete_account_warning_title,
+                LangText(context).local.delete_account_warning_title,
                 style: TextStyle(fontSize: 15, color: MyTheme.dark_font_grey),
               ),
               content: Text(
-                LangText(context).local!.delete_account_warning_description,
+                LangText(context).local.delete_account_warning_description,
                 style: TextStyle(fontSize: 13, color: MyTheme.dark_font_grey),
               ),
               actions: [
@@ -816,13 +814,13 @@ class _ProfileState extends State<Profile> {
                     onPressed: () {
                       pop(context);
                     },
-                    child: Text(LangText(context).local!.no_ucf)),
+                    child: Text(LangText(context).local.no_ucf)),
                 TextButton(
                     onPressed: () {
                       pop(context);
                       deleteAccountReq();
                     },
-                    child: Text(LangText(context).local!.yes_ucf))
+                    child: Text(LangText(context).local.yes_ucf))
               ],
             ));
   }
@@ -1476,7 +1474,7 @@ class _ProfileState extends State<Profile> {
               child: Text(
                 is_logged_in
                     ? AppLocalizations.of(context)!.logout_ucf
-                    : LangText(context).local!.login_ucf,
+                    : LangText(context).local.login_ucf,
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 10,
@@ -1512,7 +1510,7 @@ class _ProfileState extends State<Profile> {
                   padding: const EdgeInsets.only(top: 4.0),
                   child: Text(
                     //if user email is not available then check user phone if user phone is not available use empty string
-                    "${user_email != "" && user_email != null ? user_email : user_phone.$ != "" && user_phone.$ != null ? user_phone.$ : ''}",
+                    "${user_email != "" && user_email != null ? user_email : user_phone.$ != "" ? user_phone.$ : ''}",
                     style: TextStyle(
                       color: MyTheme.light_grey,
                     ),

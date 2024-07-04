@@ -238,7 +238,7 @@ class _ClassifiedProductAddState extends State<ClassifiedProductAdd> {
     // print(postBody);
 
     Loading.close();
-    if (response.result != null && response.result!) {
+    if (response.result) {
       ToastComponent.showDialog(response.message, gravity: Toast.center);
 
       Navigator.pop(context);
@@ -925,9 +925,9 @@ class _ClassifiedProductAddState extends State<ClassifiedProductAdd> {
                         alignment: Alignment.bottomRight,
                         child: TextButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
+                              backgroundColor: WidgetStateProperty.all(
                                   MyTheme.accent_color),
-                              shape: MaterialStateProperty.all<
+                              shape: WidgetStateProperty.all<
                                   RoundedRectangleBorder>(
                                 RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(6.0),
@@ -1040,7 +1040,6 @@ class _ClassifiedProductAddState extends State<ClassifiedProductAdd> {
     List<CommonDropDownItem> itemList, {
     bool isMandatory = false,
     double? width,
-    focus = false,
   }) {
     return buildCommonSingleField(
         title, _buildDropDown(onchange, selectedValue, itemList, width: width),
@@ -1054,7 +1053,6 @@ class _ClassifiedProductAddState extends State<ClassifiedProductAdd> {
     List<CommonDropDownItemWithChild> itemList, {
     bool isMandatory = false,
     double? width,
-    focus = false,
   }) {
     return buildCommonSingleField(
         title,

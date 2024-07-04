@@ -1,13 +1,9 @@
 import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/data_model/offline_payment_submit_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
-import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
-import 'package:active_ecommerce_flutter/repositories/api-request.dart';
 
 class OfflinePaymentRepository {
   Future<dynamic> getOfflinePaymentSubmitResponse(

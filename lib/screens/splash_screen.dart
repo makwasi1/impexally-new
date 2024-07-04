@@ -95,7 +95,7 @@ class _SplashScreenState extends State<SplashScreen> {
                     ),
                   ),
                   Text(
-                    "V " + _packageInfo.version,
+                    "E-Commerce",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14.0,

@@ -12,7 +12,6 @@ import 'package:active_ecommerce_flutter/data_model/state_response.dart';
 import 'package:active_ecommerce_flutter/data_model/country_response.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:toast/toast.dart';
-import 'package:active_ecommerce_flutter/other_config.dart';
 import 'package:active_ecommerce_flutter/screens/map_location.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -313,14 +312,6 @@ class _AddressState extends State<Address> {
     if (address == "") {
       ToastComponent.showDialog(
           AppLocalizations.of(context)!.enter_address_ucf,
-          gravity: Toast.center,
-          duration: Toast.lengthLong);
-      return;
-    }
-
-    if (_selected_country_list_for_update[index] == null) {
-      ToastComponent.showDialog(
-          AppLocalizations.of(context)!.select_a_country,
           gravity: Toast.center,
           duration: Toast.lengthLong);
       return;
@@ -710,7 +701,7 @@ class _AddressState extends State<Address> {
                             side: BorderSide(
                                 color: MyTheme.light_grey, width: 1)),
                         child: Text(
-                          LangText(context).local!.close_ucf,
+                          LangText(context).local.close_ucf,
                           style: TextStyle(
                             color: MyTheme.accent_color,
                             fontSize: 16,
@@ -735,7 +726,7 @@ class _AddressState extends State<Address> {
                           borderRadius: BorderRadius.circular(6.0),
                         ),
                         child: Text(
-                          LangText(context).local!.add_ucf,
+                          LangText(context).local.add_ucf,
                           style: TextStyle(
                               color: Colors.white,
                               fontSize: 16,
@@ -894,11 +885,6 @@ class _AddressState extends State<Address> {
                           height: 40,
                           child: TypeAheadField(
                             suggestionsCallback: (name) async {
-                              if (_selected_country_list_for_update[index] == null) {
-                                var stateResponse = await AddressRepository()
-                                    .getStateListByCountry(); // blank response
-                                return stateResponse.states;
-                              }
                               var stateResponse = await AddressRepository()
                                   .getStateListByCountry(
                                       country_id:

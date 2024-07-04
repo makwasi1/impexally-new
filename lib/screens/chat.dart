@@ -2,19 +2,13 @@ import 'package:active_ecommerce_flutter/custom/device_info.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
 import 'package:active_ecommerce_flutter/data_model/login_response.dart';
 import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
-import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:ui';
 import 'package:intl/intl.dart' as intl;
-import 'package:flutter/painting.dart';
-import 'package:flutter_chat_bubble/bubble_type.dart';
 import 'package:flutter_chat_bubble/chat_bubble.dart';
 import 'dart:async';
-import 'package:flutter_chat_bubble/clippers/chat_bubble_clipper_5.dart';
-import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/repositories/chat_repository.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
@@ -43,6 +37,9 @@ class _ChatState extends State<Chat> {
   final ScrollController _xcrollController = ScrollController();
   final lastKey = GlobalKey();
 
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
+  final ChatRepository chatRepository = ChatRepository();
+
   int? uid;
 
   String conversation_id = "";
@@ -62,53 +59,41 @@ class _ChatState extends State<Chat> {
 
     //check if user is loged in
     checkUser();
-    startChatSession();
+
     // fetchData();
   }
 
   checkUser() async {
-    //get user is logged in status
     LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
-    if (res.result == false) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => Login(),
-        ),
-      );
-    } else {
-      setState(() {
-        uid = res.user!.id;
-      });
-      debugPrint("user_id: ${uid}");
-    }
+    await getConversationId();
+    setState(() {
+      uid = res.user!.id;
+    });
+
+    debugPrint("user_id: ${uid}");
   }
 
-  //start a chat if no chat id is provided
-  startChatSession() async {
-    //check if the user has no chat id in shared preference
-    const storage = FlutterSecureStorage();
+  getConversationId() async {
     String? conversation = await storage.read(key: "conversation_id");
-
-    if (conversation == null || conversation == "null") {
-      var chatResponse = await ChatRepository().startChatSession();
-      conversation_id = chatResponse.data.id.toString();
-      storage.write(key: "conversation_id", value: conversation_id);
-      fetchData();
-    } else {
-      conversation_id = conversation;
-      fetchData();
+    if (conversation == null) {
+      conversation = await ChatRepository().startChatSession();
+      await storage.write(key: "conversation_id", value: conversation);
     }
+    setState(() {
+      conversation_id = conversation!;
+    });
+    fetchData(conversation_id);
   }
 
-  fetchData() async {
+  fetchData(String conversationId) async {
     var messageResponse = await ChatRepository()
-        .getMessageResponse(conversation_id: conversation_id, page: _page);
+        .getMessageResponse(conversation_id: conversationId, page: _page);
     _list.addAll(messageResponse.data);
+    //reverse this list
+    _list = _list.reversed.toList();
     _isInitial = false;
-    //_totalData = messageResponse.;
     _showLoadingContainer = false;
-    _last_id = _list[0].id;
+
     setState(() {});
 
     fetch_new_message();
@@ -126,7 +111,7 @@ class _ChatState extends State<Chat> {
 
   Future<void> _onRefresh() async {
     reset();
-    fetchData();
+    // fetchData();
   }
 
   onPressLoadMore() {
@@ -134,7 +119,7 @@ class _ChatState extends State<Chat> {
       _page++;
     });
     _showLoadingContainer = true;
-    fetchData();
+    // fetchData();
   }
 
   onTapSendMessage() async {
@@ -194,24 +179,25 @@ class _ChatState extends State<Chat> {
         .toList();
 
     if (newMessages.isNotEmpty) {
-      // Prepend new messages
-      _list = [
-        newMessages,
-        _list,
-      ].expand((x) => x).toList();
+      // Append new messages to the end of the list
+      _list.addAll(newMessages);
 
-      // Update '_last_id' with the id of the newest message
-      _last_id = _list[0].id;
+      //reverse the list to show the newest message at the bottom
+      _list = _list.reversed.toList();
+
+      debugPrint("new message: ${newMessages[0].message}");
 
       // Trigger UI update
       setState(() {});
 
       // Scroll to the bottom to show the newest message
-      _xcrollController.animateTo(
-        _xcrollController.position.maxScrollExtent + 100,
-        curve: Curves.easeOut,
-        duration: const Duration(milliseconds: 500),
-      );
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _xcrollController.animateTo(
+          _xcrollController.position.maxScrollExtent,
+          curve: Curves.easeOut,
+          duration: const Duration(milliseconds: 500),
+        );
+      });
     }
   }
 
@@ -512,15 +498,25 @@ class _ChatState extends State<Chat> {
     }
   }
 
+  convertStringToDate(String date) {
+    //convert to date time
+    DateTime dateTime = DateTime.parse(date);
+    return intl.DateFormat('yyyy-MM-dd HH:MM').format(dateTime);
+  }
+
   buildChatItem(index) {
     return _list[index].userId == uid
-        ? getSenderView(ChatBubbleClipper5(type: BubbleType.sendBubble),
-            context, _list[index].message, _list[index].date, _list[index].time)
+        ? getSenderView(
+            ChatBubbleClipper5(type: BubbleType.sendBubble),
+            context,
+            _list[index].message,
+            convertStringToDate(_list[index].date),
+            _list[index].time)
         : getReceiverView(
             ChatBubbleClipper5(type: BubbleType.receiverBubble),
             context,
             _list[index].message,
-            _list[index].date,
+            convertStringToDate(_list[index].date),
             _list[index].time);
   }
 
@@ -529,7 +525,7 @@ class _ChatState extends State<Chat> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         Container(
-          height: 40,
+          height: 60,
           width: (MediaQuery.of(context).size.width - 32) * (4 / 5),
           child: TextField(
             autofocus: false,
@@ -558,28 +554,21 @@ class _ChatState extends State<Chat> {
                 contentPadding: EdgeInsets.symmetric(horizontal: 16.0)),
           ),
         ),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: GestureDetector(
-            onTap: () {
-              onTapSendMessage();
-            },
+        GestureDetector(
+          onTap: () {
+            onTapSendMessage();
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(2.0),
             child: Container(
               width: 40,
-              height: 40,
-              margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 2.0),
-              decoration: BoxDecoration(
-                color: MyTheme.accent_color,
-                borderRadius: BorderRadius.circular(35),
-                border: Border.all(
-                    color: Color.fromRGBO(112, 112, 112, .3), width: 1),
-                //shape: BoxShape.rectangle,
-              ),
+              height: 50,
+              margin: EdgeInsets.symmetric(vertical: 4.0, horizontal: 12.0),
               child: Center(
                 child: Icon(
                   Icons.send,
-                  color: Colors.white,
-                  size: 16,
+                  color: Colors.black,
+                  size: 30,
                 ),
               ),
             ),
@@ -723,9 +712,7 @@ class _ChatState extends State<Chat> {
               right: _list[index].userId == uid ? 2 : null,
               left: _list[index].userId == uid ? null : 2,
               child: Text(
-                _list[index].dayOfMonth.toString() +
-                    " " +
-                    _list[index].time.toString(),
+                convertStringToDate(_list[index].date),
                 style: TextStyle(
                   fontSize: 8,
                   color: (_list[index].userId == uid
@@ -754,49 +741,9 @@ class _ChatState extends State<Chat> {
       alignment: Alignment.bottomLeft,
       child: Container(
         padding: const EdgeInsets.only(left: 10, bottom: 10, top: 10),
-        height: 60,
         width: double.infinity,
         color: MyTheme.white,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              child: Center(
-                child: Container(
-                  padding: const EdgeInsets.only(left: 10, right: 10),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: MyTheme.light_grey,
-                  ),
-                  child: TextField(
-                    controller: _chatTextController,
-                    decoration: const InputDecoration(
-                        hintText: "Write message...",
-                        hintStyle: TextStyle(color: Colors.black54),
-                        border: InputBorder.none),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(
-              width: 15,
-            ),
-            FloatingActionButton(
-              onPressed: _chatTextController.text.trim().isNotEmpty
-                  ? () {
-                      onTapSendMessage();
-                      //sendMessage();
-                    }
-                  : null,
-              child: const Icon(
-                Icons.send,
-                color: Colors.white,
-                size: 18,
-              ),
-              backgroundColor: MyTheme.accent_color,
-              elevation: 0,
-            ),
-          ],
-        ),
+        child: buildMessageSendingRow(context),
       ),
     );
   }

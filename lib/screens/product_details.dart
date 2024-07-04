@@ -28,10 +28,8 @@ import 'package:active_ecommerce_flutter/screens/product_variants.dart';
 import 'package:active_ecommerce_flutter/screens/seller_details.dart';
 import 'package:active_ecommerce_flutter/ui_elements/list_product_card.dart';
 import 'package:active_ecommerce_flutter/ui_elements/mini_product_card.dart';
-import 'package:active_ecommerce_flutter/ui_elements/product_card.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:firebase_dynamic_links/firebase_dynamic_links.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -103,6 +101,7 @@ class _ProductDetailsState extends State<ProductDetails>
   int? _totalData = 0;
   double _my_rating_temp = 0.0;
   double opacity = 0;
+  bool isOutOfStock = false;
 
   List<dynamic> _relatedProducts = [];
   bool _relatedProductInit = false;
@@ -156,6 +155,17 @@ class _ProductDetailsState extends State<ProductDetails>
     _colorScrollController.dispose();
     _ColorAnimationController.dispose();
     super.dispose();
+  }
+
+  Future<void> initWebViewHeight() async {
+    final contentHeight = double.parse(
+      (await controller
+              .runJavaScriptReturningResult("document.body.scrollHeight"))
+          .toString(),
+    );
+    // Adjust the webViewHeight based on the content height.
+    // You might need to adjust this calculation based on your needs.
+    webViewHeight = (contentHeight * 2) / MediaQuery.of(context).devicePixelRatio;
   }
 
   fetchAll() {
@@ -247,10 +257,14 @@ class _ProductDetailsState extends State<ProductDetails>
     if (_productDetails != null) {
       controller.loadHtmlString(
           makeHtml(_productDetails!.productDetails![0].description!));
+      initWebViewHeight();
       _appbarPriceString = _productDetails!.products!.price;
       _singlePriceString = _productDetails!.products!.price;
       // fetchVariantPrice();
       _stock = int.tryParse(_productDetails!.products!.stock!);
+      if (_productDetails!.products!.stock! == "0") {
+        isOutOfStock = true;
+      }
       _productDetails!.image!.forEach((photo) {
         _productImageList.add("https://seller.impexally.com/uploads/images/" +
             photo.imageDefault!);
@@ -321,7 +335,7 @@ class _ProductDetailsState extends State<ProductDetails>
       return;
     }
 
-    if (_isInWishList!) {
+    if (_isInWishList) {
       _isInWishList = false;
       setState(() {});
       removeFromWishList();
@@ -435,6 +449,11 @@ class _ProductDetailsState extends State<ProductDetails>
 
   onPressBuyNow(context, ProductMiniDetail? variation) {
     addToCart(mode: "buy_now", context: context, variation: variation);
+  }
+
+  onOutOfStock(context) {
+    ToastComponent.showDialog("Product out of stock. Please try again later.",
+        gravity: Toast.center, duration: Toast.lengthLong);
   }
 
   addToCart(
@@ -1145,14 +1164,6 @@ class _ProductDetailsState extends State<ProductDetails>
                               EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         ),
                         Padding(
-                          padding: EdgeInsets.only(top: 14),
-                          child: _productDetails != null
-                              ? buildSellerRow(context)
-                              : ShimmerHelper().buildBasicShimmer(
-                                  height: 50.0,
-                                ),
-                        ),
-                        Padding(
                           padding: EdgeInsets.only(top: 14, bottom: 14),
                           child: _productDetails != null
                               ? Container() //buildTotalPriceRow()
@@ -1211,6 +1222,19 @@ class _ProductDetailsState extends State<ProductDetails>
                         ),
                       ]),
                 ),
+
+                SliverList(
+                    delegate: SliverChildListDelegate([
+                  Padding(
+                    padding: EdgeInsets.only(top: 14),
+                    child: _productDetails != null
+                        ? buildSellerRow(context)
+                        : ShimmerHelper().buildBasicShimmer(
+                            height: 50.0,
+                          ),
+                  ),
+                ])),
+
                 SliverList(
                   delegate: SliverChildListDelegate([
                     Padding(
@@ -1221,7 +1245,7 @@ class _ProductDetailsState extends State<ProductDetails>
                         0.0,
                       ),
                       child: Text(
-                        "Related Products",
+                        "More From this Seller",
                         style: TextStyle(
                             color: MyTheme.dark_font_grey,
                             fontSize: 18,
@@ -1284,10 +1308,10 @@ class _ProductDetailsState extends State<ProductDetails>
             //print(productResponse.toString());
             return SingleChildScrollView(
               child: MasonryGridView.count(
-                crossAxisCount: 2,
+                crossAxisCount: 3,
                 mainAxisSpacing: 14,
                 crossAxisSpacing: 14,
-                itemCount: 4,
+                itemCount: 6,
                 shrinkWrap: true,
                 padding:
                     EdgeInsets.only(top: 20.0, bottom: 10, left: 18, right: 18),
@@ -1630,6 +1654,7 @@ class _ProductDetailsState extends State<ProductDetails>
           ),
           // a rounded button with a text "View More"
           SizedBox(height: 20),
+
           InkWell(
             onTap: () {
               Navigator.push(
@@ -2195,7 +2220,7 @@ class _ProductDetailsState extends State<ProductDetails>
           SystemConfig.systemCurrency != null
               ? _singlePriceString.replaceAll(SystemConfig.systemCurrency!.code,
                   SystemConfig.systemCurrency!.symbol)
-              : "${SystemConfig.currency} ${_singlePriceString} - ${_productDetails!.products!.priceDiscounted} ",
+              : "${SystemConfig.currency} ${_productDetails!.products!.priceDiscounted} ",
           // _singlePriceString,
           style: TextStyle(
               color: MyTheme.accent_color,
@@ -2330,10 +2355,13 @@ class _ProductDetailsState extends State<ProductDetails>
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                  backgroundColor: MyTheme.accent_color,
+                  backgroundColor:
+                      isOutOfStock ? MyTheme.dark_grey : MyTheme.accent_color,
                 ),
                 onPressed: () {
-                  onPressBuyNow(context, _productDetails);
+                  isOutOfStock
+                      ? onOutOfStock(context)
+                      : onPressBuyNow(context, _productDetails);
                 },
                 child: Text(
                   AppLocalizations.of(context)!.buy_now_ucf,
@@ -2607,44 +2635,29 @@ class _ProductDetailsState extends State<ProductDetails>
   }
 
   buildExpandableDescription() {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Container(
-            width: DeviceInfo(context).width,
-            height: webViewHeight,
-            child: WebViewWidget(
-              controller: controller,
-            ),
+    return FutureBuilder(
+      future: initWebViewHeight(),
+      builder: (context, snapshot) {
+        return Container(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                width: DeviceInfo(context).width,
+                height:
+                    webViewHeight * 2, // This height will be dynamically set
+                child: WebViewWidget(
+                  controller: controller,
+                ),
+              ),
+              // The button is removed since we're displaying all content directly.
+            ],
           ),
-          Btn.basic(
-              onPressed: () async {
-                if (webViewHeight > 50) {
-                  webViewHeight = double.parse(
-                    (await controller.runJavaScriptReturningResult(
-                            "document.getElementById('scaled-frame').clientHeight"))
-                        .toString(),
-                  );
-                  print(webViewHeight);
-                  print(MediaQuery.of(context).devicePixelRatio);
-
-                  // webViewHeight =( webViewHeight / MediaQuery.of(context).devicePixelRatio)+400;
-                  print(webViewHeight);
-                } else {
-                  webViewHeight = 50;
-                }
-
-                setState(() {});
-              },
-              child: Text(
-                webViewHeight > 50 ? "Show More..." : "Less",
-                style: TextStyle(color: Colors.black),
-              ))
-        ],
-      ),
+        );
+      },
     );
-    /*ExpandableNotifier(
+  }
+  /*ExpandableNotifier(
         child: ScrollOnExpand(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -2681,7 +2694,6 @@ class _ProductDetailsState extends State<ProductDetails>
         ],
       ),
     ));*/
-  }
 
   buildTopSellingProductList() {
     if (_topProductInit == false && _topProducts.length == 0) {
@@ -2721,8 +2733,8 @@ class _ProductDetailsState extends State<ProductDetails>
                 slug: _topProducts[index].slug,
                 image: _topProducts[index].image.imageDefault,
                 name: _topProducts[index].productDetail.title,
-                main_price: _topProducts[index].price,
-                stroked_price: _topProducts[index].priceDiscounted,
+                main_price: _topProducts[index].priceDiscounted,
+                stroked_price: _topProducts[index].price,
                 has_discount: true);
           },
         ),

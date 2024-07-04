@@ -1,11 +1,10 @@
-import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:active_ecommerce_flutter/data_model/login_response.dart';
+import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
+import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/screens/chat.dart';
 import 'package:active_ecommerce_flutter/repositories/chat_repository.dart';
-import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
-import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
@@ -28,6 +27,8 @@ class _MessengerListState extends State<MessengerList> {
     // TODO: implement initState
     super.initState();
 
+    checkUser();
+
     fetchData();
 
     _xcrollController.addListener(() {
@@ -43,6 +44,19 @@ class _MessengerListState extends State<MessengerList> {
         fetchData();
       }
     });
+  }
+
+  checkUser() async {
+    //get user is logged in status
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+    if (res.result == false) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => Login(),
+        ),
+      );
+    }
   }
 
   fetchData() async {
@@ -126,6 +140,7 @@ class _MessengerListState extends State<MessengerList> {
     return AppBar(
       backgroundColor: Colors.white,
       centerTitle: true,
+      automaticallyImplyLeading: false,
       title: Text(
         AppLocalizations.of(context)!.messages_ucf,
         style: TextStyle(
@@ -158,37 +173,33 @@ class _MessengerListState extends State<MessengerList> {
   }
 
   buildMessengerItemCard(index) {
-    return GestureDetector(
+    return InkWell(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return Chat(
-            messenger_name: "_list[index].shop_name",
-            messenger_title: "_list[index].title",
-            messenger_image: "",
+            messenger_name: "", // Assuming dynamic data
+            messenger_title: "", // Assuming dynamic data
+            messenger_image: "", // Assuming you'll add the correct image path here
           );
         }));
       },
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8.0),
-        child:
-            Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
           Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(35),
-              border: Border.all(
-                  color: Color.fromRGBO(112, 112, 112, .3), width: 1),
-              //shape: BoxShape.rectangle,
+              border: Border.all(color: Color.fromRGBO(112, 112, 112, .3), width: 1),
             ),
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(35),
                 child: FadeInImage.assetNetwork(
                     placeholder: 'assets/placeholder.png',
-                    image: "",
+                    image: "", // Assuming you'll add the correct image path here
                     fit: BoxFit.contain,
-                    imageErrorBuilder: (context, error, stackTrace) =>
-                        Image.asset(
+                    imageErrorBuilder: (context, error, stackTrace) => Image.asset(
                           'assets/placeholder.png',
                           fit: BoxFit.contain,
                         ))),
@@ -207,7 +218,7 @@ class _MessengerListState extends State<MessengerList> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Admin",
+                        "Customer Support", // Assuming dynamic data might be used here as well
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -218,7 +229,7 @@ class _MessengerListState extends State<MessengerList> {
                             fontWeight: FontWeight.w600),
                       ),
                       Text(
-                        "Contact Admin",
+                        "Contact Impexally support", // Assuming dynamic data might be used here as well
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,

@@ -80,7 +80,7 @@ class ChatRepository {
     }
   }
 
-  Future<dynamic> startChatSession({int? product_id}) async {
+  Future<String> startChatSession({int? product_id}) async {
     const storage = FlutterSecureStorage();
     String? user_id = await storage.read(key: "user_id");
     var post_body = jsonEncode({
@@ -99,13 +99,13 @@ class ChatRepository {
       body: post_body,
     );
     //get the id from the json response
-    var conversation_id = jsonDecode(response.body)["id"];
+    int conversation_id = jsonDecode(response.body)["id"];
 
-    debugPrint("conversation_id: $conversation_id");
-    //store in shared preference
-    await storage.write(
-        key: "conversation_id", value: conversation_id.toString());
-    return conversation_id;
+    debugPrint("conversation_id repository: $conversation_id");
+
+    // await storage.write(key: "conversation_id", value: conversation_id);
+   
+    return conversation_id.toString();
   }
 
   Future<dynamic> getNewMessageResponse(

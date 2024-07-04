@@ -10,12 +10,10 @@ import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
-import 'package:active_ecommerce_flutter/other_config.dart';
 import 'package:active_ecommerce_flutter/repositories/auth_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/profile_repository.dart';
 import 'package:active_ecommerce_flutter/screens/common_webview_screen.dart';
 import 'package:active_ecommerce_flutter/screens/login.dart';
-import 'package:active_ecommerce_flutter/screens/main.dart';
 import 'package:active_ecommerce_flutter/ui_elements/auth_ui.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
@@ -82,6 +80,7 @@ class _RegistrationState extends State<Registration> {
     var name = _nameController.text.toString();
     var email = _emailController.text.toString();
     var password = _passwordController.text.toString();
+    var phone_number = _phoneNumberController.text.toString();
     var password_confirm = _passwordConfirmController.text.toString();
 
     if (name == "") {
@@ -124,10 +123,11 @@ class _RegistrationState extends State<Registration> {
     }
 
     var signupResponse = await AuthRepository().getSignupResponse(
-        name,
-        _register_by == 'email' ? email : _phone,
-        password,
-        );
+      name,
+      _register_by == 'email' ? email : _phone,
+      password,
+      phone_number,
+    );
     Loading.close();
 
     if (signupResponse.result == false) {
@@ -142,31 +142,27 @@ class _RegistrationState extends State<Registration> {
           gravity: Toast.center, duration: Toast.lengthLong);
       AuthHelper().setUserData(signupResponse);
 
+      final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+      await _fcm.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
 
-        final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-        await _fcm.requestPermission(
-          alert: true,
-          announcement: false,
-          badge: true,
-          carPlay: false,
-          criticalAlert: false,
-          provisional: false,
-          sound: true,
-        );
+      String? fcmToken = await _fcm.getToken();
 
-        String? fcmToken = await _fcm.getToken();
+      if (fcmToken != null) {
+        print("--fcm token--");
+        print(fcmToken);
 
-        if (fcmToken != null) {
-          print("--fcm token--");
-          print(fcmToken);
-       
-            // update device token
-            var deviceTokenUpdateResponse = await ProfileRepository()
-                .getDeviceTokenUpdateResponse(fcmToken);
-          
-        }
-      
-
+        // update device token
+        var deviceTokenUpdateResponse =
+            await ProfileRepository().getDeviceTokenUpdateResponse(fcmToken);
+      }
 
       context.push("/");
 
@@ -235,99 +231,89 @@ class _RegistrationState extends State<Registration> {
                       color: MyTheme.accent_color, fontWeight: FontWeight.w600),
                 ),
               ),
-              if (_register_by == "email")
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        height: 36,
-                        child: TextField(
-                          controller: _emailController,
-                          autofocus: false,
-                          decoration: InputDecorations.buildInputDecoration_1(
-                              hint_text: "johndoe@example.com"),
-                        ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      height: 36,
+                      child: TextField(
+                        controller: _emailController,
+                        autofocus: false,
+                        decoration: InputDecorations.buildInputDecoration_1(
+                            hint_text: "johndoe@example.com"),
                       ),
-                      otp_addon_installed.$
-                          ? GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _register_by = "phone";
-                                });
-                              },
-                              child: Text(
-                                AppLocalizations.of(context)!
-                                    .or_register_with_a_phone,
-                                style: TextStyle(
-                                    color: MyTheme.accent_color,
-                                    fontStyle: FontStyle.italic,
-                                    decoration: TextDecoration.underline),
-                              ),
-                            )
-                          : Container()
-                    ],
-                  ),
-                )
-              else
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Container(
-                        height: 36,
-                        child: CustomInternationalPhoneNumberInput(
-                          countries: countries_code,
-                          onInputChanged: (PhoneNumber number) {
-                            print(number.phoneNumber);
-                            setState(() {
-                              _phone = number.phoneNumber;
-                            });
-                          },
-                          onInputValidated: (bool value) {
-                            print(value);
-                          },
-                          selectorConfig: SelectorConfig(
-                            selectorType: PhoneInputSelectorType.DIALOG,
-                          ),
-                          ignoreBlank: false,
-                          autoValidateMode: AutovalidateMode.disabled,
-                          selectorTextStyle:
-                              TextStyle(color: MyTheme.font_grey),
-                          // initialValue: PhoneNumber(
-                          //     isoCode: countries_code[0].toString()),
-                          textFieldController: _phoneNumberController,
-                          formatInput: true,
-                          keyboardType: TextInputType.numberWithOptions(
-                              signed: true, decimal: true),
-                          inputDecoration:
-                              InputDecorations.buildInputDecoration_phone(
-                                  hint_text: "01XXX XXX XXX"),
-                          onSaved: (PhoneNumber number) {
-                            //print('On Saved: $number');
-                          },
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
+                    ),
+                    otp_addon_installed.$
+                        ? GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _register_by = "phone";
+                              });
+                            },
+                            child: Text(
+                              AppLocalizations.of(context)!
+                                  .or_register_with_a_phone,
+                              style: TextStyle(
+                                  color: MyTheme.accent_color,
+                                  fontStyle: FontStyle.italic,
+                                  decoration: TextDecoration.underline),
+                            ),
+                          )
+                        : Container()
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 4.0),
+                child: Text(
+                  "Phone Number",
+                  style: TextStyle(
+                      color: MyTheme.accent_color, fontWeight: FontWeight.w600),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Container(
+                      height: 36,
+                      child: CustomInternationalPhoneNumberInput(
+                        countries: countries_code,
+                        onInputChanged: (PhoneNumber number) {
+                          print(number.phoneNumber);
                           setState(() {
-                            _register_by = "email";
+                            _phone = number.phoneNumber;
                           });
                         },
-                        child: Text(
-                          AppLocalizations.of(context)!
-                              .or_register_with_an_email,
-                          style: TextStyle(
-                              color: MyTheme.accent_color,
-                              fontStyle: FontStyle.italic,
-                              decoration: TextDecoration.underline),
+                        onInputValidated: (bool value) {
+                          print(value);
+                        },
+                        selectorConfig: SelectorConfig(
+                          selectorType: PhoneInputSelectorType.DIALOG,
                         ),
-                      )
-                    ],
-                  ),
+                        ignoreBlank: false,
+                        autoValidateMode: AutovalidateMode.disabled,
+                        selectorTextStyle: TextStyle(color: MyTheme.font_grey),
+                        // initialValue: PhoneNumber(
+                        //     isoCode: countries_code[0].toString()),
+                        textFieldController: _phoneNumberController,
+                        formatInput: true,
+                        keyboardType: TextInputType.numberWithOptions(
+                            signed: true, decimal: true),
+                        inputDecoration:
+                            InputDecorations.buildInputDecoration_phone(
+                                hint_text: "01XXX XXX XXX"),
+                        onSaved: (PhoneNumber number) {
+                          //print('On Saved: $number');
+                        },
+                      ),
+                    ),
+                  ],
                 ),
+              ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 4.0),
                 child: Text(

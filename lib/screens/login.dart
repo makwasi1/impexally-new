@@ -10,7 +10,6 @@ import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
-import 'package:active_ecommerce_flutter/other_config.dart';
 import 'package:active_ecommerce_flutter/repositories/auth_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/profile_repository.dart';
 import 'package:active_ecommerce_flutter/screens/main.dart';
@@ -353,7 +352,7 @@ class _LoginState extends State<Login> {
                 padding: const EdgeInsets.only(bottom: 4.0),
                 child: Text(
                   _login_by == "email"
-                      ? AppLocalizations.of(context)!.email_ucf
+                      ? "Phone Number"
                       : AppLocalizations.of(context)!.login_screen_phone,
                   style: TextStyle(
                       color: MyTheme.accent_color, fontWeight: FontWeight.w600),
@@ -371,7 +370,7 @@ class _LoginState extends State<Login> {
                           controller: _emailController,
                           autofocus: false,
                           decoration: InputDecorations.buildInputDecoration_1(
-                              hint_text: "johndoe@example.com"),
+                              hint_text: "+233XXXXXXXXX"),
                         ),
                       ),
                       otp_addon_installed.$

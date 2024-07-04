@@ -6,13 +6,9 @@ import 'package:active_ecommerce_flutter/custom/device_info.dart';
 import 'package:active_ecommerce_flutter/custom/enum_classes.dart';
 import 'package:active_ecommerce_flutter/custom/fade_network_image.dart';
 import 'package:active_ecommerce_flutter/custom/lang_text.dart';
-import 'package:active_ecommerce_flutter/custom/scroll_to_hide_widget.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
-import 'package:active_ecommerce_flutter/data_model/carriers_response.dart';
 import 'package:active_ecommerce_flutter/data_model/delivery_info_response.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
-import 'package:active_ecommerce_flutter/repositories/cart_repository.dart';
-import 'package:active_ecommerce_flutter/repositories/pickup_points_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/shipping_repository.dart';
 import 'package:active_ecommerce_flutter/screens/checkout.dart';
 import 'package:flutter/cupertino.dart';
@@ -22,11 +18,8 @@ import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/repositories/address_repository.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
-import 'package:active_ecommerce_flutter/data_model/city_response.dart';
-import 'package:active_ecommerce_flutter/data_model/country_response.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:toast/toast.dart';
-import 'package:active_ecommerce_flutter/screens/address.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ShippingInfo extends StatefulWidget {
@@ -228,7 +221,7 @@ class _ShippingInfoState extends State<ShippingInfo> {
         shipping_type: _sellerWiseShippingOption);
 
     if (shippingCostResponse.result == false) {
-      ToastComponent.showDialog(LangText(context).local!.network_error,
+      ToastComponent.showDialog(LangText(context).local.network_error,
           gravity: Toast.center, duration: Toast.lengthLong);
       return;
     }
@@ -396,7 +389,7 @@ class _ShippingInfoState extends State<ShippingInfo> {
         height: 100,
         child: Center(
             child: Text(
-              LangText(context).local!.you_need_to_log_in,
+              LangText(context).local.you_need_to_log_in,
               style: TextStyle(color: MyTheme.font_grey),
             )));
   }
@@ -851,7 +844,7 @@ class _ShippingInfoState extends State<ShippingInfo> {
                       child: Text(
                         _deliveryInfoList[sellerArrayIndex].carriers!
                             .data![carrierIndex].transitTime.toString() + " " +
-                            LangText(context).local!.day_ucf,
+                            LangText(context).local.day_ucf,
                         maxLines: 2,
                         style: TextStyle(
                           fontSize: 13,
@@ -1023,8 +1016,8 @@ class _ShippingInfoState extends State<ShippingInfo> {
           children: [
             Radio(
               materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                fillColor: MaterialStateProperty.resolveWith((states) {
-                  if (!states.contains(MaterialState.selected)) {
+                fillColor: WidgetStateProperty.resolveWith((states) {
+                  if (!states.contains(WidgetState.selected)) {
                     return MyTheme.accent_color;
                   }
                   return MyTheme.white ;
@@ -1078,8 +1071,8 @@ class _ShippingInfoState extends State<ShippingInfo> {
           children: [
             Radio(
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                fillColor: MaterialStateProperty.resolveWith((states) {
-                  if (!states.contains(MaterialState.selected)) {
+                fillColor: WidgetStateProperty.resolveWith((states) {
+                  if (!states.contains(WidgetState.selected)) {
                     return MyTheme.accent_color;
                   }
                   return MyTheme.white ;
@@ -1132,8 +1125,8 @@ class _ShippingInfoState extends State<ShippingInfo> {
           children: [
             Radio(
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                fillColor: MaterialStateProperty.resolveWith((states) {
-                  if (!states.contains(MaterialState.selected)) {
+                fillColor: WidgetStateProperty.resolveWith((states) {
+                  if (!states.contains(WidgetState.selected)) {
                     return MyTheme.accent_color;
                   }
                   return MyTheme.white ;
@@ -1243,7 +1236,7 @@ Widget  buildCartSellerList() {
                     padding: const EdgeInsets.only(top: 18.0),
                     child: Text(
 
-                      LangText(context).local!
+                      LangText(context).local
                           .choose_delivery_ucf,
                       style: TextStyle(
                           color: MyTheme.dark_font_grey,

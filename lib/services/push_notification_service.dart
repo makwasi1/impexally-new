@@ -78,7 +78,7 @@ class PushNotificationService {
               android: AndroidNotificationDetails(
                 channel.id,
                 channel.name,
-                icon: android?.smallIcon,
+                icon: android.smallIcon,
                 // other properties...
               ),
             ));

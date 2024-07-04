@@ -1,14 +1,10 @@
 import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:convert';
-import 'package:active_ecommerce_flutter/app_config.dart';
 import 'package:active_ecommerce_flutter/data_model/coupon_apply_response.dart';
 import 'package:active_ecommerce_flutter/data_model/coupon_remove_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
-import 'package:active_ecommerce_flutter/middlewares/banned_user.dart';
-import 'package:active_ecommerce_flutter/repositories/api-request.dart';
 import '../data_model/coupon_list_response.dart';
 import '../data_model/product_mini_response.dart';
 import '../helpers/main_helpers.dart';

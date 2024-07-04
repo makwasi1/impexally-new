@@ -59,7 +59,7 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
         .getOwnClassifiedProducts(page: _page);
     if (productResponse.data!.isEmpty) {
       ToastComponent.showDialog(
-        LangText(context).local!.no_more_products_ucf,
+        LangText(context).local.no_more_products_ucf,
         gravity: Toast.center,
       );
     }
@@ -92,11 +92,11 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
     var response = await ClassifiedProductRepository()
         .getDeleteClassifiedProductResponse(id);
     Navigator.pop(loadingContext);
-    if (response.result!) {
+    if (response.result) {
       resetAll();
     }
     ToastComponent.showDialog(
-      response.message!,
+      response.message,
       gravity: Toast.center,
       duration: 3,
     );
@@ -107,14 +107,14 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
     var response = await ClassifiedProductRepository()
         .getStatusChangeClassifiedProductResponse(id, value ? 1 : 0);
     Navigator.pop(loadingContext);
-    if (response.result!) {
+    if (response.result) {
       // _productStatus[index] = value;
       _productList[index!].status = value;
       resetAll();
     }
     Navigator.pop(switchContext);
     ToastComponent.showDialog(
-      response.message!,
+      response.message,
       gravity: Toast.center,
       duration: 3,
     );
@@ -198,7 +198,7 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
         appBar: AppBar(
           elevation: 0,
           title: Text(
-            LangText(context).local!.my_products_ucf,
+            LangText(context).local.my_products_ucf,
             style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -284,7 +284,7 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
                         width: 5,
                       ),
                       Text(
-                        LangText(context).local!.current_package_ucf,
+                        LangText(context).local.current_package_ucf,
                         style: TextStyle(fontSize: 10, color: MyTheme.grey_153),
                       ),
                       SizedBox(
@@ -303,7 +303,7 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
                   Row(
                     children: [
                       Text(
-                        LangText(context).local!.upgrade_package_ucf,
+                        LangText(context).local.upgrade_package_ucf,
                         style: TextStyle(
                             fontSize: 12,
                             color: MyTheme.accent_color,
@@ -344,7 +344,7 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text(
-                      LangText(context).local!.remaining_uploads,
+                      LangText(context).local.remaining_uploads,
                       style: CommonFunctions.dashboardBoxText(context),
                     ),
                     Text(
@@ -395,7 +395,7 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        LangText(context).local!.add_new_products_ucf,
+                        LangText(context).local.add_new_products_ucf,
                         style: CommonFunctions.dashboardBoxText(context)
                             .copyWith(color: MyTheme.dark_grey, fontSize: 12),
                       ),
@@ -417,7 +417,7 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            LangText(context).local!.all_products_ucf,
+            LangText(context).local.all_products_ucf,
             style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -582,14 +582,14 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
               width: DeviceInfo(context).width! * 1.5,
               child: AlertDialog(
                 title: Text(
-                  LangText(context).local!.do_you_want_to_delete_it,
+                  LangText(context).local.do_you_want_to_delete_it,
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
                       color: Colors.red),
                 ),
                 content: Text(
-                  LangText(context).local!.do_you_want_to_delete_it,
+                  LangText(context).local.do_you_want_to_delete_it,
                   style: const TextStyle(
                       fontWeight: FontWeight.w400, fontSize: 14),
                 ),
@@ -600,7 +600,7 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
                         Navigator.pop(context);
                       },
                       child: Text(
-                        LangText(context).local!.no_ucf,
+                        LangText(context).local.no_ucf,
                         style: TextStyle(color: MyTheme.white, fontSize: 12),
                       )),
                   Btn.basic(
@@ -609,7 +609,7 @@ class _MyClassifiedAdsState extends State<MyClassifiedAds> {
                         Navigator.pop(context);
                         deleteProduct(id);
                       },
-                      child: Text(LangText(context).local!.yes_ucf,
+                      child: Text(LangText(context).local.yes_ucf,
                           style:
                               TextStyle(color: MyTheme.white, fontSize: 12))),
                 ],

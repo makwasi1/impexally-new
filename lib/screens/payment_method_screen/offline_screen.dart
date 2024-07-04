@@ -16,10 +16,8 @@ import 'package:active_ecommerce_flutter/ui_elements/html_content_webview.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_html/flutter_html.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:toast/toast.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
 class OfflineScreen extends StatefulWidget {
   int? order_id;

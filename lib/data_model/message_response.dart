@@ -88,11 +88,11 @@ class Message {
         userId: int.tryParse(json["sender_id"]),
         sendType: json["send_type"],
         message: json["message"],
-        year: json["year"],
-        month: json["month"],
+        year: json["created_at"],
+        month: json["created_at"],
         dayOfMonth: json["day_of_month"],
-        date: json["date"],
-        time: json["time"],
+        date: json["created_at"],
+        time: json["created_at"],
       );
 
   Map<String, dynamic> toJson() => {

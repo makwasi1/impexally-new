@@ -4,7 +4,6 @@ import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/screens/product_details.dart';
 import 'package:flutter/material.dart';
 
-import '../helpers/shared_value_helper.dart';
 
 class MiniProductCard extends StatefulWidget {
   int? id;
@@ -59,12 +58,16 @@ class _MiniProductCardState extends State<MiniProductCard> {
                           borderRadius: BorderRadius.vertical(
                               top: Radius.circular(6), bottom: Radius.zero),
                           child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/placeholder.png',
-                            image:
-                                "https://seller.impexally.com/uploads/images/" +
-                                    widget.image!,
-                            fit: BoxFit.cover,
-                          ))),
+                              placeholder: 'assets/placeholder.png',
+                              image:
+                                  "https://seller.impexally.com/uploads/images/" +
+                                      widget.image!,
+                              fit: BoxFit.contain,
+                              imageErrorBuilder: (context, error, stackTrace) =>
+                                  Image.asset(
+                                    "assets/placeholder.png",
+                                    fit: BoxFit.cover,
+                                  )))),
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(8, 4, 8, 6),
@@ -79,7 +82,6 @@ class _MiniProductCardState extends State<MiniProductCard> {
                         fontWeight: FontWeight.w600),
                   ),
                 ),
-          
                 Padding(
                   padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
                   child: Text(
@@ -87,7 +89,7 @@ class _MiniProductCardState extends State<MiniProductCard> {
                         ? widget.main_price!.replaceAll(
                             SystemConfig.systemCurrency!.code!,
                             SystemConfig.systemCurrency!.symbol!)
-                        : "GH₵" + widget.main_price!,
+                        : "GH₵" + widget.discount!,
                     maxLines: 1,
                     style: TextStyle(
                         color: MyTheme.accent_color,
@@ -127,7 +129,7 @@ class _MiniProductCardState extends State<MiniProductCard> {
                     )
                   ],
                 )
-              ]),       
+              ]),
           // whole sale
         ]),
       ),

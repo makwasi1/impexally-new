@@ -142,7 +142,7 @@ class _UploadFileState extends State<UploadFile> {
   delete(id) async {
     var response = await FileUploadRepository().deleteFile(id);
 
-    if (response.result!) {
+    if (response.result) {
       resetData();
     }
 

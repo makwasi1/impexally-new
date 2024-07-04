@@ -1,9 +1,7 @@
-import 'dart:async';
 
 import 'package:active_ecommerce_flutter/data_model/login_response.dart';
 import 'package:active_ecommerce_flutter/data_model/new_cart.dart';
 import 'package:active_ecommerce_flutter/data_model/order_mini_response.dart';
-import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/repositories/cart_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/order_repository.dart';
 import 'package:flutter/material.dart';

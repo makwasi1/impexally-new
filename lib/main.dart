@@ -24,6 +24,7 @@ import 'package:active_ecommerce_flutter/screens/flash_deal_products.dart';
 import 'package:active_ecommerce_flutter/screens/followed_sellers.dart';
 import 'package:active_ecommerce_flutter/screens/index.dart';
 import 'package:active_ecommerce_flutter/screens/login.dart';
+import 'package:active_ecommerce_flutter/screens/messenger_list.dart';
 import 'package:active_ecommerce_flutter/screens/order_details.dart';
 import 'package:active_ecommerce_flutter/screens/order_list.dart';
 import 'package:active_ecommerce_flutter/screens/package/packages.dart';
@@ -45,10 +46,7 @@ import 'package:one_context/one_context.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_value/shared_value.dart';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:uni_links/uni_links.dart';
 import 'package:upgrader/upgrader.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'firebase_options.dart';
 
 import 'app_config.dart';
@@ -68,10 +66,10 @@ main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-    statusBarColor: Colors.transparent,
-    systemNavigationBarDividerColor: Colors.transparent,
-  ));
+  // SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+  //   statusBarColor: MyTheme.accent_color,
+  //   systemNavigationBarDividerColor: Colors.transparent,
+  // ));
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -122,6 +120,10 @@ var routes = GoRouter(
               pageBuilder: (BuildContext context, GoRouterState state) =>
                   MaterialPage(child: UpdatePackage())),
           GoRoute(
+              path: "messages",
+              pageBuilder: (BuildContext context, GoRouterState state) =>
+                  MaterialPage(child: MessengerList())),
+          GoRoute(
               path: "auction_product_bids",
               pageBuilder: (BuildContext context, GoRouterState state) =>
                   MaterialPage(
@@ -142,7 +144,7 @@ var routes = GoRouter(
               path: "dashboard",
               name: "sell",
               pageBuilder: (BuildContext context, GoRouterState state) =>
-                  AIZRoute.rightTransition(SellerMain())),        
+                  AIZRoute.rightTransition(SellerMain())),
           GoRoute(
               path: "auction-products",
               pageBuilder: (BuildContext context, GoRouterState state) =>
@@ -331,6 +333,16 @@ class _MyAppState extends State<MyApp> {
               scaffoldBackgroundColor: MyTheme.white,
               visualDensity: VisualDensity.adaptivePlatformDensity,
               fontFamily: "PublicSansSerif",
+              appBarTheme: AppBarTheme(
+                backgroundColor: MyTheme.accent_color,
+                elevation: 0,
+                iconTheme: IconThemeData(color: MyTheme.dark_grey),
+                systemOverlayStyle: SystemUiOverlayStyle(
+                  statusBarColor: MyTheme.accent_color,
+                  statusBarIconBrightness: Brightness.dark,
+                  statusBarBrightness: Brightness.light,
+                ),
+              ),
               /*textTheme: TextTheme(
               bodyText1: TextStyle(),
               bodyText2: TextStyle(fontSize: 12.0),

@@ -2,7 +2,6 @@ import 'package:active_ecommerce_flutter/custom/box_decorations.dart';
 import 'package:active_ecommerce_flutter/custom/btn.dart';
 import 'package:active_ecommerce_flutter/custom/device_info.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
-import 'package:active_ecommerce_flutter/data_model/category_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
@@ -154,7 +153,7 @@ class _CategoryListState extends State<CategoryList> {
               childAspectRatio: 0.7,
               crossAxisCount: 3,
             ),
-            itemCount: snapshot.data!.categories!.length,
+            itemCount: snapshot.data!.categories.length,
             padding: EdgeInsets.only(
                 left: 18, right: 18, bottom: widget.is_base_category ? 30 : 0),
             scrollDirection: Axis.vertical,

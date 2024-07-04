@@ -17,13 +17,12 @@ import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:active_ecommerce_flutter/screens/select_address.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 
 import '../data_model/login_response.dart';
 import '../data_model/product_detail.dart';
-import '../data_model/products_model.dart';
 import 'cart.dart';
 
 class ProductVariants extends StatefulWidget {
@@ -714,6 +713,48 @@ class _ProductVariantsState extends State<ProductVariants> {
     );
   }
 
+  openPhotoDialog(BuildContext context, path) => showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            child: Container(
+                child: Stack(
+              children: [
+                PhotoView(
+                  enableRotation: true,
+                  heroAttributes: const PhotoViewHeroAttributes(tag: "someTag"),
+                  imageProvider: NetworkImage(path),
+                ),
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Container(
+                    decoration: ShapeDecoration(
+                      color: MyTheme.medium_grey_50,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(25),
+                          bottomRight: Radius.circular(25),
+                          topRight: Radius.circular(25),
+                          topLeft: Radius.circular(25),
+                        ),
+                      ),
+                    ),
+                    width: 40,
+                    height: 40,
+                    child: IconButton(
+                      icon: Icon(Icons.clear, color: MyTheme.white),
+                      onPressed: () {
+                        Navigator.of(context, rootNavigator: true).pop();
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            )),
+          );
+        },
+      );
+
   String getVariationOptionName(String variationOption) {
     String optionName = "";
     String serialized = variationOption;
@@ -792,21 +833,52 @@ class _ProductVariantsState extends State<ProductVariants> {
       child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Container(
-                width: 50,
-                height: 50,
-                child: ClipRRect(
+            GestureDetector(
+              onTap: () {
+                openPhotoDialog(
+                    context,
+                    "https://seller.impexally.com/uploads/images/" +
+                        _initialImage!);
+              },
+              child: Container(
+                  width: 50,
+                  height: 50,
+                  child: ClipRRect(
                     borderRadius: BorderRadius.horizontal(
                         left: Radius.circular(6), right: Radius.zero),
-                    child: FadeInImage.assetNetwork(
-                      placeholder: 'assets/placeholder.png',
-                      image: "https://seller.impexally.com/uploads/images/" +
-                          _initialImage!,
-                      fit: BoxFit.contain,
-                      imageErrorBuilder: (context, error, stackTrace) {
-                        return Image.asset('assets/placeholder.png');
-                      },
-                    ))),
+                    child: Stack(
+                      children: [
+                        FadeInImage.assetNetwork(
+                          placeholder: 'assets/placeholder.png',
+                          image:
+                              "https://seller.impexally.com/uploads/images/" +
+                                  _initialImage!,
+                          fit: BoxFit.contain,
+                          imageErrorBuilder: (context, error, stackTrace) {
+                            return Image.asset('assets/placeholder.png');
+                          },
+                        ),
+                        Positioned(
+                          right: -10, // Position as needed
+                          top: -10, // Position as needed
+                          child: Container(
+                            color: Colors
+                                .transparent, // Semi-transparent background for better visibility
+                            child: IconButton(
+                              icon: Icon(Icons.zoom_in, color: Colors.white),
+                              onPressed: () {
+                                openPhotoDialog(
+                                    context,
+                                    "https://seller.impexally.com/uploads/images/" +
+                                        _initialImage!);
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )),
+            ),
             Container(
               //color: Colors.red,
               width: DeviceInfo(context).width! / 2,
@@ -876,6 +948,10 @@ class _ProductVariantsState extends State<ProductVariants> {
     );
   }
 
+  String selectedChoice = "";
+  String selectedChoice1 = "";
+  bool isSelected = false;
+
   Widget buildSizeSelection() {
     return Container(
       // padding: const EdgeInsets.only(8.0),
@@ -904,21 +980,58 @@ class _ProductVariantsState extends State<ProductVariants> {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 10, vertical: 7),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(5),
-                      border: Border.all(color: Colors.red),
-                      color: Color.fromARGB(255, 240, 219, 219),
-                    ),
-                    child: Text(
-                      "Select Product ${variation.labelNames!}",
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 171, 15, 4),
-                        fontSize: 14,
-                        fontWeight: FontWeight.w400,
+                  Row(
+                    children: [
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          border: Border.all(color: Colors.red),
+                          color: Color.fromARGB(255, 240, 219, 219),
+                        ),
+                        child: Text(
+                          "Select Product ${variation.labelNames!}",
+                          style: TextStyle(
+                            color: Color.fromARGB(255, 171, 15, 4),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
                       ),
-                    ),
+                      variation.labelNames == "Color" ||
+                              variation.labelNames == "color"
+                          ? Visibility(
+                              visible: selectedChoice.isNotEmpty,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 5),
+                                child: Text(
+                                  "($selectedChoice)" + " is Selected ",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ))
+                          : Visibility(
+                              visible: selectedChoice1.isNotEmpty,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 7),
+                                child: Text(
+                                  "($selectedChoice1)" +
+                                      " ${variation.labelNames!} is Selected ",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            )
+                    ],
                   ),
                   SizedBox(height: 5),
                   variation.labelNames == "Color" ||
@@ -930,12 +1043,13 @@ class _ProductVariantsState extends State<ProductVariants> {
                                   (optionIndex) {
                             var option =
                                 variation.variationOptions![optionIndex];
-                            bool isSelected =
-                                selectedOptions[index] == optionIndex;
+                            isSelected = selectedOptions[index] == optionIndex;
                             return GestureDetector(
                               onTap: () {
                                 debugPrint(
                                     "Image tapped ${option.id} ${variation.id}");
+                                debugPrint(
+                                    "${getVariationOptionName(option.optionNames!)}");
 
                                 setState(() {
                                   selectedOptions[index] =
@@ -944,13 +1058,17 @@ class _ProductVariantsState extends State<ProductVariants> {
                                       option.id ?? optionIndex;
                                   selectedOptions1 = variation.id!;
 
+                                  selectedChoice = getVariationOptionName(
+                                      option.optionNames!);
+
                                   itemSelectedVariations[index] = {
                                     "variation_id": variation.id,
                                     "variation_option_id": option.id,
                                   };
                                   _initialImage =
                                       option.imageVariation!.imageDefault;
-                                  if (option.priceDiscounted! != "0")
+                                  if (double.parse(option.priceDiscounted!) >
+                                      0.0)
                                     _initialDidcountedPrice =
                                         option.priceDiscounted!;
                                 });
@@ -985,8 +1103,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                                   (optionIndex) {
                             var option =
                                 variation.variationOptions![optionIndex];
-                            bool isSelected =
-                                selectedOptions[index] == optionIndex;
+                            isSelected = selectedOptions[index] == optionIndex;
                             return ChoiceChip(
                               label: Text(
                                   getVariationOptionName(option.optionNames!)),
@@ -1003,7 +1120,10 @@ class _ProductVariantsState extends State<ProductVariants> {
                                     "variation_id": variation.id,
                                     "variation_option_id": option.id,
                                   };
-                                  if (option.priceDiscounted! != "0")
+                                  selectedChoice1 = getVariationOptionName(
+                                      option.optionNames!);
+                                  if (double.parse(option.priceDiscounted!) >
+                                      0.0)
                                     _initialDidcountedPrice =
                                         option.priceDiscounted!;
                                 });

@@ -2,7 +2,6 @@ import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/screens/classified_ads/classified_product_details.dart';
 import 'package:flutter/material.dart';
-import 'package:active_ecommerce_flutter/screens/product_details.dart';
 import 'package:active_ecommerce_flutter/custom/box_decorations.dart';
 class ClassifiedMiniProductCard extends StatefulWidget {
   int? id;

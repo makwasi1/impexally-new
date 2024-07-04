@@ -1,5 +1,4 @@
 import 'package:active_ecommerce_flutter/repositories/auction_products_repository.dart';
-import 'package:active_ecommerce_flutter/screens/cart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:toast/toast.dart';
@@ -12,7 +11,6 @@ import '../helpers/main_helpers.dart';
 import '../helpers/shared_value_helper.dart';
 import '../helpers/shimmer_helper.dart';
 import '../my_theme.dart';
-import '../repositories/cart_repository.dart';
 
 class AuctionBiddedProducts extends StatefulWidget {
   const AuctionBiddedProducts({Key? key}) : super(key: key);
@@ -331,7 +329,7 @@ class _AuctionBiddedProductsState extends State<AuctionBiddedProducts> {
                                   action!,
                                   style: TextStyle(
                                       fontSize: 12,
-                                      color: isBuyable!
+                                      color: isBuyable
                                           ? MyTheme.white
                                           : MyTheme.accent_color),
                                 ),

@@ -5,7 +5,6 @@ import 'package:active_ecommerce_flutter/data_model/slider_response.dart';
 import 'package:active_ecommerce_flutter/repositories/category_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/flash_deal_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/product_repository.dart';
-import 'package:active_ecommerce_flutter/repositories/sliders_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 
@@ -119,7 +118,7 @@ class HomePresenter extends ChangeNotifier {
 
   fetchFeaturedCategories() async {
     var categoryResponse = await CategoryRepository().getFeturedCategories();
-    featuredCategoryList.addAll(categoryResponse.categories!);
+    featuredCategoryList.addAll(categoryResponse.categories);
     isCategoryInitial = false;
     notifyListeners();
   }

@@ -5,12 +5,10 @@ import 'package:active_ecommerce_flutter/custom/device_info.dart';
 import 'package:active_ecommerce_flutter/custom/text_styles.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
-import 'package:active_ecommerce_flutter/data_model/cart_response.dart';
 import 'package:active_ecommerce_flutter/data_model/login_response.dart';
 import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
-import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
 import 'package:active_ecommerce_flutter/repositories/cart_repository.dart';
@@ -18,8 +16,6 @@ import 'package:active_ecommerce_flutter/screens/login.dart';
 import 'package:active_ecommerce_flutter/screens/select_address.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:toast/toast.dart';
 
@@ -510,6 +506,53 @@ class _CartState extends State<Cart> {
     );
   }
 
+  String getVariationOptionName(String variationOption) {
+    String optionName = "";
+    String serialized = variationOption;
+    RegExp regExp = RegExp(r's:11:"option_name";s:\d+:"(.*?)"');
+
+    var matches = regExp.allMatches(serialized);
+    for (Match match in matches) {
+      optionName = match.group(1)!;
+    }
+    return optionName;
+  }
+
+  String getVariationOptionLables(String variationOption) {
+    String optionName = "";
+    String serialized = variationOption;
+    RegExp labelRegex = RegExp(r'"label";s:\d+:"(.*?)";');
+
+    var matches = labelRegex.allMatches(serialized);
+    for (Match match in matches) {
+      optionName = match.group(1)!;
+    }
+    return optionName;
+  }
+
+  String getPrice(int seller_index) {
+    // Assuming priceDiscounted is a String that needs to be parsed into a double
+    var priceString = _shopList[seller_index]
+            .variation![1]
+            .variationOptions!
+            .priceDiscounted ??
+        _shopList[seller_index].product.priceDiscounted!;
+
+    // Parse the price string to a double, defaulting to 0.0 if parsing fails
+    var price = double.tryParse(priceString) ?? 0.0;
+
+    // Check if the price is 0.0, then try another index or use the actual price
+    if (price == 0.0) {
+      var fallbackPriceString = _shopList[seller_index]
+          .variation![0]
+          .variationOptions!
+          .priceDiscounted!;
+      price = double.tryParse(fallbackPriceString) ?? 0.0;
+    }
+
+    return price.toString();
+  }
+
   buildCartSellerItemCard(seller_index, item_index) {
     return FutureBuilder(
       future: fetchProductDetails(_shopList[seller_index].productId),
@@ -563,14 +606,79 @@ class _CartState extends State<Cart> {
                               fontWeight: FontWeight.w400),
                         ),
                         Padding(
+                          padding: const EdgeInsets.only(
+                              top: 2.0, left: 2.0, right: 2.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 7,
+                                    vertical: 4), // Adjust padding as needed
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Colors.red,
+                                      width:
+                                          1), // Change this to your desired highlight color
+                                  color: Colors
+                                      .white, // Change this to your desired highlight color
+                                  borderRadius: BorderRadius.circular(
+                                      20), // Gives the pill shape
+                                ),
+                                child: Text(
+                                  getVariationOptionName(_shopList[seller_index]
+                                          .variation![0]
+                                          .variationOptions!
+                                          .optionNames!) ??
+                                      '',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                    color: MyTheme.font_grey,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4), // Adjust padding as needed
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                      color: Colors.blue,
+                                      width:
+                                          1), // Change this to your desired highlight color
+                                  color: Colors
+                                      .white, // Change this to your desired highlight color
+                                  borderRadius: BorderRadius.circular(
+                                      20), // Gives the pill shape
+                                ),
+                                child: Text(
+                                  getVariationOptionName(_shopList[seller_index]
+                                          .variation![1]
+                                          .variationOptions!
+                                          .optionNames!) ??
+                                      '',
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 2,
+                                  style: TextStyle(
+                                    color: MyTheme.font_grey,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Padding(
                           padding: const EdgeInsets.only(top: 23.0),
                           child: Row(
                             children: [
                               Text(
-                                'GH₵ ' +
-                                    _shopList[seller_index]
-                                        .product
-                                        .priceDiscounted!,
+                                'GH₵ ' + getPrice(seller_index),
                                 textAlign: TextAlign.left,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
