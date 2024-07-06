@@ -165,7 +165,7 @@ class _ProductDetailsState extends State<ProductDetails>
     );
     // Adjust the webViewHeight based on the content height.
     // You might need to adjust this calculation based on your needs.
-    webViewHeight = (contentHeight * 2) / MediaQuery.of(context).devicePixelRatio;
+    webViewHeight = contentHeight / MediaQuery.of(context).devicePixelRatio;
   }
 
   fetchAll() {
@@ -2640,6 +2640,7 @@ class _ProductDetailsState extends State<ProductDetails>
       builder: (context, snapshot) {
         return Container(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Container(
