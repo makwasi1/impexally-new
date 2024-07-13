@@ -30,6 +30,7 @@ import 'package:active_ecommerce_flutter/ui_elements/list_product_card.dart';
 import 'package:active_ecommerce_flutter/ui_elements/mini_product_card.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -106,7 +107,11 @@ class _ProductDetailsState extends State<ProductDetails>
   List<dynamic> _relatedProducts = [];
   bool _relatedProductInit = false;
   List<dynamic> _topProducts = [];
+  List<dynamic> _sellerProducts = [];
   bool _topProductInit = false;
+  bool _topSellerInit = false;
+
+  double contentHeight = 0.0;
 
   @override
   void initState() {
@@ -228,6 +233,7 @@ class _ProductDetailsState extends State<ProductDetails>
     fetchVendorDetails(_productDetails!.products!.userId.toString());
 
     setProductDetailValues();
+    fetchUserProducts();
 
     setState(() {});
   }
@@ -251,6 +257,19 @@ class _ProductDetailsState extends State<ProductDetails>
     _topProducts.addAll(topProductResponse.products!.take(numProductsToAdd));
 
     _topProductInit = true;
+  }
+
+  fetchUserProducts() async {
+    var topProductResponse = await ProductRepository()
+        .getFilteredProductsFromSeller(_productDetails!.products!.userId);
+
+    // Get the number of products to add
+    int numProductsToAdd = min(10, topProductResponse.products!.length);
+
+    // Add only the first numProductsToAdd products to _topProducts
+    _sellerProducts.addAll(topProductResponse.products!.take(numProductsToAdd));
+
+    _topSellerInit = true;
   }
 
   setProductDetailValues() {
@@ -1158,19 +1177,6 @@ class _ProductDetailsState extends State<ProductDetails>
                                   height: 30.0,
                                 ),
                         ),
-                        Container(
-                          color: MyTheme.light_grey,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 14, bottom: 14),
-                          child: _productDetails != null
-                              ? Container() //buildTotalPriceRow()
-                              : ShimmerHelper().buildBasicShimmer(
-                                  height: 30.0,
-                                ),
-                        ),
                       ],
                     ),
                   ),
@@ -1235,28 +1241,56 @@ class _ProductDetailsState extends State<ProductDetails>
                   ),
                 ])),
 
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        18.0,
-                        24.0,
-                        18.0,
-                        0.0,
-                      ),
-                      child: Text(
-                        "More From this Seller",
-                        style: TextStyle(
-                            color: MyTheme.dark_font_grey,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    (_productDetails?.products?.userId != null)
-                        ? buildProductList(context)
-                        : Container(),
-                  ]),
-                ),
+                // SliverList(
+                //   delegate: SliverChildListDelegate([
+                //     Padding(
+                //       padding: const EdgeInsets.fromLTRB(
+                //         18.0,
+                //         24.0,
+                //         18.0,
+                //         0.0,
+                //       ),
+                //       child: Text(
+                //         "More From this Seller",
+                //         style: TextStyle(
+                //             color: MyTheme.dark_font_grey,
+                //             fontSize: 18,
+                //             fontWeight: FontWeight.bold),
+                //       ),
+                //     ),
+                //     (_productDetails?.products?.userId != null)
+                //         ? buildProductList(context)
+                //         : Container(),
+                //   ]),
+                // ),
+                // SliverList(
+                //   delegate: SliverChildListDelegate([
+                //     Padding(
+                //       padding: const EdgeInsets.fromLTRB(
+                //         18.0,
+                //         24.0,
+                //         18.0,
+                //         0.0,
+                //       ),
+                //       child: Text(
+                //         "More from Seller",
+                //         style: TextStyle(
+                //             color: MyTheme.dark_font_grey,
+                //             fontSize: 16,
+                //             fontWeight: FontWeight.w600),
+                //       ),
+                //     ),
+                //     Padding(
+                //       padding: const EdgeInsets.fromLTRB(
+                //         16.0,
+                //         0.0,
+                //         16.0,
+                //         0.0,
+                //       ),
+                //       child: buildTopSellingProductList2(),
+                //     ),
+                //   ]),
+                // ),
 
                 //Top selling product
                 SliverList(
@@ -1443,7 +1477,7 @@ class _ProductDetailsState extends State<ProductDetails>
           ),
           SizedBox(height: 10),
           Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            // crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
@@ -2364,7 +2398,9 @@ class _ProductDetailsState extends State<ProductDetails>
                       : onPressBuyNow(context, _productDetails);
                 },
                 child: Text(
-                  AppLocalizations.of(context)!.buy_now_ucf,
+                  isOutOfStock
+                      ? "Out of Stock "
+                      : AppLocalizations.of(context)!.buy_now_ucf,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16,
@@ -2651,7 +2687,25 @@ class _ProductDetailsState extends State<ProductDetails>
                   controller: controller,
                 ),
               ),
-              // The button is removed since we're displaying all content directly.
+              // Btn.basic(
+              //     onPressed: () async {
+              //       if (webViewHeight > 50) {
+              //         print(webViewHeight);
+              //         print(MediaQuery.of(context).devicePixelRatio);
+
+              //         webViewHeight = (webViewHeight /
+              //                 MediaQuery.of(context).devicePixelRatio) +
+              //             400;
+              //         print("fgfgfgfg" + webViewHeight.toString());
+              //       } else {
+              //         webViewHeight = 50;
+              //       }
+              //       setState(() {});
+              //     },
+              //     child: Text(
+              //       webViewHeight > 50 ? "Less" : "Show More...",
+              //       style: TextStyle(color: Colors.black),
+              //     ))
             ],
           ),
         );
@@ -2695,6 +2749,62 @@ class _ProductDetailsState extends State<ProductDetails>
         ],
       ),
     ));*/
+
+  buildTopSellingProductList2() {
+    if (_topSellerInit == false && _sellerProducts.length == 0) {
+      return Column(
+        children: [
+          Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: ShimmerHelper().buildBasicShimmer(
+                height: 75.0,
+              )),
+          Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: ShimmerHelper().buildBasicShimmer(
+                height: 75.0,
+              )),
+          Padding(
+              padding: const EdgeInsets.only(top: 8.0),
+              child: ShimmerHelper().buildBasicShimmer(
+                height: 75.0,
+              )),
+        ],
+      );
+    } else if (_topProducts.length > 0) {
+      return GridView.builder(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // Number of items in a row
+          crossAxisSpacing: 4.0, // Space between items horizontally
+          mainAxisSpacing: 4.0, // Space between items vertically
+        ),
+        itemCount: 6,
+        shrinkWrap: true,
+        physics:
+            NeverScrollableScrollPhysics(), // To disable GridView's scrolling
+        itemBuilder: (context, index) {
+          return MiniProductCard(
+            id: _sellerProducts[index].id,
+            slug: _sellerProducts[index].slug,
+            image: _sellerProducts[index].image.imageDefault,
+            name: _sellerProducts[index].productDetail.title,
+            main_price: _sellerProducts[index].priceDiscounted,
+            stroked_price: _sellerProducts[index].price,
+            has_discount: true,
+            discount: _sellerProducts[index].priceDiscounted,
+          );
+        },
+      );
+    } else {
+      return Container(
+          height: 100,
+          child: Center(
+              child: Text(
+                  AppLocalizations.of(context)!
+                      .no_top_selling_products_from_this_seller,
+                  style: TextStyle(color: MyTheme.font_grey))));
+    }
+  }
 
   buildTopSellingProductList() {
     if (_topProductInit == false && _topProducts.length == 0) {

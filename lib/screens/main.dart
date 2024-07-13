@@ -131,7 +131,7 @@ class _MainState extends State<Main> {
           extendBody: true,
           body: _children[_currentIndex],
           bottomNavigationBar: SizedBox(
-            height: 70,
+            height: 90,
             child: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
               onTap: onTapped,

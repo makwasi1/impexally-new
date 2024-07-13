@@ -841,8 +841,8 @@ class _ProductVariantsState extends State<ProductVariants> {
                         _initialImage!);
               },
               child: Container(
-                  width: 50,
-                  height: 50,
+                  width: 100,
+                  height: 100,
                   child: ClipRRect(
                     borderRadius: BorderRadius.horizontal(
                         left: Radius.circular(6), right: Radius.zero),
@@ -865,7 +865,8 @@ class _ProductVariantsState extends State<ProductVariants> {
                             color: Colors
                                 .transparent, // Semi-transparent background for better visibility
                             child: IconButton(
-                              icon: Icon(Icons.zoom_in, color: Colors.white),
+                              icon: Icon(Icons.crop_5_4_sharp,
+                                  color: Colors.grey, size: 40),
                               onPressed: () {
                                 openPhotoDialog(
                                     context,
@@ -1089,7 +1090,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                                   placeholder: 'assets/placeholder.png',
                                   image:
                                       "https://seller.impexally.com/uploads/images/" +
-                                          option.imageVariation!.imageSmall!,
+                                          option.imageVariation!.imageDefault!,
                                   fit: BoxFit.cover,
                                 ),
                               ),

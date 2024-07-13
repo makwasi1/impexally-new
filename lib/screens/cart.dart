@@ -88,9 +88,9 @@ class _CartState extends State<Cart> {
         await CartRepository().getCartResponseList(res.user!.id!);
 
     if (cartResponseList!.cart != null) {
-      _shopList = cartResponseList.cart!.items!;
+      _shopList = cartResponseList.cart!;
       // _cartTotalString = cartResponseList.cartTotal.toString();
-      _cartId = cartResponseList.cart!.id;
+      _cartId = cartResponseList.cart![0].id;
       getSetCartTotal();
       _isInitial = false;
 
@@ -530,27 +530,22 @@ class _CartState extends State<Cart> {
     return optionName;
   }
 
-  String getPrice(int seller_index) {
-    // Assuming priceDiscounted is a String that needs to be parsed into a double
-    var priceString = _shopList[seller_index]
-            .variation![1]
-            .variationOptions!
-            .priceDiscounted ??
-        _shopList[seller_index].product.priceDiscounted!;
-
-    // Parse the price string to a double, defaulting to 0.0 if parsing fails
-    var price = double.tryParse(priceString) ?? 0.0;
-
-    // Check if the price is 0.0, then try another index or use the actual price
-    if (price == 0.0) {
-      var fallbackPriceString = _shopList[seller_index]
-          .variation![0]
-          .variationOptions!
-          .priceDiscounted!;
-      price = double.tryParse(fallbackPriceString) ?? 0.0;
+  //get variation product color
+  String getItemImage(Item cartItem) {
+    //loop through the
+    String imageDefault;
+    try {
+      var firstValidVariation = cartItem.variation!.firstWhere(
+        (img) => img.variationOptions!.imageVariation != null,
+      );
+      imageDefault =
+          firstValidVariation.variationOptions!.imageVariation!.imageDefault!;
+    } catch (e) {
+      // Handle the case where no valid variation is found or variation is null
+      imageDefault = ""; // or set a default image string
     }
 
-    return price.toString();
+    return imageDefault;
   }
 
   buildCartSellerItemCard(seller_index, item_index) {
@@ -582,9 +577,9 @@ class _CartState extends State<Cart> {
                       child: FadeInImage.assetNetwork(
                         placeholder: 'assets/placeholder.png',
                         image: "https://seller.impexally.com/uploads/images/" +
-                            prod!.image![0]
-                                .imageDefault!, // Assuming 'image' is the field for image URL
-                        fit: BoxFit.cover,
+                            getItemImage(_shopList[
+                                seller_index]), // Assuming 'image' is the field for image URL
+                        fit: BoxFit.contain,
                       )),
                 ),
                 Container(
@@ -597,7 +592,7 @@ class _CartState extends State<Cart> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          prod.productDetails!.first.title ?? '',
+                          prod!.productDetails!.first.title ?? '',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: TextStyle(
@@ -678,7 +673,7 @@ class _CartState extends State<Cart> {
                           child: Row(
                             children: [
                               Text(
-                                'GH₵ ' + getPrice(seller_index),
+                                'GH₵ ' + _shopList[seller_index].itemPrice,
                                 textAlign: TextAlign.left,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,

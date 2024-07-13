@@ -19,7 +19,7 @@ class CartCounter extends ChangeNotifier {
         await CartRepository().getCartResponseList(user.user!.id);
 
     if (cartResponseList != null) {
-      cartCounter = cartResponseList.cart!.items!.length;
+      cartCounter = cartResponseList.cart!.length;
     } else {
       cartCounter = 0;
     }

@@ -30,7 +30,10 @@ class AuthRepository {
      if(response.statusCode == 200){
         return loginResponseFromJson(response.body);  
      } else {
-        return LoginResponse();
+        return new LoginResponse(
+          result: false,
+          message: "Failed to Login. Check Phone number and Password"
+        );
      }   
   }
 

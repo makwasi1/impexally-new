@@ -4,6 +4,7 @@ import 'package:active_ecommerce_flutter/custom/lang_text.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
 import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
 import 'package:active_ecommerce_flutter/data_model/login_response.dart';
+import 'package:active_ecommerce_flutter/data_model/new_cart.dart';
 import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
@@ -768,6 +769,23 @@ class _SelectAddressState extends State<SelectAddress>
     );
   }
 
+  String getItemImage(Item cartItem) {
+    //loop through the
+    String imageDefault;
+    try {
+      var firstValidVariation = cartItem.variation!.firstWhere(
+        (img) => img.variationOptions!.imageVariation != null,
+      );
+      imageDefault =
+          firstValidVariation.variationOptions!.imageVariation!.imageDefault!;
+    } catch (e) {
+      // Handle the case where no valid variation is found or variation is null
+      imageDefault = ""; // or set a default image string
+    }
+
+    return imageDefault;
+  }
+
   buildCartSellerItemCard(seller_index, item_index) {
     return FutureBuilder(
       future: fetchProductDetails(widget.cartList[seller_index].productId),
@@ -797,8 +815,8 @@ class _SelectAddressState extends State<SelectAddress>
                       child: FadeInImage.assetNetwork(
                         placeholder: 'assets/placeholder.png',
                         image: "https://seller.impexally.com/uploads/images/" +
-                            prod!.image![0]
-                                .imageDefault!, // Assuming 'image' is the field for image URL
+                            getItemImage(widget.cartList[
+                                seller_index]), // Assuming 'image' is the field for image URL
                         fit: BoxFit.cover,
                       )),
                 ),
@@ -812,7 +830,7 @@ class _SelectAddressState extends State<SelectAddress>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          prod.productDetails!.first.title ?? '',
+                          prod?.productDetails?.first.title ?? '',
                           overflow: TextOverflow.ellipsis,
                           maxLines: 2,
                           style: TextStyle(

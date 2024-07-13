@@ -99,11 +99,6 @@ class _LoginState extends State<Login> {
         _login_by == 'email' ? email : _phone, password, _login_by);
     Loading.close();
     if (loginResponse.result == false) {
-      if (loginResponse.message.runtimeType == List) {
-        ToastComponent.showDialog(loginResponse.message!.join("\n"),
-            gravity: Toast.center, duration: 3);
-        return;
-      }
       ToastComponent.showDialog(loginResponse.message!.toString(),
           gravity: Toast.center, duration: Toast.lengthLong);
     } else {

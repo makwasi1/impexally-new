@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:active_ecommerce_flutter/data_model/products_model.dart';
+
 class CartModel {
-  UserCart? cart;
+  List<Item>? cart;
   dynamic cartTotal;
 
   CartModel({
@@ -10,64 +12,11 @@ class CartModel {
   });
 
   factory CartModel.fromJson(Map<String, dynamic> json) => CartModel(
-        cart: json["cart"] == null ? null : UserCart.fromMap(json["cart"]),
+        cart: json["items"] == null
+            ? null
+            : List<Item>.from(json["items"].map((x) => Item.fromMap(x))),
         cartTotal: json["cart_total"],
       );
-
-  String toJson() => json.encode(toMap());
-
-  Map<String, dynamic> toMap() => {
-        "cart": cart?.toMap(),
-        "cart_total": cartTotal,
-      };
-}
-
-class UserCart {
-  int? id;
-  String? userId;
-  String? status;
-  DateTime? createdAt;
-  DateTime? updatedAt;
-  List<Item>? items;
-
-  UserCart({
-    this.id,
-    this.userId,
-    this.status,
-    this.createdAt,
-    this.updatedAt,
-    this.items,
-  });
-
-  factory UserCart.fromJson(String str) => UserCart.fromMap(json.decode(str));
-
-  String toJson() => json.encode(toMap());
-
-  factory UserCart.fromMap(Map<String, dynamic> json) => UserCart(
-        id: json["id"],
-        userId: json["user_id"],
-        status: json["status"],
-        createdAt: json["created_at"] == null
-            ? null
-            : DateTime.parse(json["created_at"]),
-        updatedAt: json["updated_at"] == null
-            ? null
-            : DateTime.parse(json["updated_at"]),
-        items: json["items"] == null
-            ? []
-            : List<Item>.from(json["items"]!.map((x) => Item.fromMap(x))),
-      );
-
-  Map<String, dynamic> toMap() => {
-        "id": id,
-        "user_id": userId,
-        "status": status,
-        "created_at": createdAt?.toIso8601String(),
-        "updated_at": updatedAt?.toIso8601String(),
-        "items": items == null
-            ? []
-            : List<dynamic>.from(items!.map((x) => x.toMap())),
-      };
 }
 
 class Item {
@@ -77,35 +26,38 @@ class Item {
   String? variationId;
   dynamic variationOptionId;
   String? quantity;
+  String? itemPrice;
   DateTime? createdAt;
   DateTime? updatedAt;
   Product? product;
   List<Variation>? variation;
 
-  Item({
-    this.id,
-    this.cartId,
-    this.productId,
-    this.variationId,
-    this.variationOptionId,
-    this.quantity,
-    this.createdAt,
-    this.updatedAt,
-    this.product,
-    this.variation
-  });
+  Item(
+      {this.id,
+      this.cartId,
+      this.productId,
+      this.variationId,
+      this.variationOptionId,
+      this.quantity,
+      this.createdAt,
+      this.updatedAt,
+      this.product,
+      this.variation,
+      this.itemPrice
+      });
 
   factory Item.fromJson(String str) => Item.fromMap(json.decode(str));
 
   String toJson() => json.encode(toMap());
 
   factory Item.fromMap(Map<String, dynamic> json) => Item(
-        id: json["id"],
+        id: json["item_id"],
         cartId: json["cart_id"],
         productId: json["product_id"],
         variationId: json["variation_id"],
         variationOptionId: json["variation_option_id"],
         quantity: json["quantity"],
+        itemPrice: json["used_price"],
         createdAt: json["created_at"] == null
             ? null
             : DateTime.parse(json["created_at"]),
@@ -118,7 +70,6 @@ class Item {
             ? null
             : List<Variation>.from(
                 json["variations"].map((x) => Variation.fromMap(x))),
-        
       );
 
   Map<String, dynamic> toMap() => {
@@ -134,7 +85,6 @@ class Item {
         "variation": variation == null
             ? null
             : List<dynamic>.from(variation!.map((x) => x.toMap())),
-        
       };
 }
 
@@ -150,6 +100,7 @@ class VariationOptions {
   String? discountRate;
   String? isDefault;
   String? useDefaultPrice;
+  ImageVariation? imageVariation;
 
   VariationOptions({
     this.id,
@@ -163,6 +114,7 @@ class VariationOptions {
     this.discountRate,
     this.isDefault,
     this.useDefaultPrice,
+    this.imageVariation
   });
 
   VariationOptions.fromJson(Map<String, dynamic> json) {
@@ -177,6 +129,9 @@ class VariationOptions {
     discountRate = json['discount_rate'];
     isDefault = json['is_default'];
     useDefaultPrice = json['use_default_price'];
+    imageVariation = json['image_variation'] != null
+        ? new ImageVariation.fromJson(json['image_variation'])
+        : null;
   }
 
   Map<String, dynamic> toJson() {
