@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.activeitzone.activeecommerceflutterapp</string>
+	<string>com.impexally.app</string>
 	<key>PROJECT_ID</key>
 	<string>impexall-notify</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:564140156072:ios:23b35f534c8e4f29834e9d</string>
+	<string>1:564140156072:ios:d9f7447b96c1284d834e9d</string>
 </dict>
 </plist>

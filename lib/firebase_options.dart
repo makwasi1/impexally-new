@@ -59,11 +59,11 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDO4YtJDOpi_x79E1tUAqEBaG9Px__YzpY',
-    appId: '1:564140156072:ios:23b35f534c8e4f29834e9d',
+    appId: '1:564140156072:ios:d9f7447b96c1284d834e9d',
     messagingSenderId: '564140156072',
     projectId: 'impexall-notify',
     storageBucket: 'impexall-notify.appspot.com',
-    iosBundleId: 'com.activeitzone.activeecommerceflutterapp',
+    iosBundleId: 'com.impexally.app',
   );
 
 }

@@ -1091,7 +1091,8 @@ class _ProductVariantsState extends State<ProductVariants> {
                                   image:
                                       "https://seller.impexally.com/uploads/images/" +
                                           option.imageVariation!.imageDefault!,
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.contain,
+                                  imageErrorBuilder: (context, error, stackTrace) => Image.asset('assets/placeholder.png'),
                                 ),
                               ),
                             );

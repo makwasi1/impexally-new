@@ -203,7 +203,7 @@ class _CategoryListState extends State<CategoryList> {
                   child: FadeInImage.assetNetwork(
                     placeholder: 'assets/placeholder.png',
                     image: "https://seller.impexally.com/"+categoryResponse.categories[index].image ?? "",
-                    fit: BoxFit.cover,
+                    fit: BoxFit.contain,
                     height: itemWidth,
                     width: DeviceInfo(context).width,
                   ),

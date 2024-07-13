@@ -553,14 +553,14 @@ class _LoginState extends State<Login> {
                 ),
               ),
               if (Platform.isIOS)
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: SignInWithAppleButton(
-                    onPressed: () async {
-                      signInWithApple();
-                    },
-                  ),
-                ),
+                // Padding(
+                //   padding: const EdgeInsets.only(top: 20.0),
+                //   child: SignInWithAppleButton(
+                //     onPressed: () async {
+                //       signInWithApple();
+                //     },
+                //   ),
+                // ),
               Visibility(
                 visible: allow_google_login.$ || allow_facebook_login.$,
                 child: Padding(
