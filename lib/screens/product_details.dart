@@ -1241,56 +1241,28 @@ class _ProductDetailsState extends State<ProductDetails>
                   ),
                 ])),
 
-                // SliverList(
-                //   delegate: SliverChildListDelegate([
-                //     Padding(
-                //       padding: const EdgeInsets.fromLTRB(
-                //         18.0,
-                //         24.0,
-                //         18.0,
-                //         0.0,
-                //       ),
-                //       child: Text(
-                //         "More From this Seller",
-                //         style: TextStyle(
-                //             color: MyTheme.dark_font_grey,
-                //             fontSize: 18,
-                //             fontWeight: FontWeight.bold),
-                //       ),
-                //     ),
-                //     (_productDetails?.products?.userId != null)
-                //         ? buildProductList(context)
-                //         : Container(),
-                //   ]),
-                // ),
-                // SliverList(
-                //   delegate: SliverChildListDelegate([
-                //     Padding(
-                //       padding: const EdgeInsets.fromLTRB(
-                //         18.0,
-                //         24.0,
-                //         18.0,
-                //         0.0,
-                //       ),
-                //       child: Text(
-                //         "More from Seller",
-                //         style: TextStyle(
-                //             color: MyTheme.dark_font_grey,
-                //             fontSize: 16,
-                //             fontWeight: FontWeight.w600),
-                //       ),
-                //     ),
-                //     Padding(
-                //       padding: const EdgeInsets.fromLTRB(
-                //         16.0,
-                //         0.0,
-                //         16.0,
-                //         0.0,
-                //       ),
-                //       child: buildTopSellingProductList2(),
-                //     ),
-                //   ]),
-                // ),
+                SliverList(
+                  delegate: SliverChildListDelegate([
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(
+                        18.0,
+                        24.0,
+                        18.0,
+                        0.0,
+                      ),
+                      child: Text(
+                        "More From this Seller",
+                        style: TextStyle(
+                            color: MyTheme.dark_font_grey,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    (_productDetails?.products?.userId != null)
+                        ? buildProductList(context)
+                        : Container(),
+                  ]),
+                ),
 
                 //Top selling product
                 SliverList(
@@ -1334,7 +1306,7 @@ class _ProductDetailsState extends State<ProductDetails>
     return FutureBuilder(
         future: ProductRepository()
             .getFilteredProductsFromSeller(_productDetails!.products!.userId),
-        builder: (context, AsyncSnapshot<ProductResponse> snapshot) {
+        builder: (context, snapshot) {
           if (snapshot.hasError) {
             return Container();
           } else if (snapshot.hasData) {
@@ -1342,26 +1314,25 @@ class _ProductDetailsState extends State<ProductDetails>
             //print(productResponse.toString());
             return SingleChildScrollView(
               child: MasonryGridView.count(
-                crossAxisCount: 3,
+                crossAxisCount: 2,
                 mainAxisSpacing: 14,
                 crossAxisSpacing: 14,
-                itemCount: 6,
+                itemCount: homeData?.products!.length,
                 shrinkWrap: true,
                 padding:
                     EdgeInsets.only(top: 20.0, bottom: 10, left: 18, right: 18),
                 physics: NeverScrollableScrollPhysics(),
                 itemBuilder: (context, index) {
-                  // 3
                   return MiniProductCard(
-                    id: homeData?.products![index].id,
-                    slug: "",
-                    image: homeData?.products![index].image!.imageDefault,
-                    name: homeData?.products![index].productDetail!.title!,
-                    main_price: homeData?.products![index].price,
-                    stroked_price: homeData?.products![index].priceDiscounted,
-                    has_discount: true,
-                    discount: homeData?.products![index].priceDiscounted,
-                  );
+                      id: homeData?.products![index].id,
+                      slug: "",
+                      image: homeData?.products![index].image!.imageDefault,
+                      name: homeData?.products![index].productDetail!.title!,
+                      main_price: homeData?.products![index].price,
+                      stroked_price: homeData?.products![index].priceDiscounted,
+                      has_discount: true,
+                      discount: homeData?.products![index].priceDiscounted,
+                      isSeller: true);
                 },
               ),
             );

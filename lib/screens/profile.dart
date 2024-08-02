@@ -18,6 +18,7 @@ import 'package:active_ecommerce_flutter/screens/coupons.dart';
 import 'package:active_ecommerce_flutter/screens/currency_change.dart';
 import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/followed_sellers.dart';
+import 'package:active_ecommerce_flutter/screens/home.dart';
 import 'package:active_ecommerce_flutter/screens/messenger_list.dart';
 import 'package:active_ecommerce_flutter/screens/order_list.dart';
 import 'package:active_ecommerce_flutter/screens/profile_edit.dart';
@@ -150,12 +151,16 @@ class _ProfileState extends State<Profile> {
     loading();
     var response = await AuthRepository().getAccountDeleteResponse();
 
-    if (response.result) {
+    if (response) {
       AuthHelper().clearUserData();
       Navigator.pop(loadingcontext);
       context.go("/");
+      ToastComponent.showDialog("Account deleted successfully",
+          gravity: Toast.center, duration: Toast.lengthLong);
+    } else {
+      ToastComponent.showDialog("Failed to delete account",
+          gravity: Toast.center, duration: Toast.lengthLong);
     }
-    ToastComponent.showDialog(response.message);
   }
 
   String counterText(String txt, {default_length = 3}) {
@@ -168,10 +173,8 @@ class _ProfileState extends State<Profile> {
     } else if (default_length == 2 && txt.length == 1) {
       leading_zeros = "0";
     }
-  
-    var newtxt = (txt == "" || txt == null.toString())
-        ? blank_zeros
-        : txt;
+
+    var newtxt = (txt == "" || txt == null.toString()) ? blank_zeros : txt;
 
     // print(txt + " " + default_length.toString());
     // print(newtxt);
@@ -197,7 +200,11 @@ class _ProfileState extends State<Profile> {
   onTapLogout(BuildContext context) async {
     AuthHelper().clearUserData();
     AuthHelper().clearUserDetailsFromSharedPref();
-    fetchAll();
+    // fetchAll();
+
+    Navigator.pushAndRemoveUntil(context,
+        MaterialPageRoute(builder: (context) => Home()), (route) => false);
+
     context.go("/");
   }
 
@@ -1481,10 +1488,12 @@ class _ProfileState extends State<Profile> {
                     fontWeight: FontWeight.w500),
               ),
               onPressed: () {
-                if (is_logged_in)
+                if (is_logged_in) {
                   onTapLogout(context);
-                else
+                  context.push("/");
+                } else {
                   context.push("/users/login");
+                }
               },
             ),
           ),

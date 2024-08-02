@@ -95,18 +95,18 @@ class _SellerDetailsState extends State<SellerDetails> {
     ToastComponent.showDialog(shopResponse.message);
   }
 
-  Future checkFollowed() async {
-    if (SystemConfig.systemUser != null &&
-        SystemConfig.systemUser!.id != null) {
-      var shopResponse =
-          await ShopRepository().followedCheck(_shopDetails?.id ?? 0);
-      // print(shopResponse.result);
-      // print(shopResponse.message);
+  // Future checkFollowed() async {
+  //   if (SystemConfig.systemUser != null &&
+  //       SystemConfig.systemUser!.id != null) {
+  //     var shopResponse =
+  //         await ShopRepository().followedCheck(_shopDetails?.id ?? 0);
+  //     // print(shopResponse.result);
+  //     // print(shopResponse.message);
 
-      _isThisSellerFollowed = shopResponse.result;
-      setState(() {});
-    }
-  }
+  //     _isThisSellerFollowed = shopResponse.result;
+  //     setState(() {});
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -128,7 +128,6 @@ class _SellerDetailsState extends State<SellerDetails> {
   }
 
   fetchOthers() {
-    checkFollowed();
     fetchNewArrivalProducts();
     fetchTopProducts();
     fetchFeaturedProducts();

@@ -1149,7 +1149,7 @@ class _FilterState extends State<Filter> {
                     main_price: _productList[index].priceDiscounted,
                     stroked_price: _productList[index].price,
                     has_discount: true,
-                    discount: _productList[index].discountRate + "%",
+                    discount: _productList[index].price,
                     is_wholesale: true,
                     stock: _productList[index].stock,
                   );

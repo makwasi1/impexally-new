@@ -54,6 +54,8 @@ class _SelectAddressState extends State<SelectAddress>
   int? _shipping_cost_string = 0;
   String? _state_id;
 
+  var _shopList = [];
+
   // list type variables
   List<dynamic> _shippingAddressList = [];
   ProductMiniDetail? _productDetails;
@@ -78,11 +80,29 @@ class _SelectAddressState extends State<SelectAddress>
 
   fetchAll() {
     fetchShippingAddressList();
+    fetchData();
 
     debugPrint("cartAmount: ${widget.cartAmount}");
 
     _cartTotalString = int.tryParse(widget.cartAmount!);
     setState(() {});
+  }
+
+  fetchData() async {
+    // getCartCount();
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+    CartModel? cartResponseList =
+        await CartRepository().getCartResponseList(res.user!.id!);
+
+    if (cartResponseList!.cart != null) {
+      _shopList = cartResponseList.cart!;
+
+      setState(() {});
+    } else {
+      _shopList = [];
+
+      setState(() {});
+    }
   }
 
   onPressDelete(cart_id) {
@@ -664,7 +684,7 @@ class _SelectAddressState extends State<SelectAddress>
         physics: NeverScrollableScrollPhysics(),
         shrinkWrap: true,
         itemBuilder: (context, index) {
-          return buildCartSellerItemCard(index, index);
+          return buildCartSellerItemCard2(index, index);
         },
       ),
     );
@@ -784,6 +804,141 @@ class _SelectAddressState extends State<SelectAddress>
     }
 
     return imageDefault;
+  }
+
+  buildCartSellerItemCard2(seller_index, item_index) {
+    return FutureBuilder(
+      future: fetchProductDetails(_shopList[seller_index].productId),
+      builder: (context, AsyncSnapshot<ProductMiniDetail?> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return ShimmerHelper().buildListShimmer(
+              item_count: 5,
+              item_height:
+                  100.0); // Show loading indicator while waiting for data
+        } else if (snapshot.hasError) {
+          return Text(
+              "Error: ${snapshot.error}"); // Show error if something went wrong
+        } else if (snapshot.hasData) {
+          var prod = snapshot.data; // Your product details object
+          return Container(
+            height: 120,
+            decoration: BoxDecorations.buildBoxDecoration_1(),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                Container(
+                  width: DeviceInfo(context).width! / 4,
+                  height: 120,
+                  child: ClipRRect(
+                      borderRadius: BorderRadius.horizontal(
+                          left: Radius.circular(6), right: Radius.zero),
+                      child: FadeInImage.assetNetwork(
+                        placeholder: 'assets/placeholder.png',
+                        image: "https://seller.impexally.com/uploads/images/" +
+                            getItemImage(_shopList[
+                                seller_index]), // Assuming 'image' is the field for image URL
+                        fit: BoxFit.contain,
+                      )),
+                ),
+                Container(
+                  //color: Colors.red,
+                  width: DeviceInfo(context).width! / 2,
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          prod!.productDetails!.first.title ?? '',
+                          maxLines: 2,
+                          style: TextStyle(
+                              color: MyTheme.font_grey,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w400),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 4.0),
+                          child: Row(
+                            children: [
+                              Text(
+                                'GH₵ ' + _shopList[seller_index].itemPrice,
+                                textAlign: TextAlign.left,
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 2,
+                                style: TextStyle(
+                                    color: MyTheme.accent_color,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w700),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            Chip(
+                              label: Text(
+                                "Qty: " +
+                                    widget.cartList[seller_index].quantity
+                                        .toString(),
+                                style: TextStyle(
+                                    color: Colors.black, fontSize: 12),
+                              ),
+                              backgroundColor: MyTheme.light_grey,
+                              padding:
+                                  const EdgeInsets.only(top: 2.0, bottom: 2.0),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                //navigate to cart screen
+                                Navigator.push(context,
+                                    MaterialPageRoute(builder: (context) {
+                                  return Cart(
+                                    has_bottomnav: false,
+                                  );
+                                })).then((value) {
+                                  onPopped(value);
+                                });
+                              },
+                              child: Chip(
+                                label: Text(
+                                  "Edit",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                                avatar: CircleAvatar(
+                                  backgroundColor: Colors.transparent,
+                                  child: Image.asset(
+                                    'assets/edit.png',
+                                    height: 16,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                backgroundColor: MyTheme.accent_color,
+                                padding: const EdgeInsets.only(bottom: 2.0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+              ],
+            ),
+          );
+        } else {
+          return Text(
+              "No data available"); // Handle case where no data is returned
+        }
+      },
+    );
   }
 
   buildCartSellerItemCard(seller_index, item_index) {

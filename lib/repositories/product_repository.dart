@@ -133,7 +133,7 @@ class ProductRepository {
       "Content-Type": "application/json",
     });
     var jsonResponse = jsonDecode(response.body);
-    return ProductResponse.fromJson(jsonResponse['products']);
+    return ProductResponse.fromJson(jsonResponse['products']["data"]);
   }
 
   Future<ProductMiniResponse> getFilteredProducts2(

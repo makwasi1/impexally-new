@@ -13,6 +13,7 @@ import 'package:active_ecommerce_flutter/screens/seller_admin.dart';
 import 'package:active_ecommerce_flutter/screens/todays_deal_products.dart';
 import 'package:active_ecommerce_flutter/ui_elements/mini_product_card.dart';
 import 'package:active_ecommerce_flutter/ui_elements/product_card.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -634,8 +635,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   Widget buildHomeMenuRow2(BuildContext context) {
     return Container(
         padding: EdgeInsets.only(top: 5, bottom: 10),
-        child: Image.network(
-            "https://image.impexally.com/images/app/impexally/athleisure.webp"));
+        child: CachedNetworkImage(
+          imageUrl:
+              "https://image.impexally.com/images/app/impexally/athleisure.webp",
+          placeholder: (context, url) => Container(), // Placeholder widget
+          errorWidget: (context, url, error) =>
+              Icon(Icons.error), // Error widget
+          // Adjust the height as needed
+        ));
   }
   //   return Row(
   //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -904,13 +911,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 child: Column(
                   children: [
                     Container(
-                      height: 70,
-                      padding: EdgeInsets.only(left: 10),
-                      child: Image.network(
-                        "https://image.impexally.com/images/agents/riderz.png",
-                        // Adjust the height as needed
-                      ),
-                    ),
+                        height: 70,
+                        padding: EdgeInsets.only(left: 10),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "https://image.impexally.com/images/agents/riderz.png",
+                          placeholder: (context, url) =>
+                              Container(), // Placeholder widget
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error), // Error widget
+                          // Adjust the height as needed
+                        )),
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
@@ -939,13 +950,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 child: Column(
                   children: [
                     Container(
-                      height: 70,
-                      padding: EdgeInsets.only(left: 10),
-                      child: Image.network(
-                        "https://image.impexally.com/images/ae/home-page/z0.png",
-                        // Adjust the height as needed
-                      ),
-                    ),
+                        height: 70,
+                        padding: EdgeInsets.only(left: 10),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "https://image.impexally.com/images/ae/home-page/z0.png",
+                          placeholder: (context, url) =>
+                              Container(), // Placeholder widget
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error), // Error widget
+                          // Adjust the height as needed
+                        )),
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
@@ -973,13 +988,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 child: Column(
                   children: [
                     Container(
-                      height: 70,
-                      padding: EdgeInsets.only(left: 10),
-                      child: Image.network(
-                        "https://image.impexally.com/images/ae/home-page/z5.png",
-                        // Adjust the height as needed
-                      ),
-                    ),
+                        height: 70,
+                        padding: EdgeInsets.only(left: 10),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "https://image.impexally.com/images/ae/home-page/z5.png",
+                          placeholder: (context, url) =>
+                              Container(), // Placeholder widget
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error), // Error widget
+                          // Adjust the height as needed
+                        )),
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
@@ -1007,13 +1026,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 child: Column(
                   children: [
                     Container(
-                      height: 70,
-                      padding: EdgeInsets.only(right: 10),
-                      child: Image.network(
-                        "https://image.impexally.com/images/ae/home-page/12.png",
-                        // Adjust the height as needed
-                      ),
-                    ),
+                        height: 70,
+                        padding: EdgeInsets.only(right: 10),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "https://image.impexally.com/images/ae/home-page/12.png",
+                          placeholder: (context, url) =>
+                              Container(), // Placeholder widget
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error), // Error widget
+                          // Adjust the height as needed
+                        )),
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
@@ -1041,13 +1064,17 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 child: Column(
                   children: [
                     Container(
-                      height: 70,
-                      padding: EdgeInsets.only(right: 10),
-                      child: Image.network(
-                        "https://image.impexally.com/images/ae/home-page/z2.png",
-                        // Adjust the height as needed
-                      ),
-                    ),
+                        height: 70,
+                        padding: EdgeInsets.only(right: 10),
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "https://image.impexally.com/images/ae/home-page/z2.png",
+                          placeholder: (context, url) =>
+                              Container(), // Placeholder widget
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error), // Error widget
+                          // Adjust the height as needed
+                        )),
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
@@ -1089,8 +1116,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                           borderRadius: BorderRadius.circular(10),
                         ),
                         padding: EdgeInsets.only(left: 10),
-                        child: Image.network(
-                          "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp",
+                        child: CachedNetworkImage(
+                          imageUrl:
+                              "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp",
+                          placeholder: (context, url) =>
+                              Container(), // Placeholder widget
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error), // Error widget
                           // Adjust the height as needed
                         ),
                       ),
@@ -1122,15 +1154,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                   child: Column(
                     children: [
                       Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        padding: EdgeInsets.only(right: 10),
-                        child: Image.network(
-                          "https://image.impexally.com/images/app/impexally/make-mone-online.png",
-                          // Adjust the height as needed
-                        ),
-                      ),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          padding: EdgeInsets.only(right: 10),
+                          child: CachedNetworkImage(
+                            imageUrl:
+                                "https://image.impexally.com/images/app/impexally/make-mone-online.png",
+                            placeholder: (context, url) =>
+                                Container(), // Placeholder widget
+                            errorWidget: (context, url, error) =>
+                                Icon(Icons.error), // Error widget
+                            // Adjust the height as needed
+                          )),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(

@@ -1,4 +1,5 @@
 import 'package:active_ecommerce_flutter/app_config.dart';
+import 'package:active_ecommerce_flutter/data_model/login_response.dart';
 import 'package:active_ecommerce_flutter/data_model/profile_image_update_response.dart';
 import 'package:active_ecommerce_flutter/data_model/user_info_response.dart';
 import 'dart:convert';
@@ -6,6 +7,7 @@ import 'package:active_ecommerce_flutter/data_model/profile_counters_response.da
 import 'package:active_ecommerce_flutter/data_model/profile_update_response.dart';
 import 'package:active_ecommerce_flutter/data_model/device_token_update_response.dart';
 import 'package:active_ecommerce_flutter/data_model/phone_email_availability_response.dart';
+import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
@@ -41,8 +43,8 @@ class ProfileRepository {
 
   Future<dynamic> getDeviceTokenUpdateResponse(String device_token) async {
 
-    const storage = FlutterSecureStorage();
-    var user_id = await storage.read(key: "user_id");
+  LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+   String? user_id = res.user!.id.toString();
     var post_body = jsonEncode({"fcm_token": "${device_token}", "id": "${user_id}"});
 
     String url = ("${AppConfig.BASE_URL}/setTokenUser");

@@ -636,35 +636,44 @@ class _CartState extends State<Cart> {
                                   ),
                                 ),
                               ),
-                              Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4), // Adjust padding as needed
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.blue,
-                                      width:
-                                          1), // Change this to your desired highlight color
-                                  color: Colors
-                                      .white, // Change this to your desired highlight color
-                                  borderRadius: BorderRadius.circular(
-                                      20), // Gives the pill shape
-                                ),
-                                child: Text(
-                                  getVariationOptionName(_shopList[seller_index]
-                                          .variation![1]
-                                          .variationOptions!
-                                          .optionNames!) ??
-                                      '',
-                                  overflow: TextOverflow.ellipsis,
-                                  maxLines: 2,
-                                  style: TextStyle(
-                                    color: MyTheme.font_grey,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ),
-                              ),
+                              _shopList[seller_index].variation.length > 1
+                                  ? Container(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical:
+                                              4), // Adjust padding as needed
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                            color: Colors.blue,
+                                            width:
+                                                1), // Change this to your desired highlight color
+                                        color: Colors
+                                            .white, // Change this to your desired highlight color
+                                        borderRadius: BorderRadius.circular(
+                                            20), // Gives the pill shape
+                                      ),
+                                      child: _shopList[seller_index]
+                                                  .variation
+                                                  .length >
+                                              1
+                                          ? Text(
+                                              getVariationOptionName(
+                                                      _shopList[seller_index]
+                                                          .variation![1]
+                                                          .variationOptions!
+                                                          .optionNames!) ??
+                                                  '',
+                                              overflow: TextOverflow.ellipsis,
+                                              maxLines: 2,
+                                              style: TextStyle(
+                                                color: MyTheme.font_grey,
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                            )
+                                          : Text(''),
+                                    )
+                                  : Text(''),
                             ],
                           ),
                         ),

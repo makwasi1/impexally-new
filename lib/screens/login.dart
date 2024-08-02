@@ -52,6 +52,8 @@ class _LoginState extends State<Login> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
 
+  bool hidePassword = true;
+
   @override
   void initState() {
     //on Splash Screen hide statusbar
@@ -76,11 +78,11 @@ class _LoginState extends State<Login> {
 
   onPressedLogin() async {
     Loading.show(context);
-    var email = _emailController.text.toString();
+    var email = _phone;
     var password = _passwordController.text.toString();
 
-    if (_login_by == 'email' && email == "") {
-      ToastComponent.showDialog(AppLocalizations.of(context)!.enter_email,
+    if (_login_by == 'email' && _phone == "") {
+      ToastComponent.showDialog("Please Enter your phone number",
           gravity: Toast.center, duration: Toast.lengthLong);
       return;
     } else if (_login_by == 'phone' && _phone == "") {
@@ -95,8 +97,8 @@ class _LoginState extends State<Login> {
       return;
     }
 
-    var loginResponse = await AuthRepository().getLoginResponse(
-        _login_by == 'email' ? email : _phone, password, _login_by);
+    var loginResponse =
+        await AuthRepository().getLoginResponse(_phone, password, _login_by);
     Loading.close();
     if (loginResponse.result == false) {
       ToastComponent.showDialog(loginResponse.message!.toString(),
@@ -108,34 +110,24 @@ class _LoginState extends State<Login> {
       AuthHelper().saveUserDetailsToSharedPref(loginResponse);
       // push notification starts
 
-        final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+      final FirebaseMessaging _fcm = FirebaseMessaging.instance;
 
-        await _fcm.requestPermission(
-          alert: true,
-          announcement: false,
-          badge: true,
-          carPlay: false,
-          criticalAlert: false,
-          provisional: false,
-          sound: true,
-        );
+      await _fcm.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
 
-        String? fcmToken = await _fcm.getToken();
+      String? fcmToken = await _fcm.getToken();
 
-        if (fcmToken != null) {
-          print("--fcm token--");
-          if (is_logged_in.$ == true) {
-            // update device token
-            var deviceTokenUpdateResponse = await ProfileRepository()
-                .getDeviceTokenUpdateResponse(fcmToken);
-          }
-        }
-      
-
-      // Navigator.pushAndRemoveUntil(context,
-      //     MaterialPageRoute(builder: (context) {
-      //   return Main();
-      // }), (newRoute) => false);
+      if (fcmToken != null) {
+        debugPrint("fcmToken: $fcmToken");
+        await ProfileRepository().getDeviceTokenUpdateResponse(fcmToken);
+      }
       context.push("/");
     }
   }
@@ -361,30 +353,38 @@ class _LoginState extends State<Login> {
                     children: [
                       Container(
                         height: 36,
-                        child: TextField(
-                          controller: _emailController,
-                          autofocus: false,
-                          decoration: InputDecorations.buildInputDecoration_1(
-                              hint_text: "+233XXXXXXXXX"),
+                        child: CustomInternationalPhoneNumberInput(
+                          countries: countries_code,
+                          onInputChanged: (PhoneNumber number) {
+                            print(number.phoneNumber);
+                            setState(() {
+                              _phone = number.phoneNumber;
+                            });
+                          },
+                          onInputValidated: (bool value) {
+                            print(value);
+                          },
+                          selectorConfig: SelectorConfig(
+                            selectorType: PhoneInputSelectorType.DIALOG,
+                          ),
+                          ignoreBlank: false,
+                          autoValidateMode: AutovalidateMode.disabled,
+                          selectorTextStyle:
+                              TextStyle(color: MyTheme.font_grey),
+                          // initialValue: PhoneNumber(
+                          //     isoCode: countries_code[0].toString()),
+                          textFieldController: _phoneNumberController,
+                          formatInput: true,
+                          keyboardType: TextInputType.numberWithOptions(
+                              signed: true, decimal: true),
+                          inputDecoration:
+                              InputDecorations.buildInputDecoration_phone(
+                                  hint_text: "01XXX XXX XXX"),
+                          onSaved: (PhoneNumber number) {
+                            //print('On Saved: $number');
+                          },
                         ),
                       ),
-                      otp_addon_installed.$
-                          ? GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _login_by = "phone";
-                                });
-                              },
-                              child: Text(
-                                AppLocalizations.of(context)!
-                                    .or_login_with_a_phone,
-                                style: TextStyle(
-                                    color: MyTheme.accent_color,
-                                    fontStyle: FontStyle.italic,
-                                    decoration: TextDecoration.underline),
-                              ),
-                            )
-                          : Container()
                     ],
                   ),
                 )
@@ -461,14 +461,35 @@ class _LoginState extends State<Login> {
                   children: [
                     Container(
                       height: 36,
-                      child: TextField(
-                        controller: _passwordController,
-                        autofocus: false,
-                        obscureText: true,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        decoration: InputDecorations.buildInputDecoration_1(
-                            hint_text: "• • • • • • • •"),
+                      child: Stack(
+                        alignment: Alignment.centerRight,
+                        children: [
+                          TextField(
+                            controller: _passwordController,
+                            autofocus: false,
+                            obscureText: hidePassword,
+                            enableSuggestions: false,
+                            autocorrect: false,
+                            decoration: InputDecorations.buildInputDecoration_1(
+                                hint_text: "123456"),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                hidePassword = !hidePassword;
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Icon(
+                                hidePassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: MyTheme.font_grey,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     GestureDetector(
@@ -561,17 +582,17 @@ class _LoginState extends State<Login> {
                 //     },
                 //   ),
                 // ),
-              Visibility(
-                visible: allow_google_login.$ || allow_facebook_login.$,
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 20.0),
-                  child: Center(
-                      child: Text(
-                    AppLocalizations.of(context)!.login_screen_login_with,
-                    style: TextStyle(color: MyTheme.font_grey, fontSize: 12),
-                  )),
+                Visibility(
+                  visible: allow_google_login.$ || allow_facebook_login.$,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 20.0),
+                    child: Center(
+                        child: Text(
+                      AppLocalizations.of(context)!.login_screen_login_with,
+                      style: TextStyle(color: MyTheme.font_grey, fontSize: 12),
+                    )),
+                  ),
                 ),
-              ),
               Padding(
                 padding: const EdgeInsets.only(top: 15.0),
                 child: Center(

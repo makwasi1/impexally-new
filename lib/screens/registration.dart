@@ -45,6 +45,8 @@ class _RegistrationState extends State<Registration> {
   bool _isCaptchaShowing = false;
   String googleRecaptchaKey = "";
 
+  bool hidePassword = true;
+
   //controllers
   TextEditingController _nameController = TextEditingController();
   TextEditingController _emailController = TextEditingController();
@@ -79,7 +81,7 @@ class _RegistrationState extends State<Registration> {
 
     var name = _nameController.text.toString();
     var email = _emailController.text.toString();
-    var password = _passwordController.text.toString();
+    var password = _passwordController.text.toString().trim();
     var phone_number = _phoneNumberController.text.toString();
     var password_confirm = _passwordConfirmController.text.toString();
 
@@ -107,7 +109,7 @@ class _RegistrationState extends State<Registration> {
           gravity: Toast.center,
           duration: Toast.lengthLong);
       return;
-    } else if (password.length < 6) {
+    } else if (password.length < 1) {
       ToastComponent.showDialog(
           AppLocalizations.of(context)!
               .password_must_contain_at_least_6_characters,
@@ -126,7 +128,7 @@ class _RegistrationState extends State<Registration> {
       name,
       _register_by == 'email' ? email : _phone,
       password,
-      phone_number,
+      _phone!
     );
     Loading.close();
 
@@ -152,33 +154,15 @@ class _RegistrationState extends State<Registration> {
         provisional: false,
         sound: true,
       );
-
       String? fcmToken = await _fcm.getToken();
 
       if (fcmToken != null) {
-        print("--fcm token--");
-        print(fcmToken);
-
-        // update device token
-        var deviceTokenUpdateResponse =
-            await ProfileRepository().getDeviceTokenUpdateResponse(fcmToken);
+        debugPrint("fcmToken: $fcmToken");
+        await ProfileRepository().getDeviceTokenUpdateResponse(fcmToken);
       }
-
-      context.push("/");
-
-      // if ((mail_verification_status.$ && _register_by == "email") ||
-      //     _register_by == "phone") {
-      //   Navigator.push(context, MaterialPageRoute(builder: (context) {
-      //     return Otp(
-      //       verify_by: _register_by,
-      //       user_id: signupResponse.user_id,
-      //     );
-      //   }));
-      // } else {
-      //   Navigator.push(context, MaterialPageRoute(builder: (context) {
-      //     return Login();
-      //   }));
-      // }
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return Login();
+      }));
     }
   }
 
@@ -322,33 +306,51 @@ class _RegistrationState extends State<Registration> {
                       color: MyTheme.accent_color, fontWeight: FontWeight.w600),
                 ),
               ),
-              Padding(
+                Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Container(
-                      height: 36,
-                      child: TextField(
-                        controller: _passwordController,
-                        autofocus: false,
-                        obscureText: true,
-                        enableSuggestions: false,
-                        autocorrect: false,
-                        decoration: InputDecorations.buildInputDecoration_1(
-                            hint_text: "• • • • • • • •"),
+                  Container(
+                    height: 36,
+                    child: Stack(
+                    alignment: Alignment.centerRight,
+                    children: [
+                      TextField(
+                      controller: _passwordController,
+                      autofocus: false,
+                      obscureText: hidePassword,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      decoration: InputDecorations.buildInputDecoration_1(
+                        hint_text: "123456"),
                       ),
+                      GestureDetector(
+                      onTap: () {
+                        setState(() {
+                        hidePassword = !hidePassword;
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Icon(
+                        hidePassword ? Icons.visibility : Icons.visibility_off,
+                        color: MyTheme.font_grey,
+                        ),
+                      ),
+                      ),
+                    ],
                     ),
-                    Text(
-                      AppLocalizations.of(context)!
-                          .password_must_contain_at_least_6_characters,
-                      style: TextStyle(
-                          color: MyTheme.textfield_grey,
-                          fontStyle: FontStyle.italic),
-                    )
+                  ),
+                  Text(
+                    "Password must contain at least 6 characters long",
+                    style: TextStyle(
+                      color: MyTheme.grey_153,
+                      fontStyle: FontStyle.italic),
+                  )
                   ],
                 ),
-              ),
+                ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 4.0),
                 child: Text(
@@ -368,7 +370,7 @@ class _RegistrationState extends State<Registration> {
                     enableSuggestions: false,
                     autocorrect: false,
                     decoration: InputDecorations.buildInputDecoration_1(
-                        hint_text: "• • • • • • • •"),
+                        hint_text: "123456"),
                   ),
                 ),
               ),

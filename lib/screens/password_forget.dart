@@ -71,13 +71,14 @@ class _PasswordForgetState extends State<PasswordForget> {
           gravity: Toast.center, duration: Toast.lengthLong);
     } else {
       ToastComponent.showDialog(passwordForgetResponse.message!,
-          gravity: Toast.center, duration: Toast.lengthLong);
+          gravity: Toast.center, duration: 10);
 
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return PasswordOtp(
-          verify_by: _send_code_by,
-        );
-      }));
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return PasswordOtp(
+                    verify_by: _send_code_by,
+                    email_or_code: email,
+                  );
+                }));
     }
   }
 

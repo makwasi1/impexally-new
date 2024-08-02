@@ -79,7 +79,7 @@ class _PasswordOtpState extends State<PasswordOtp> {
           gravity: Toast.center,
           duration: Toast.lengthLong);
       return;
-    } else if (password.length < 6) {
+    } else if (password.length < 1) {
       ToastComponent.showDialog(
           AppLocalizations.of(context)!
               .password_must_contain_at_least_6_characters,
@@ -96,14 +96,17 @@ class _PasswordOtpState extends State<PasswordOtp> {
     }
 
     var passwordConfirmResponse =
-        await AuthRepository().getPasswordConfirmResponse(code, password);
+        await AuthRepository().getPasswordConfirmResponse(code, password, widget.email_or_code!);
 
     if (passwordConfirmResponse.result == false) {
       ToastComponent.showDialog(passwordConfirmResponse.message!,
           gravity: Toast.center, duration: Toast.lengthLong);
+          //show a pop up with a copy text for the 
+
     } else {
       ToastComponent.showDialog(passwordConfirmResponse.message!,
           gravity: Toast.center, duration: Toast.lengthLong);
+          
 
       headeText=AppLocalizations.of(context)!.password_changed_ucf;
       cardController.toggleCard();

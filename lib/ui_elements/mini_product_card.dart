@@ -4,7 +4,6 @@ import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/screens/product_details.dart';
 import 'package:flutter/material.dart';
 
-
 class MiniProductCard extends StatefulWidget {
   int? id;
   String slug;
@@ -14,6 +13,7 @@ class MiniProductCard extends StatefulWidget {
   String? stroked_price;
   bool? has_discount;
   bool? is_wholesale;
+  bool? isSeller;
   var discount;
   MiniProductCard({
     Key? key,
@@ -26,6 +26,7 @@ class MiniProductCard extends StatefulWidget {
     this.has_discount,
     this.is_wholesale = false,
     this.discount,
+    this.isSeller = false,
   }) : super(key: key);
 
   @override
@@ -109,26 +110,32 @@ class _MiniProductCardState extends State<MiniProductCard> {
                         fontWeight: FontWeight.w500),
                   ),
                 ),
-                Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
-                      child: Image.network(
-                          height: 18,
-                          "https://image.flylandexpress.com/images/home-page/flylan-express-officia-1.webp"),
-                    ),
-                    Icon(
-                      Icons.star,
-                      color: Colors.yellow,
-                      size: 15,
-                    ),
-                    Icon(
-                      Icons.star,
-                      color: Colors.yellow,
-                      size: 15,
-                    )
-                  ],
-                )
+                widget.isSeller!
+                    ? Container()
+                    : Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.fromLTRB(8, 0, 8, 0),
+                            child: Image.network(
+                                height: 18,
+                                "https://image.flylandexpress.com/images/home-page/flylan-express-officia-1.webp"),
+                          ),
+                          Expanded(
+                            child: Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 15,
+                            ),
+                          ),
+                          Expanded(
+                            child: Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 15,
+                            ),
+                          )
+                        ],
+                      )
               ]),
           // whole sale
         ]),
