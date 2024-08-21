@@ -3,6 +3,8 @@
 //     final wishlistResponse = wishlistResponseFromJson(jsonString);
 //https://app.quicktype.io/
 import 'dart:convert';
+import 'package:active_ecommerce_flutter/data_model/order_item_response.dart';
+
 
 WishlistResponse wishlistResponseFromJson(String str) =>
     WishlistResponse.fromJson(json.decode(str));
@@ -21,16 +23,19 @@ class WishlistResponse {
   bool? success;
   int? status;
 
-  factory WishlistResponse.fromJson(Map<String, dynamic> json) =>
-      WishlistResponse(
-        wishlist_items: List<WishlistItem>.from(
-            json["data"].map((x) => WishlistItem.fromJson(x))),
-        success: json["success"],
-        status: json["status"],
-      );
+  WishlistResponse.fromJson(Map<String, dynamic> json) {
+    if (json["wishlist"] != null) {
+      wishlist_items = [];
+      json["wishlist"].forEach((v) {
+        wishlist_items!.add(WishlistItem.fromJson(v));
+      });
+    }
+    success = json["success"];
+    status = json["status"];
+  }
 
   Map<String, dynamic> toJson() => {
-        "data": List<dynamic>.from(wishlist_items!.map((x) => x.toJson())),
+        "wishlist": List<dynamic>.from(wishlist_items!.map((x) => x.toJson())),
         "success": success,
         "status": status,
       };
@@ -57,28 +62,41 @@ class WishlistItem {
 }
 
 class Product {
-  Product({
-    this.id,
-    this.name,
-    this.thumbnail_image,
-    this.base_price,
-    this.rating, this.slug,
-  });
+  Product(
+      {this.id,
+      this.name,
+      this.thumbnail_image,
+      this.base_price,
+      this.rating,
+      this.slug,
+      this.image,
+      this.discount,
+      this.stock,
+      this.productDetails
+      });
 
   int? id;
   String? name;
   String? thumbnail_image;
   String? base_price;
-  int? rating;
+  String? rating;
   String? slug;
+  Image? image;
+  ProductDetail? productDetails;
+  String? discount;
+  String? stock;
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
         id: json["id"],
         name: json["name"],
         thumbnail_image: json["thumbnail_image"],
-        base_price: json["base_price"],
+        base_price: json["price"],
         rating: json["rating"],
         slug: json["slug"],
+        discount: json["price_discounted"],
+        stock: json["stock"],
+        image: Image.fromJson(json["image"]),
+        productDetails: ProductDetail.fromJson(json["product_detail"]),
       );
 
   Map<String, dynamic> toJson() => {

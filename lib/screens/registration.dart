@@ -14,7 +14,9 @@ import 'package:active_ecommerce_flutter/repositories/auth_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/profile_repository.dart';
 import 'package:active_ecommerce_flutter/screens/common_webview_screen.dart';
 import 'package:active_ecommerce_flutter/screens/login.dart';
+import 'package:active_ecommerce_flutter/screens/otp.dart';
 import 'package:active_ecommerce_flutter/ui_elements/auth_ui.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -44,6 +46,7 @@ class _RegistrationState extends State<Registration> {
   bool? _isAgree = false;
   bool _isCaptchaShowing = false;
   String googleRecaptchaKey = "";
+  String? receivedID;
 
   bool hidePassword = true;
 
@@ -53,6 +56,8 @@ class _RegistrationState extends State<Registration> {
   TextEditingController _phoneNumberController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   TextEditingController _passwordConfirmController = TextEditingController();
+
+  FirebaseAuth auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -124,46 +129,39 @@ class _RegistrationState extends State<Registration> {
       return;
     }
 
-    var signupResponse = await AuthRepository().getSignupResponse(
-      name,
-      _register_by == 'email' ? email : _phone,
-      password,
-      _phone!
-    );
-    Loading.close();
-
-    if (signupResponse.result == false) {
-      var message = "";
-      signupResponse.message.forEach((value) {
-        message += value + "\n";
-      });
-
-      ToastComponent.showDialog(message, gravity: Toast.center, duration: 3);
-    } else {
-      ToastComponent.showDialog(signupResponse.message,
-          gravity: Toast.center, duration: Toast.lengthLong);
-      AuthHelper().setUserData(signupResponse);
-
-      final FirebaseMessaging _fcm = FirebaseMessaging.instance;
-      await _fcm.requestPermission(
-        alert: true,
-        announcement: false,
-        badge: true,
-        carPlay: false,
-        criticalAlert: false,
-        provisional: false,
-        sound: true,
+    if (_phone != null && _phone != "") {
+      await auth.verifyPhoneNumber(
+        phoneNumber: _phone!,
+        verificationCompleted: (PhoneAuthCredential credential) async {
+          await auth.signInWithCredential(credential);
+        },
+        verificationFailed: (FirebaseAuthException e) {
+          if (e.code == 'invalid-phone-number') {
+            print('The provided phone number is not valid.');
+          }
+        },
+        codeSent: (String verificationId, int? resendToken) {
+          Loading.close();
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return Otp(verID: verificationId, phone: _phone,
+            email: email, name: name, password: password
+            );
+          }));
+          ToastComponent.showDialog(
+          "OTP sent to your phone number",
+          gravity: Toast.bottom,
+          duration: Toast.lengthLong);
+        },
+        codeAutoRetrievalTimeout: (String verificationId) {
+          // Auto-resolution timed out...
+        },
       );
-      String? fcmToken = await _fcm.getToken();
-
-      if (fcmToken != null) {
-        debugPrint("fcmToken: $fcmToken");
-        await ProfileRepository().getDeviceTokenUpdateResponse(fcmToken);
-      }
-      Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return Login();
-      }));
     }
+
+    
+      //create user phone auth with firebase auth
+
+    
   }
 
   @override
@@ -306,51 +304,52 @@ class _RegistrationState extends State<Registration> {
                       color: MyTheme.accent_color, fontWeight: FontWeight.w600),
                 ),
               ),
-                Padding(
+              Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                  Container(
-                    height: 36,
-                    child: Stack(
-                    alignment: Alignment.centerRight,
-                    children: [
-                      TextField(
-                      controller: _passwordController,
-                      autofocus: false,
-                      obscureText: hidePassword,
-                      enableSuggestions: false,
-                      autocorrect: false,
-                      decoration: InputDecorations.buildInputDecoration_1(
-                        hint_text: "123456"),
+                    Container(
+                      height: 36,
+                      child: Stack(
+                        alignment: Alignment.centerRight,
+                        children: [
+                          TextField(
+                            controller: _passwordController,
+                            autofocus: false,
+                            obscureText: hidePassword,
+                            enableSuggestions: false,
+                            autocorrect: false,
+                            decoration: InputDecorations.buildInputDecoration_1(
+                                hint_text: "******"),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                hidePassword = !hidePassword;
+                              });
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Icon(
+                                hidePassword
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: MyTheme.font_grey,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      GestureDetector(
-                      onTap: () {
-                        setState(() {
-                        hidePassword = !hidePassword;
-                        });
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 8.0),
-                        child: Icon(
-                        hidePassword ? Icons.visibility : Icons.visibility_off,
-                        color: MyTheme.font_grey,
-                        ),
-                      ),
-                      ),
-                    ],
                     ),
-                  ),
-                  Text(
-                    "Password must contain at least 6 characters long",
-                    style: TextStyle(
-                      color: MyTheme.grey_153,
-                      fontStyle: FontStyle.italic),
-                  )
+                    Text(
+                      "Password must contain at least 6 characters long",
+                      style: TextStyle(
+                          color: MyTheme.grey_153, fontStyle: FontStyle.italic),
+                    )
                   ],
                 ),
-                ),
+              ),
               Padding(
                 padding: const EdgeInsets.only(bottom: 4.0),
                 child: Text(
@@ -370,7 +369,7 @@ class _RegistrationState extends State<Registration> {
                     enableSuggestions: false,
                     autocorrect: false,
                     decoration: InputDecorations.buildInputDecoration_1(
-                        hint_text: "123456"),
+                        hint_text: "******"),
                   ),
                 ),
               ),

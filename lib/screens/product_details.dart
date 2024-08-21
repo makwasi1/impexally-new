@@ -346,13 +346,13 @@ class _ProductDetailsState extends State<ProductDetails>
   }
 
   onWishTap() {
-    if (is_logged_in.$ == false) {
-      ToastComponent.showDialog(
-          AppLocalizations.of(context)!.you_need_to_log_in,
-          gravity: Toast.center,
-          duration: Toast.lengthLong);
-      return;
-    }
+    // if (is_logged_in.$ == false) {
+    //   ToastComponent.showDialog(
+    //       AppLocalizations.of(context)!.you_need_to_log_in,
+    //       gravity: Toast.center,
+    //       duration: Toast.lengthLong);
+    //   return;
+    // }
 
     if (_isInWishList) {
       _isInWishList = false;

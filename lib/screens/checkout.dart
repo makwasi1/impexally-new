@@ -2,6 +2,7 @@ import 'package:active_ecommerce_flutter/custom/box_decorations.dart';
 import 'package:active_ecommerce_flutter/custom/btn.dart';
 import 'package:active_ecommerce_flutter/custom/enum_classes.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
+import 'package:active_ecommerce_flutter/data_model/login_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
@@ -19,6 +20,7 @@ import 'package:toast/toast.dart';
 
 import '../data_model/payment_type_response.dart';
 import '../dummy_data/payment_methods.dart';
+import '../helpers/auth_helper.dart';
 
 class Checkout extends StatefulWidget {
   int? order_id; // only need when making manual payment from order details
@@ -81,7 +83,7 @@ class _CheckoutState extends State<Checkout> {
     /*print("user data");
     print(is_logged_in.$);
     print(access_token.value);*/
-
+    _loadPhoneNumber();
     fetchAll();
   }
 
@@ -316,7 +318,7 @@ class _CheckoutState extends State<Checkout> {
     String? user_id = await storage.read(key: "user_id");
     await OrderRepository()
         .createOrder(widget.cart_amount, widget.delivery_fee);
-    await storage.delete(key: "cart_id");    
+    await storage.delete(key: "cart_id");
     await CartRepository().removeUserCart(int.tryParse(user_id!));
     // }
     Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -358,6 +360,14 @@ class _CheckoutState extends State<Checkout> {
     //print(_selected_payment_method_key);
   }
 
+  _loadPhoneNumber() async {
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+    String? phoneNumber = res.user!.phone;
+    if (phoneNumber != null) {
+      _phoneNumberController.text = phoneNumber;
+    }
+  }
+
   onPaymentWithMobileMoney() {
     showDialog(
       context: context,
@@ -370,6 +380,7 @@ class _CheckoutState extends State<Checkout> {
               TextField(
                 keyboardType: TextInputType.phone,
                 controller: _phoneNumberController,
+                enabled: false,
                 decoration: InputDecoration(
                   labelText: 'Phone number',
                   hintText: 'Enter your phone number ',

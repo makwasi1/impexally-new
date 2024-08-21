@@ -25,10 +25,7 @@ class _WishlistState extends State<Wishlist> {
 
   @override
   void initState() {
-    if (is_logged_in.$ == true) {
-      fetchWishlistItems();
-    }
-
+    fetchWishlistItems();
     super.initState();
   }
 
@@ -73,7 +70,8 @@ class _WishlistState extends State<Wishlist> {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
+      textDirection:
+          app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
           backgroundColor: Colors.white,
           appBar: buildAppBar(context),
@@ -119,15 +117,7 @@ class _WishlistState extends State<Wishlist> {
   }
 
   buildWishlist() {
-    if (is_logged_in.$ == false) {
-      return Container(
-          height: 100,
-          child: Center(
-              child: Text(
-            AppLocalizations.of(context)!.you_need_to_log_in,
-            style: TextStyle(color: MyTheme.font_grey),
-          )));
-    } else if (_wishlistInit == true && _wishlistItems.length == 0) {
+    if (_wishlistInit == true && _wishlistItems.length == 0) {
       return SingleChildScrollView(
         child: ShimmerHelper().buildListShimmer(item_count: 10),
       );
@@ -142,34 +132,34 @@ class _WishlistState extends State<Wishlist> {
           padding: EdgeInsets.only(top: 10.0, bottom: 10, left: 18, right: 18),
           physics: NeverScrollableScrollPhysics(),
           itemBuilder: (context, index) {
-            // 3
-            return ProductCard(
-              id: _wishlistItems[index].product.id,
-              slug: _wishlistItems[index].product.slug,
-              image: _wishlistItems[index].product.thumbnail_image,
-              name: _wishlistItems[index].product.name,
-              main_price: _wishlistItems[index].product.base_price,
-              // is_wholesale: _wishlistItems[index].product.isWholesale,
-              stroked_price: "0",
-
-              has_discount: false,
+            return Stack(
+              children: [
+                ProductCard(
+                  id: _wishlistItems[index].product.id,
+                  slug: _wishlistItems[index].product.slug,
+                  image: _wishlistItems[index].product.image.imageDefault,
+                  name: _wishlistItems[index].product.productDetails!.title,
+                  main_price: _wishlistItems[index].product.base_price,
+                  stroked_price: "0",
+                  stock: _wishlistItems[index].product.stock,
+                  discount: _wishlistItems[index].product.discount,
+                  has_discount: false,
+                ),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: Icon(Icons.cancel, color: Colors.red),
+                    onPressed: () {
+                      // Handle delete action here
+                         _onPressRemove(index);
+                    },
+                  ),
+                ),
+              ],
             );
           },
         ),
-
-        /*
-        ListView.builder(
-          itemCount: _wishlistItems.length,
-          scrollDirection: Axis.vertical,
-          physics: NeverScrollableScrollPhysics(),
-          shrinkWrap: true,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 3.0),
-              child: buildWishListItem(index),
-            );
-          },
-        ),*/
       );
     } else {
       return Container(

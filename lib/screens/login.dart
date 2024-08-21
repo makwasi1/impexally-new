@@ -471,7 +471,7 @@ class _LoginState extends State<Login> {
                             enableSuggestions: false,
                             autocorrect: false,
                             decoration: InputDecorations.buildInputDecoration_1(
-                                hint_text: "123456"),
+                                hint_text: "******"),
                           ),
                           GestureDetector(
                             onTap: () {

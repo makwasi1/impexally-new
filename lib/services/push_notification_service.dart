@@ -148,7 +148,7 @@ class PushNotificationService {
     await flutterLocalNotificationsPlugin.show(
       0,
       'Password Reset Code',
-      '$code',
+      ' $code',
       platformChannelSpecifics,
       payload: 'item x',
     );

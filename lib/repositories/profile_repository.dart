@@ -11,9 +11,12 @@ import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class ProfileRepository {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
   Future<dynamic> getProfileCountersResponse() async {
     String url = ("${AppConfig.BASE_URL}/profile/counters");
     final response = await ApiRequest.get(
@@ -42,10 +45,10 @@ class ProfileRepository {
   }
 
   Future<dynamic> getDeviceTokenUpdateResponse(String device_token) async {
-
-  LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
-   String? user_id = res.user!.id.toString();
-    var post_body = jsonEncode({"fcm_token": "${device_token}", "id": "${user_id}"});
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+    String? user_id = res.user!.id.toString();
+    var post_body =
+        jsonEncode({"fcm_token": "${device_token}", "id": "${user_id}"});
 
     String url = ("${AppConfig.BASE_URL}/setTokenUser");
     final response = await ApiRequest.post(
@@ -107,4 +110,34 @@ class ProfileRepository {
 
     return userInfoResponseFromJson(response.body);
   }
+
+  Future<void> verifyPhoneNumber(String phoneNumber) async {
+    await _auth.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        // Auto-retrieve verification code
+        await _auth.signInWithCredential(credential);
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        if (e.code == 'invalid-phone-number') {
+          print('The provided phone number is not valid.');
+        }
+        // Handle other errors
+      },
+      codeSent: (String verificationId, int? resendToken) async {
+        // Save the verification ID for future use
+        String smsCode = 'xxxxxx'; // Code input by the user
+        PhoneAuthCredential credential = PhoneAuthProvider.credential(
+          verificationId: verificationId,
+          smsCode: smsCode,
+        );
+        // Sign the user in with the credential
+        await _auth.signInWithCredential(credential);
+      },
+      codeAutoRetrievalTimeout: (String verificationId) {},
+      timeout: Duration(seconds: 60),
+    );
+  }
+
+  
 }

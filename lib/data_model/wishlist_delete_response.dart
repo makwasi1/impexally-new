@@ -11,20 +11,16 @@ String wishlistDeleteResponseToJson(WishlistDeleteResponse data) => json.encode(
 
 class WishlistDeleteResponse {
   WishlistDeleteResponse({
-    this.result,
-    this.message,
+    this.message
   });
 
-  bool? result;
   String? message;
 
   factory WishlistDeleteResponse.fromJson(Map<String, dynamic> json) => WishlistDeleteResponse(
-    result: json["result"],
     message: json["message"],
   );
 
   Map<String, dynamic> toJson() => {
-    "result": result,
     "message": message,
   };
 }

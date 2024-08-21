@@ -1,7 +1,12 @@
 import 'package:active_ecommerce_flutter/custom/btn.dart';
+import 'package:active_ecommerce_flutter/custom/loading.dart';
 import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
+import 'package:active_ecommerce_flutter/repositories/profile_repository.dart';
+import 'package:active_ecommerce_flutter/screens/login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:active_ecommerce_flutter/custom/input_decorations.dart';
@@ -12,11 +17,22 @@ import 'package:toast/toast.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
-
-
 class Otp extends StatefulWidget {
   String? title;
-  Otp({Key? key,this.title}) : super(key: key);
+  String? verID;
+  String? phone;
+  String? email;
+  String? name;
+  String? password;
+  Otp({
+    Key? key,
+    this.title,
+    this.verID,
+    this.phone,
+    this.email,
+    this.name,
+    this.password,
+  }) : super(key: key);
 
   @override
   _OtpState createState() => _OtpState();
@@ -25,60 +41,96 @@ class Otp extends StatefulWidget {
 class _OtpState extends State<Otp> {
   //controllers
   TextEditingController _verificationCodeController = TextEditingController();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
     //on Splash Screen hide statusbar
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.bottom]);
     super.initState();
   }
 
   @override
   void dispose() {
     //before going to other screen show statusbar
-    SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual, overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+        overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     super.dispose();
   }
 
   onTapResend() async {
-    var resendCodeResponse = await AuthRepository()
-        .getResendCodeResponse();
+    var resendCodeResponse = await AuthRepository().getResendCodeResponse();
 
     if (resendCodeResponse.result == false) {
-      ToastComponent.showDialog(resendCodeResponse.message!, gravity: Toast.center, duration: Toast.lengthLong);
+      ToastComponent.showDialog(resendCodeResponse.message!,
+          gravity: Toast.center, duration: Toast.lengthLong);
     } else {
-      ToastComponent.showDialog(resendCodeResponse.message!, gravity: Toast.center, duration: Toast.lengthLong);
-
+      ToastComponent.showDialog(resendCodeResponse.message!,
+          gravity: Toast.center, duration: Toast.lengthLong);
     }
-
   }
 
   onPressConfirm() async {
-
     var code = _verificationCodeController.text.toString();
+    Loading.show(context);
 
-    if(code == ""){
-      ToastComponent.showDialog(AppLocalizations.of(context)!.enter_verification_code, gravity: Toast.center, duration: Toast.lengthLong);
+    if (code == "") {
+      ToastComponent.showDialog(
+          AppLocalizations.of(context)!.enter_verification_code,
+          gravity: Toast.center,
+          duration: Toast.lengthLong);
       return;
     }
 
-    var confirmCodeResponse = await AuthRepository()
-        .getConfirmCodeResponse(code);
+    final credential = PhoneAuthProvider.credential(
+      verificationId: widget.verID!,
+      smsCode: code,
+    );
 
-    if (!(confirmCodeResponse.result)) {
-      ToastComponent.showDialog(confirmCodeResponse.message, gravity: Toast.center, duration: Toast.lengthLong);
+    await _auth.signInWithCredential(credential);
+
+    if (credential.accessToken != null) {
+      print("OTP Verified");
+    }
+
+    var signupResponse = await AuthRepository().getSignupResponse(
+        widget.name!, widget.email, widget.password!, widget.phone!);
+
+    if (signupResponse.result == false) {
+      var message = "";
+      signupResponse.message.forEach((value) {
+        message += value + "\n";
+      });
+
+      ToastComponent.showDialog(message, gravity: Toast.center, duration: 3);
     } else {
-      ToastComponent.showDialog(confirmCodeResponse.message, gravity: Toast.center, duration: Toast.lengthLong);
+      ToastComponent.showDialog(signupResponse.message,
+          gravity: Toast.center, duration: Toast.lengthLong);
+      AuthHelper().setUserData(signupResponse);
 
-      // Navigator.push(context, MaterialPageRoute(builder: (context) {
-      //   return Login();
-      // }));
-      if(SystemConfig.systemUser!=null){
-        SystemConfig.systemUser!.emailVerified=true;
+      final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+      await _fcm.requestPermission(
+        alert: true,
+        announcement: false,
+        badge: true,
+        carPlay: false,
+        criticalAlert: false,
+        provisional: false,
+        sound: true,
+      );
+      String? fcmToken = await _fcm.getToken();
+
+      if (fcmToken != null) {
+        debugPrint("fcmToken: $fcmToken");
+        await ProfileRepository().getDeviceTokenUpdateResponse(fcmToken);
       }
-      //Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context)=>Main()), (route) => false);
-      context.go("/");
+
+      Loading.close();
+
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return Login();
+      }));
     }
   }
 
@@ -86,7 +138,8 @@ class _OtpState extends State<Otp> {
   Widget build(BuildContext context) {
     final _screen_width = MediaQuery.of(context).size.width;
     return Directionality(
-      textDirection: app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
+      textDirection:
+          app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.white,
         body: Stack(
@@ -102,46 +155,20 @@ class _OtpState extends State<Otp> {
                   child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  if(widget.title!=null)
-                  Text(widget.title!,style: TextStyle(fontSize: 25,color: MyTheme.font_grey),),
+                  if (widget.title != null)
+                    Text(
+                      widget.title!,
+                      style: TextStyle(fontSize: 25, color: MyTheme.font_grey),
+                    ),
                   Padding(
                     padding: const EdgeInsets.only(top: 40.0, bottom: 15),
                     child: Container(
                       width: 75,
                       height: 75,
-                      child:
-                          Image.asset('assets/login_registration_form_logo.png'),
+                      child: Image.asset(
+                          'assets/login_registration_form_logo.png'),
                     ),
                   ),
-                  /*Padding(
-                    padding: const EdgeInsets.only(bottom: 20.0),
-                    child: Text(
-                      "${AppLocalizations.of(context)!.verify_your} " +
-                          (_verify_by == "email"
-                              ? AppLocalizations.of(context)!.email_account_ucf
-                              : AppLocalizations.of(context)!.phone_number_ucf),
-                      style: TextStyle(
-                          color: MyTheme.accent_color,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w600),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
-                    child: Container(
-                        width: _screen_width * (3 / 4),
-                        child: _verify_by == "email"
-                            ? Text(
-                            AppLocalizations.of(context)!.enter_the_verification_code_that_sent_to_your_email_recently,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: MyTheme.dark_grey, fontSize: 14))
-                            : Text(
-                            AppLocalizations.of(context)!.enter_the_verification_code_that_sent_to_your_phone_recently,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                    color: MyTheme.dark_grey, fontSize: 14))),
-                  ),*/
                   Container(
                     width: _screen_width * (3 / 4),
                     child: Column(
@@ -188,7 +215,7 @@ class _OtpState extends State<Otp> {
                                     fontWeight: FontWeight.w600),
                               ),
                               onPressed: () {
-                               onPressConfirm();
+                                onPressConfirm();
                               },
                             ),
                           ),
@@ -199,25 +226,11 @@ class _OtpState extends State<Otp> {
                   Padding(
                     padding: const EdgeInsets.only(top: 60),
                     child: InkWell(
-                      onTap: (){
+                      onTap: () {
                         onTapResend();
                       },
-                      child: Text(AppLocalizations.of(context)!.resend_code_ucf,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: MyTheme.accent_color,
-                              decoration: TextDecoration.underline,
-                              fontSize: 13)),
-                    ),
-                  ),
-                  // SizedBox(height: 15,),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 40),
-                    child: InkWell(
-                      onTap: (){
-                        onTapLogout(context);
-                      },
-                      child: Text(AppLocalizations.of(context)!.logout_ucf,
+                      child: Text(
+                          AppLocalizations.of(context)!.resend_code_ucf,
                           textAlign: TextAlign.center,
                           style: TextStyle(
                               color: MyTheme.accent_color,
@@ -232,14 +245,5 @@ class _OtpState extends State<Otp> {
         ),
       ),
     );
-  }
-
-
-  onTapLogout(context) async {
-    AuthHelper().clearUserData();
-    context.go("/");
-    // Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context) {
-    //   return Main();
-    // }), (route) => false);
   }
 }

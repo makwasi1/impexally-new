@@ -89,6 +89,7 @@ dependencies:
   webview_flutter: ^4.8.0
   flutter_inappwebview: ^6.0.0
   webview_flutter_plus: ^0.4.5
+  firebase_auth: ^4.16.0
   
 
 dev_dependencies:

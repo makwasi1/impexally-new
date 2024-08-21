@@ -776,10 +776,10 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           Padding(
             padding: const EdgeInsets.only(left: 5.0),
             child: Text(
-              "🇬🇭 Impexpress - Sameday Delivery Across Ghana Accra City",
+              "🇬🇭 Impexpress - Sameday Delivery Across Ghana Accra",
               style: TextStyle(
                   color: Colors.black,
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.normal),
             ),
           ),

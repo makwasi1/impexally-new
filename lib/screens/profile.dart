@@ -9,6 +9,7 @@ import 'package:active_ecommerce_flutter/helpers/auth_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 import 'package:active_ecommerce_flutter/presenter/cart_counter.dart';
+import 'package:active_ecommerce_flutter/repositories/wishlist_repository.dart';
 import 'package:active_ecommerce_flutter/screens/address.dart';
 import 'package:active_ecommerce_flutter/screens/auction_products.dart';
 import 'package:active_ecommerce_flutter/screens/classified_ads/classified_ads.dart';
@@ -35,6 +36,7 @@ import 'package:provider/provider.dart';
 import 'package:route_transitions/route_transitions.dart';
 import 'package:toast/toast.dart';
 
+import '../data_model/wishlist_response.dart';
 import '../repositories/auth_repository.dart';
 import 'auction_bidded_products.dart';
 import 'auction_purchase_history.dart';
@@ -109,7 +111,7 @@ class _ProfileState extends State<Profile> {
   }
 
   fetchAll() {
-    // fetchCounters();
+    fetchCounters();
     getCartCount();
   }
 
@@ -119,42 +121,48 @@ class _ProfileState extends State<Profile> {
     int orderCount =
         await Provider.of<CartCounter>(context, listen: false).getOrderCount();
 
+    int wishlistCount =
+        await Provider.of<CartCounter>(context, listen: false).getWishlistCount();    
+
     setState(() {
       _cartCounter = cartCount;
       _orderCounter = orderCount;
+      _wishlistCounter = wishlistCount;
       _cartCounterString =
           counterText(_cartCounter.toString(), default_length: 2);
       _orderCounterString =
           counterText(_orderCounter.toString(), default_length: 2);
+      _wishlistCounterString =
+          counterText(_wishlistCounter.toString(), default_length: 2);    
     });
   }
 
-  // fetchCounters() async {
-  //   var profileCountersResponse =
-  //       await ProfileRepository().getProfileCountersResponse();
+  fetchCounters() async {
+    WishlistResponse? cartResponseList =
+        await WishListRepository().getUserWishlist();
 
-  //   _cartCounter = profileCountersResponse.cart_item_count;
-  //   _wishlistCounter = profileCountersResponse.wishlist_item_count;
-  //   _orderCounter = profileCountersResponse.order_count;
+    if (cartResponseList != null) {
+      _wishlistCounter = cartResponseList.wishlist_items!.length;
+    } else {
+      _wishlistCounter = 0;
+    }
 
-  //   _cartCounterString =
-  //       counterText(_cartCounter.toString(), default_length: 2);
-  //   _wishlistCounterString =
-  //       counterText(_wishlistCounter.toString(), default_length: 2);
-  //   _orderCounterString =
-  //       counterText(_orderCounter.toString(), default_length: 2);
+    _wishlistCounterString =
+        counterText(_wishlistCounter.toString(), default_length: 2);
 
-  //   setState(() {});
-  // }
+    setState(() {});
+  }
 
-  deleteAccountReq() async {
+  deleteAccountReq(BuildContext context) async {
     loading();
     var response = await AuthRepository().getAccountDeleteResponse();
 
     if (response) {
       AuthHelper().clearUserData();
+      AuthHelper().clearUserDetailsFromSharedPref();
       Navigator.pop(loadingcontext);
-      context.go("/");
+      Navigator.pushAndRemoveUntil(context,
+          MaterialPageRoute(builder: (context) => Home()), (route) => false);
       ToastComponent.showDialog("Account deleted successfully",
           gravity: Toast.center, duration: Toast.lengthLong);
     } else {
@@ -637,7 +645,7 @@ class _ProfileState extends State<Profile> {
               children: [
                 buildBottomVerticalCardListItem("assets/delete.png",
                     LangText(context).local.delete_my_account, onPressed: () {
-                  deleteWarningDialog();
+                  deleteWarningDialog(context);
 
                   // Navigator.push(context, MaterialPageRoute(builder: (context) {
                   //   return Filter(
@@ -804,7 +812,7 @@ class _ProfileState extends State<Profile> {
         duration: Toast.lengthLong);
   }
 
-  deleteWarningDialog() {
+  deleteWarningDialog(BuildContext context) {
     return showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -824,8 +832,7 @@ class _ProfileState extends State<Profile> {
                     child: Text(LangText(context).local.no_ucf)),
                 TextButton(
                     onPressed: () {
-                      pop(context);
-                      deleteAccountReq();
+                      deleteAccountReq(context);
                     },
                     child: Text(LangText(context).local.yes_ucf))
               ],

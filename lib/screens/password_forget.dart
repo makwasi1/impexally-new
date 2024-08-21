@@ -67,10 +67,10 @@ class _PasswordForgetState extends State<PasswordForget> {
             _send_code_by == 'email' ? email : _phone, _send_code_by);
 
     if (passwordForgetResponse.result == false) {
-      ToastComponent.showDialog(passwordForgetResponse.message!,
+      ToastComponent.showDialog("Failed to send code",
           gravity: Toast.center, duration: Toast.lengthLong);
     } else {
-      ToastComponent.showDialog(passwordForgetResponse.message!,
+      ToastComponent.showDialog("Code sent successfully. Check your email",
           gravity: Toast.center, duration: 10);
 
           Navigator.push(context, MaterialPageRoute(builder: (context) {
