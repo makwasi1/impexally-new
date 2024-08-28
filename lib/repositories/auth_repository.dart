@@ -9,12 +9,16 @@ import 'package:active_ecommerce_flutter/data_model/password_confirm_response.da
 import 'package:active_ecommerce_flutter/data_model/password_forget_response.dart';
 import 'package:active_ecommerce_flutter/data_model/resend_code_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 import '../services/push_notification_service.dart';
 
 class AuthRepository {
-  Future<LoginResponse> getLoginResponse(String? email, String password,String loginBy) async {
+  Future<LoginResponse> getLoginResponse(
+      String? email, String password, String loginBy) async {
+    const storage = FlutterSecureStorage();
     var post_body = jsonEncode({
       "phone_number": "${email}",
       "password": "$password",
@@ -29,14 +33,15 @@ class AuthRepository {
         },
         body: post_body);
 
-     if(response.statusCode == 200){
-        return loginResponseFromJson(response.body);  
-     } else {
-        return new LoginResponse(
+    if (response.statusCode == 200) {
+      await storage.write(key: "user_phone", value: email);
+      debugPrint("User Phone: $email");
+      return loginResponseFromJson(response.body);
+    } else {
+      return new LoginResponse(
           result: false,
-          message: "Failed to Login. Check Phone number and Password"
-        );
-     }   
+          message: "Failed to Login. Check Phone number and Password");
+    }
   }
 
   Future<LoginResponse> getSocialLoginResponse(
@@ -78,7 +83,7 @@ class AuthRepository {
 
   Future<bool> getAccountDeleteResponse() async {
     LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
-       String? user_id = res.user!.id.toString();
+    String? user_id = res.user!.id.toString();
 
     String url = ("${AppConfig.BASE_URL}/user/$user_id");
 
@@ -87,9 +92,8 @@ class AuthRepository {
     print("Bearer ${access_token.$}");
 
     //create a delete http request
-    final response = await http.delete(Uri.parse(url), headers: {
-      "Content-Type": "application/json"
-    });
+    final response = await http
+        .delete(Uri.parse(url), headers: {"Content-Type": "application/json"});
 
     // print(response.body);
     if (response.statusCode == 200) {
@@ -130,17 +134,19 @@ class AuthRepository {
   Future<ResendCodeResponse> getResendCodeResponse() async {
     String url = ("${AppConfig.BASE_URL}/auth/resend_code");
     final response = await ApiRequest.get(
-        url: url,
-        headers: {
-          "Content-Type": "application/json",
-          "App-Language": app_language.$!,
-          "Authorization": "Bearer ${access_token.$}",
-        },);
+      url: url,
+      headers: {
+        "Content-Type": "application/json",
+        "App-Language": app_language.$!,
+        "Authorization": "Bearer ${access_token.$}",
+      },
+    );
     return resendCodeResponseFromJson(response.body);
   }
 
-  Future<ConfirmCodeResponse> getConfirmCodeResponse(String verification_code) async {
-    var post_body = jsonEncode({ "verification_code": "$verification_code"});
+  Future<ConfirmCodeResponse> getConfirmCodeResponse(
+      String verification_code) async {
+    var post_body = jsonEncode({"verification_code": "$verification_code"});
 
     String url = ("${AppConfig.BASE_URL}/auth/confirm_code");
     // print(url);
@@ -159,69 +165,71 @@ class AuthRepository {
 
   Future<PasswordForgetResponse> getPasswordForgetResponse(
       String? email_or_phone, String send_code_by) async {
-    var post_body = jsonEncode(
-        {"email": "$email_or_phone"});
+    var post_body = jsonEncode({"email": "$email_or_phone"});
 
     String url = ("${AppConfig.BASE_URL}/send-reset-code");
 
-    final response = await ApiRequest.post(url:url,
-        headers: {
-          "Content-Type": "application/json"
-        },
+    final response = await ApiRequest.post(
+        url: url,
+        headers: {"Content-Type": "application/json"},
         body: post_body);
 
-        print(response.body);
-      //get user id 
-      //send notification
-      await sendNotification("Password Reset Code", response.body);
-    
+    print(response.body);
+    //get user id
+    //send notification
+    await sendNotification("Password Reset Code", response.body);
+
     return passwordForgetResponseFromJson(response.body);
   }
 
-  //send 
+  //send
 
-Future<void> sendNotification( String title, String body) async {
-  // final String url = "https://native.impexally.com/public/api/sendnotification";
+  Future<void> sendNotification(String title, String body) async {
+    // final String url = "https://native.impexally.com/public/api/sendnotification";
 
-   LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
-       String? user_id = res.user!.id.toString();
-       print("uiweuryiuewyurywyruwyuryiw"+user_id);
+    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
+    String? user_id = res.user!.id.toString();
+    print("uiweuryiuewyurywyruwyuryiw" + user_id);
 
-  final Map<String, String> headers = {
-    "Content-Type": "application/json",
-  };
+    final Map<String, String> headers = {
+      "Content-Type": "application/json",
+    };
 
-   String url = ("${AppConfig.BASE_URL}/sendnotification");
+    String url = ("${AppConfig.BASE_URL}/sendnotification");
 
-  final Map<String, String> payload = {
-    "user_id": user_id,
-    "title": title,
-    "body": body,
-  };
+    final Map<String, String> payload = {
+      "user_id": user_id,
+      "title": title,
+      "body": body,
+    };
 
-  final response = await ApiRequest.post(
-    url: url,
-    headers: headers,
-    body: jsonEncode(payload),
-  );
+    final response = await ApiRequest.post(
+      url: url,
+      headers: headers,
+      body: jsonEncode(payload),
+    );
 
-  if (response.statusCode == 200) {
-    print("Notification sent successfully");
-  } else {
-    print("Failed to send notification: ${response.statusCode}");
+    if (response.statusCode == 200) {
+      print("Notification sent successfully");
+    } else {
+      print("Failed to send notification: ${response.statusCode}");
+    }
   }
-}
-
 
   //
 
   Future<PasswordConfirmResponse> getPasswordConfirmResponse(
       String verification_code, String password, String email) async {
-    var post_body = jsonEncode(
-        {"token": "$verification_code", "new_password": "$password", "new_password_confirmation": "$password", "email": "$email"});
+    var post_body = jsonEncode({
+      "token": "$verification_code",
+      "new_password": "$password",
+      "new_password_confirmation": "$password",
+      "email": "$email"
+    });
 
     String url = ("${AppConfig.BASE_URL}/reset-password");
-    final response = await ApiRequest.post(url:url,
+    final response = await ApiRequest.post(
+        url: url,
         headers: {
           "Content-Type": "application/json",
           "App-Language": app_language.$!,
@@ -237,7 +245,8 @@ Future<void> sendNotification( String title, String body) async {
         {"email_or_code": "$email_or_code", "verify_by": "$verify_by"});
 
     String url = ("${AppConfig.BASE_URL}/auth/password/resend_code");
-    final response = await ApiRequest.post(url:url,
+    final response = await ApiRequest.post(
+        url: url,
         headers: {
           "Content-Type": "application/json",
           "App-Language": app_language.$!,
@@ -252,7 +261,8 @@ Future<void> sendNotification( String title, String body) async {
 
     String url = ("${AppConfig.BASE_URL}/auth/info");
     if (access_token.$!.isNotEmpty) {
-      final response = await ApiRequest.post(url:url,
+      final response = await ApiRequest.post(
+          url: url,
           headers: {
             "Content-Type": "application/json",
             "App-Language": app_language.$!,
@@ -262,5 +272,70 @@ Future<void> sendNotification( String title, String body) async {
       return loginResponseFromJson(response.body);
     }
     return LoginResponse();
+  }
+
+//create an sms with twilio api
+  Future<String> sendSMS(String? phone) async {
+    final String url =
+        "https://verify.twilio.com/v2/Services/VA55f1911a0a4142480bd733bc288d5f02/Verifications";
+
+    final String username = "ACa93dbbbda2f88c2546588fc863a78c29";
+    final String password = "8c24f46b87d779eed8c0e7e6b36a93cb";
+    final String basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+
+    final Map<String, String> headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": basicAuth,
+    };
+
+    final Map<String, String> payload = {
+      "To": phone!,
+      "Channel": "sms",
+    };
+
+    final response = await ApiRequest.post(
+      url: url,
+      headers: headers,
+      body: Uri(queryParameters: payload).query,
+    );
+
+    if (response.statusCode == 201) {
+      return "success";
+    } else {
+      return "Failed to send SMS: ${response.statusCode}";
+    }
+  }
+
+  Future<String> verifySMSCode(String? code, String? phone) async {
+    final String url =
+        "https://verify.twilio.com/v2/Services/VA55f1911a0a4142480bd733bc288d5f02/VerificationCheck";
+
+    final String username = "ACa93dbbbda2f88c2546588fc863a78c29";
+    final String password = "8c24f46b87d779eed8c0e7e6b36a93cb";
+    final String basicAuth =
+        'Basic ' + base64Encode(utf8.encode('$username:$password'));
+
+    final Map<String, String> headers = {
+      "Content-Type": "application/x-www-form-urlencoded",
+      "Authorization": basicAuth,
+    };
+
+    final Map<String, String> payload = {
+      "To": phone!,
+      "Code": code!,
+    };
+
+    final response = await ApiRequest.post(
+      url: url,
+      headers: headers,
+      body: Uri(queryParameters: payload).query,
+    );
+
+    if (response.statusCode == 200) {
+      return "success";
+    } else {
+      return "Failed to send SMS: ${response.statusCode}";
+    }
   }
 }

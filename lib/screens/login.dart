@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_facebook_auth/flutter_facebook_auth.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
@@ -80,6 +81,7 @@ class _LoginState extends State<Login> {
     Loading.show(context);
     var email = _phone;
     var password = _passwordController.text.toString();
+    const storage = FlutterSecureStorage();
 
     if (_login_by == 'email' && _phone == "") {
       ToastComponent.showDialog("Please Enter your phone number",
@@ -97,8 +99,11 @@ class _LoginState extends State<Login> {
       return;
     }
 
+    await storage.write(key: "phone", value: _phone);
+
     var loginResponse =
         await AuthRepository().getLoginResponse(_phone, password, _login_by);
+
     Loading.close();
     if (loginResponse.result == false) {
       ToastComponent.showDialog(loginResponse.message!.toString(),

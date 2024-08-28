@@ -73,6 +73,7 @@ class _CheckoutState extends State<Checkout> {
   late BuildContext loadingcontext;
   String payment_type = "cart_payment";
   String? _title;
+  String? phone;
 
   TextEditingController _phoneNumberController = TextEditingController();
 
@@ -84,6 +85,7 @@ class _CheckoutState extends State<Checkout> {
     print(is_logged_in.$);
     print(access_token.value);*/
     _loadPhoneNumber();
+    phoneNumberReader();
     fetchAll();
   }
 
@@ -256,6 +258,7 @@ class _CheckoutState extends State<Checkout> {
       return;
     }
     debugPrint("Selected Payment Method: " + _selected_payment_method!);
+    phoneNumberReader();
     onPaymentWithMobileMoney();
   }
 
@@ -361,11 +364,21 @@ class _CheckoutState extends State<Checkout> {
   }
 
   _loadPhoneNumber() async {
-    LoginResponse res = await AuthHelper().getUserDetailsFromSharedPref();
-    String? phoneNumber = res.user!.phone;
+    const storage = FlutterSecureStorage();
+    String? phoneNumber = await storage.read(key: 'phone');
+    debugPrint("Phone Number: $phoneNumber");
     if (phoneNumber != null) {
-      _phoneNumberController.text = phoneNumber;
+      setState(() {
+        phone = phoneNumber;
+      });
     }
+  }
+
+  Future<String> phoneNumberReader() async {
+    const storage = FlutterSecureStorage();
+    String? phoneNumber = await storage.read(key: 'phone');
+    debugPrint("hshdhsdhshdhsd ${phoneNumber}");
+    return phoneNumber!;
   }
 
   onPaymentWithMobileMoney() {
@@ -377,13 +390,11 @@ class _CheckoutState extends State<Checkout> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
-                keyboardType: TextInputType.phone,
-                controller: _phoneNumberController,
-                enabled: false,
-                decoration: InputDecoration(
-                  labelText: 'Phone number',
-                  hintText: 'Enter your phone number ',
+              Text(
+                'Phone Number: ${phone}',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
               SizedBox(height: 20), // Add some spacing

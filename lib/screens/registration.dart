@@ -130,38 +130,31 @@ class _RegistrationState extends State<Registration> {
     }
 
     if (_phone != null && _phone != "") {
-      await auth.verifyPhoneNumber(
-        phoneNumber: _phone!,
-        verificationCompleted: (PhoneAuthCredential credential) async {
-          await auth.signInWithCredential(credential);
-        },
-        verificationFailed: (FirebaseAuthException e) {
-          if (e.code == 'invalid-phone-number') {
-            print('The provided phone number is not valid.');
-          }
-        },
-        codeSent: (String verificationId, int? resendToken) {
-          Loading.close();
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return Otp(verID: verificationId, phone: _phone,
-            email: email, name: name, password: password
-            );
-          }));
-          ToastComponent.showDialog(
-          "OTP sent to your phone number",
-          gravity: Toast.bottom,
-          duration: Toast.lengthLong);
-        },
-        codeAutoRetrievalTimeout: (String verificationId) {
-          // Auto-resolution timed out...
-        },
-      );
+      //use twilio sms verify api here to send sms to the phone number
+      //if success then navigate to otp screen
+      //if failed then show error message
+      String messageSent = await AuthRepository().sendSMS(_phone!);
+      if (messageSent == "success") { 
+        Loading.close();
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Otp(
+                      name: name,
+                      email: email,
+                      phone: _phone,
+                      password: password,
+                    )));
+
+        ToastComponent.showDialog("SMS sent successfully",
+            gravity: Toast.center, duration: Toast.lengthLong);
+      } else {
+        ToastComponent.showDialog("Failed to send SMS. Please try again later",
+            gravity: Toast.center, duration: Toast.lengthLong);
+      }
     }
 
-    
-      //create user phone auth with firebase auth
-
-    
+    //create user phone auth with firebase auth
   }
 
   @override

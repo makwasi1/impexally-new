@@ -12,6 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:active_ecommerce_flutter/custom/input_decorations.dart';
 import 'package:active_ecommerce_flutter/repositories/auth_repository.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:go_router/go_router.dart';
 import 'package:toast/toast.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
@@ -43,6 +44,10 @@ class _OtpState extends State<Otp> {
   TextEditingController _verificationCodeController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  List<TextEditingController> _otpControllers =
+      List.generate(6, (index) => TextEditingController());
+  List<FocusNode> _otpFocusNodes = List.generate(6, (index) => FocusNode());
+
   @override
   void initState() {
     //on Splash Screen hide statusbar
@@ -56,23 +61,25 @@ class _OtpState extends State<Otp> {
     //before going to other screen show statusbar
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
         overlays: [SystemUiOverlay.top, SystemUiOverlay.bottom]);
+    _otpControllers.forEach((controller) => controller.dispose());
+    _otpFocusNodes.forEach((node) => node.dispose());
     super.dispose();
   }
 
   onTapResend() async {
-    var resendCodeResponse = await AuthRepository().getResendCodeResponse();
+    var resendCodeResponse = await AuthRepository().sendSMS(widget.phone);
 
-    if (resendCodeResponse.result == false) {
-      ToastComponent.showDialog(resendCodeResponse.message!,
+    if (resendCodeResponse == "success") {
+      ToastComponent.showDialog(resendCodeResponse!,
           gravity: Toast.center, duration: Toast.lengthLong);
     } else {
-      ToastComponent.showDialog(resendCodeResponse.message!,
+      ToastComponent.showDialog(resendCodeResponse!,
           gravity: Toast.center, duration: Toast.lengthLong);
     }
   }
 
   onPressConfirm() async {
-    var code = _verificationCodeController.text.toString();
+    String code = _otpControllers.map((controller) => controller.text).join();
     Loading.show(context);
 
     if (code == "") {
@@ -83,16 +90,17 @@ class _OtpState extends State<Otp> {
       return;
     }
 
-    final credential = PhoneAuthProvider.credential(
-      verificationId: widget.verID!,
-      smsCode: code,
-    );
+    var verifiedResponse =
+        await AuthRepository().verifySMSCode(code, widget.phone!);
 
-    await _auth.signInWithCredential(credential);
-
-    if (credential.accessToken != null) {
-      print("OTP Verified");
+    if (verifiedResponse != "success") {
+      Loading.close();
+      ToastComponent.showDialog("Code not valid. Please try again.",
+          gravity: Toast.center, duration: Toast.lengthLong);
+      throw Exception(verifiedResponse);
     }
+
+    print("verifiedResponse: $verifiedResponse");
 
     var signupResponse = await AuthRepository().getSignupResponse(
         widget.name!, widget.email, widget.password!, widget.phone!);
@@ -103,7 +111,8 @@ class _OtpState extends State<Otp> {
         message += value + "\n";
       });
 
-      ToastComponent.showDialog(message, gravity: Toast.center, duration: 3);
+      ToastComponent.showDialog("Registered Successfully",
+          gravity: Toast.center, duration: 3);
     } else {
       ToastComponent.showDialog(signupResponse.message,
           gravity: Toast.center, duration: Toast.lengthLong);
@@ -142,106 +151,99 @@ class _OtpState extends State<Otp> {
           app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
         backgroundColor: Colors.white,
-        body: Stack(
-          children: [
-            Container(
-              width: _screen_width * (3 / 4),
-              child: Image.asset(
-                  "assets/splash_login_registration_background_image.png"),
-            ),
-            Container(
-              width: double.infinity,
-              child: SingleChildScrollView(
-                  child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: MyTheme.dark_grey),
+            onPressed: () => Navigator.pop(context),
+          ),
+        ),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (widget.title != null)
-                    Text(
-                      widget.title!,
-                      style: TextStyle(fontSize: 25, color: MyTheme.font_grey),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 40.0, bottom: 15),
-                    child: Container(
-                      width: 75,
-                      height: 75,
-                      child: Image.asset(
-                          'assets/login_registration_form_logo.png'),
-                    ),
+                  SizedBox(height: 40),
+                  Text(
+                    "Verification Code",
+                    style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: MyTheme.accent_color),
                   ),
-                  Container(
-                    width: _screen_width * (3 / 4),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 8.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Container(
-                                height: 36,
-                                child: TextField(
-                                  controller: _verificationCodeController,
-                                  autofocus: false,
-                                  decoration:
-                                      InputDecorations.buildInputDecoration_1(
-                                          hint_text: "A X B 4 J H"),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 40.0),
-                          child: Container(
-                            height: 45,
-                            decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: MyTheme.textfield_grey, width: 1),
-                                borderRadius: const BorderRadius.all(
-                                    Radius.circular(12.0))),
-                            child: Btn.basic(
-                              minWidth: MediaQuery.of(context).size.width,
-                              color: MyTheme.accent_color,
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(12.0))),
-                              child: Text(
-                                AppLocalizations.of(context)!.confirm_ucf,
-                                style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600),
-                              ),
-                              onPressed: () {
-                                onPressConfirm();
-                              },
+                  SizedBox(height: 16),
+                  Text(
+                    "Enter the 6-digit code sent to ${widget.phone}",
+                    style: TextStyle(fontSize: 16, color: MyTheme.font_grey),
+                  ),
+                  SizedBox(height: 40),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List.generate(
+                      6,
+                      (index) => SizedBox(
+                        width: 50,
+                        child: TextField(
+                          controller: _otpControllers[index],
+                          focusNode: _otpFocusNodes[index],
+                          keyboardType: TextInputType.number,
+                          textAlign: TextAlign.center,
+                          maxLength: 1,
+                          style: TextStyle(fontSize: 24),
+                          decoration: InputDecoration(
+                            counterText: "",
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: MyTheme.light_grey),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: MyTheme.accent_color),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                           ),
+                          onChanged: (value) {
+                            if (value.length == 1 && index < 5) {
+                              _otpFocusNodes[index + 1].requestFocus();
+                            }
+                          },
                         ),
-                      ],
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 60),
-                    child: InkWell(
-                      onTap: () {
-                        onTapResend();
-                      },
+                  SizedBox(height: 40),
+                  ElevatedButton(
+                    onPressed: onPressConfirm,
+                    child: Text(
+                      AppLocalizations.of(context)!.confirm_ucf,
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: MyTheme.accent_color,
+                      minimumSize: Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  Center(
+                    child: TextButton(
+                      onPressed: onTapResend,
                       child: Text(
-                          AppLocalizations.of(context)!.resend_code_ucf,
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                              color: MyTheme.accent_color,
-                              decoration: TextDecoration.underline,
-                              fontSize: 13)),
+                        AppLocalizations.of(context)!.resend_code_ucf,
+                        style: TextStyle(
+                            color: MyTheme.accent_color, fontSize: 16),
+                      ),
                     ),
                   ),
                 ],
-              )),
-            )
-          ],
+              ),
+            ),
+          ),
         ),
       ),
     );
