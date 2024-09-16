@@ -8,6 +8,7 @@ import 'package:active_ecommerce_flutter/presenter/home_presenter.dart';
 import 'package:active_ecommerce_flutter/screens/category_products.dart';
 import 'package:active_ecommerce_flutter/screens/filter.dart';
 import 'package:active_ecommerce_flutter/screens/flash_deal_list.dart';
+import 'package:active_ecommerce_flutter/screens/import_china.dart';
 import 'package:active_ecommerce_flutter/screens/profile.dart';
 import 'package:active_ecommerce_flutter/screens/seller_admin.dart';
 import 'package:active_ecommerce_flutter/screens/todays_deal_products.dart';
@@ -644,120 +645,6 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           // Adjust the height as needed
         ));
   }
-  //   return Row(
-  //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  //     children: [
-  //       /* Flexible(
-  //         flex: 1,
-  //         fit: FlexFit.tight,
-  //         child: GestureDetector(
-  //           onTap: () {
-  //             Navigator.push(context, MaterialPageRoute(builder: (context) {
-  //               return CategoryList(
-  //                 is_top_category: true,
-  //               );
-  //             }));
-  //           },
-  //           child: Container(
-  //             height: 90,
-  //             width: MediaQuery.of(context).size.width / 3 - 4,
-  //             decoration: BoxDecorations.buildBoxDecoration_1(),
-  //             child: Column(
-  //               children: [
-  //                 Padding(
-  //                   padding: const EdgeInsets.all(16.0),
-  //                   child: Container(
-  //                       height: 20,
-  //                       width: 20,
-  //                       child: Image.asset("assets/top_categories.png")),
-  //                 ),
-  //                 Text(
-  //                   AppLocalizations.of(context).home_screen_top_categories,
-  //                   textAlign: TextAlign.center,
-  //                   style: TextStyle(
-  //                       color: Color.fromRGBO(132, 132, 132, 1),
-  //                       fontWeight: FontWeight.w300),
-  //                 )
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ),*/
-
-  //       Flexible(
-  //         flex: 1,
-  //         fit: FlexFit.tight,
-  //         child: GestureDetector(
-  //           onTap: () {
-  //             Navigator.push(context, MaterialPageRoute(builder: (context) {
-  //               return Filter(
-  //                 selected_filter: "brands",
-  //               );
-  //             }));
-  //           },
-  //           child: Container(
-  //             height: 90,
-  //             width: MediaQuery.of(context).size.width / 3 - 4,
-  //             decoration: BoxDecorations.buildBoxDecoration_1(),
-  //             child: Column(
-  //               children: [
-  //                 Padding(
-  //                   padding: const EdgeInsets.all(16.0),
-  //                   child: Container(
-  //                       height: 20,
-  //                       width: 20,
-  //                       child: Image.network("https://image.impexally.com/images/app/impexally/athleisure.webp")),
-  //                 ),
-  //                 // Text(AppLocalizations.of(context)!.brands_ucf,
-  //                 //     textAlign: TextAlign.center,
-  //                 //     style: TextStyle(
-  //                 //         color: Color.fromRGBO(132, 132, 132, 1),
-  //                 //         fontWeight: FontWeight.w300)),
-  //               ],
-  //             ),
-  //           ),
-  //         ),
-  //       ),
-  //       if (vendor_system.$)
-  //         SizedBox(
-  //           width: 10,
-  //         ),
-  //       if (vendor_system.$)
-  //         Flexible(
-  //           flex: 1,
-  //           fit: FlexFit.tight,
-  //           child: GestureDetector(
-  //             onTap: () {
-  //               Navigator.push(context, MaterialPageRoute(builder: (context) {
-  //                 return TopSellers();
-  //               }));
-  //             },
-  //             child: Container(
-  //               height: 90,
-  //               width: MediaQuery.of(context).size.width / 3 - 4,
-  //               decoration: BoxDecorations.buildBoxDecoration_1(),
-  //               child: Column(
-  //                 children: [
-  //                   Padding(
-  //                     padding: const EdgeInsets.all(16.0),
-  //                     child: Container(
-  //                         height: 20,
-  //                         width: 20,
-  //                         child: Image.asset("assets/top_sellers.png")),
-  //                   ),
-  //                   Text(AppLocalizations.of(context)!.top_sellers_ucf,
-  //                       textAlign: TextAlign.center,
-  //                       style: TextStyle(
-  //                           color: Color.fromRGBO(132, 132, 132, 1),
-  //                           fontWeight: FontWeight.w300)),
-  //                 ],
-  //               ),
-  //             ),
-  //           ),
-  //         ),
-  //     ],
-  //   );
-  // }
 
   Widget buildInfoBar(BuildContext context) {
     return Container(
@@ -906,7 +793,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  _makePhoneCall();
+                  // _makePhoneCall();
+                  launchUrl(Uri.parse("https://app.impexally.com/riders-info"));
                 },
                 child: Column(
                   children: [
@@ -940,12 +828,13 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return CategoryProducts(
-                      slug: homeData.featuredCategoryList[1].id.toString(),
-                      // category_name: homeData.featuredCategoryList[index].name,
-                    );
-                  }));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ImportFromChinaWebView(
+                          url: "https://app.impexally.com/import-from-china",
+                        )),
+                  );
                 },
                 child: Column(
                   children: [
@@ -954,7 +843,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         padding: EdgeInsets.only(left: 10),
                         child: CachedNetworkImage(
                           imageUrl:
-                              "https://image.impexally.com/images/ae/home-page/z0.png",
+                              "https://image.impexally.com/images/ae/home-page/import-from-china.png",
                           placeholder: (context, url) =>
                               Container(), // Placeholder widget
                           errorWidget: (context, url, error) =>
@@ -964,7 +853,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
-                        "Under 49",
+                        "From China",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 10,
@@ -1107,7 +996,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               Flexible(
                 child: GestureDetector(
                   onTap: () {
-                    _makePhoneCall();
+                    launchUrl(
+                        Uri.parse("https://app.impexally.com/riders-info"));
                   },
                   child: Column(
                     children: [
