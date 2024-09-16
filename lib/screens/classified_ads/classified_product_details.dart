@@ -1153,7 +1153,7 @@ class _ClassifiedAdsDetailsState extends State<ClassifiedAdsDetails>
                                   /*Image.asset(
                                         singleProduct.product_images[index])*/
                                   FadeInImage.assetNetwork(
-                                placeholder: 'assets/placeholder.png',
+                                placeholder: 'assets/flylande_loader.gif',
                                 image: _productImageList[index],
                                 fit: BoxFit.contain,
                               )),

@@ -88,7 +88,7 @@ class MyWidget {
             ? ClipRRect(
                 borderRadius: radius,
                 child: FadeInImage.assetNetwork(
-                  placeholder: "assets/placeholder.png",
+                  placeholder: "assets/app_logo.jpeg",
                   image: url,
                   height: height,
                   imageErrorBuilder: (context, object, stackTrace) {
@@ -98,7 +98,7 @@ class MyWidget {
                       decoration: BoxDecoration(
                         borderRadius: radius,
                         image: const DecorationImage(
-                          image: AssetImage("assets/placeholder.png"),
+                          image: AssetImage("assets/app_logo.jpeg"),
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -114,7 +114,7 @@ class MyWidget {
                 decoration: BoxDecoration(
                   borderRadius: radius,
                   image: const DecorationImage(
-                    image: AssetImage("assets/placeholder.png"),
+                    image: AssetImage("assets/app_logo.jpeg"),
                     fit: BoxFit.cover,
                   ),
                 ),

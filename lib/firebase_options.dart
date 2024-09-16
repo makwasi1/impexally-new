@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDq_66gBWj4TY59ocw7Jm3n8ac1Pqm4eOg',
-    appId: '1:564140156072:android:6a85bbbaaee29551834e9d',
+    appId: '1:564140156072:android:703864cfa5f1eca1834e9d',
     messagingSenderId: '564140156072',
     projectId: 'impexall-notify',
     storageBucket: 'impexall-notify.appspot.com',
@@ -63,7 +63,6 @@ class DefaultFirebaseOptions {
     messagingSenderId: '564140156072',
     projectId: 'impexall-notify',
     storageBucket: 'impexall-notify.appspot.com',
-    iosBundleId: 'com.impexally.app',
+    iosBundleId: 'com.flylandexpress.app',
   );
-
 }

@@ -323,12 +323,12 @@ class _ChatState extends State<Chat> {
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(35),
                         child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/placeholder.png',
+                            placeholder: 'assets/flylande_loader.gif',
                             image: widget.messenger_image!,
                             fit: BoxFit.contain,
                             imageErrorBuilder: (context, error, stackTrace) =>
                                 Image.asset(
-                                  'assets/placeholder.png',
+                                  'assets/app_logo.jpeg',
                                   fit: BoxFit.contain,
                                 ))),
                   ),

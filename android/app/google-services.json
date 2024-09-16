@@ -29,6 +29,28 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:564140156072:android:703864cfa5f1eca1834e9d",
+        "android_client_info": {
+          "package_name": "com.flylandexpress.app.twa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDq_66gBWj4TY59ocw7Jm3n8ac1Pqm4eOg"
+        },
+        {
+          "current_key": "AIzaSyCUOC_Hg0qeMERSjY_8-zHAVllsD5V3QGY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:564140156072:android:dd37dcc427999a23834e9d",
         "android_client_info": {
           "package_name": "com.flylandexpress.driver_app"

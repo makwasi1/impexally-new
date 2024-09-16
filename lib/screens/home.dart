@@ -153,14 +153,14 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                           ),
                                         )
                                       : Container(),
-                                  buildInfoBar(context),
+                                  // buildInfoBar(context),
                                   buildHomeCarouselSlider(context, homeData),
                                   // buildPromoItems(),
                                   // buildHomeMenuRow1(context, homeData),
 
                                   buildPromoItems(),
 
-                                  buildHomeRow(),
+                                  // buildHomeRow(),
                                   // buildHomeBannerOne(context, homeData),
                                   Padding(
                                     padding: const EdgeInsets.fromLTRB(
@@ -421,19 +421,19 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         child: ClipRRect(
                             borderRadius: BorderRadius.horizontal(
                                 left: Radius.circular(6), right: Radius.zero),
-                            child:
-                                homeData.featuredCategoryList[index].image != ""
-                                    ? FadeInImage.assetNetwork(
-                                        placeholder: 'assets/placeholder.png',
-                                        image: "https://seller.impexally.com/" +
-                                            homeData.featuredCategoryList[index]
-                                                .image,
-                                        fit: BoxFit.cover,
-                                      )
-                                    : Image.asset(
-                                        'assets/placeholder.png',
-                                        fit: BoxFit.cover,
-                                      ))),
+                            child: homeData.featuredCategoryList[index].image !=
+                                    ""
+                                ? FadeInImage.assetNetwork(
+                                    placeholder: 'assets/flylande_loader.gif',
+                                    image: "https://seller.impexally.com/" +
+                                        homeData
+                                            .featuredCategoryList[index].image,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.asset(
+                                    'assets/app_logo.jpeg',
+                                    fit: BoxFit.cover,
+                                  ))),
                     Flexible(
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
@@ -637,7 +637,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
         padding: EdgeInsets.only(top: 5, bottom: 10),
         child: CachedNetworkImage(
           imageUrl:
-              "https://image.impexally.com/images/app/impexally/athleisure.webp",
+              "https://image.flylandexpress.com/images/app/flyland/banners/the-sourcing-hub.webp",
           placeholder: (context, url) => Container(), // Placeholder widget
           errorWidget: (context, url, error) =>
               Icon(Icons.error), // Error widget
@@ -776,7 +776,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           Padding(
             padding: const EdgeInsets.only(left: 5.0),
             child: Text(
-              "🇬🇭 Impexpress - Sameday Delivery Across Ghana Accra",
+              "",
               style: TextStyle(
                   color: Colors.black,
                   fontSize: 11,
@@ -915,7 +915,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         padding: EdgeInsets.only(left: 10),
                         child: CachedNetworkImage(
                           imageUrl:
-                              "https://image.impexally.com/images/agents/riderz.png",
+                              "https://image.flylandexpress.com/images/app/flyland/banners/1g.webp",
                           placeholder: (context, url) =>
                               Container(), // Placeholder widget
                           errorWidget: (context, url, error) =>
@@ -925,7 +925,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
-                        "Get Riders",
+                        "Tomatoes",
                         style: TextStyle(
                             overflow: TextOverflow.ellipsis,
                             color: Colors.black,
@@ -954,7 +954,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         padding: EdgeInsets.only(left: 10),
                         child: CachedNetworkImage(
                           imageUrl:
-                              "https://image.impexally.com/images/ae/home-page/z0.png",
+                              "https://image.flylandexpress.com/images/app/flyland/banners/2g.webp",
                           placeholder: (context, url) =>
                               Container(), // Placeholder widget
                           errorWidget: (context, url, error) =>
@@ -964,7 +964,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
-                        "Under 49",
+                        "Oranges",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 10,
@@ -992,7 +992,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         padding: EdgeInsets.only(left: 10),
                         child: CachedNetworkImage(
                           imageUrl:
-                              "https://image.impexally.com/images/ae/home-page/z5.png",
+                              "https://image.flylandexpress.com/images/app/flyland/banners/3g.webp",
                           placeholder: (context, url) =>
                               Container(), // Placeholder widget
                           errorWidget: (context, url, error) =>
@@ -1002,7 +1002,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
-                        "Deals",
+                        "Pineapples",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 10,
@@ -1030,7 +1030,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         padding: EdgeInsets.only(right: 10),
                         child: CachedNetworkImage(
                           imageUrl:
-                              "https://image.impexally.com/images/ae/home-page/12.png",
+                              "https://image.flylandexpress.com/images/app/flyland/banners/5g.webp",
                           placeholder: (context, url) =>
                               Container(), // Placeholder widget
                           errorWidget: (context, url, error) =>
@@ -1040,7 +1040,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
-                        "Featured",
+                        "Bananas",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 10,
@@ -1068,7 +1068,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                         padding: EdgeInsets.only(right: 10),
                         child: CachedNetworkImage(
                           imageUrl:
-                              "https://image.impexally.com/images/ae/home-page/z2.png",
+                              "https://image.flylandexpress.com/images/app/flyland/banners/4g.webp",
                           placeholder: (context, url) =>
                               Container(), // Placeholder widget
                           errorWidget: (context, url, error) =>
@@ -1078,7 +1078,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     Padding(
                       padding: const EdgeInsets.all(1.0),
                       child: Text(
-                        "Special Offer",
+                        "Vegetables",
                         style: TextStyle(
                             overflow: TextOverflow.ellipsis,
                             color: Colors.black,
@@ -1350,7 +1350,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             children: [
               Expanded(
                 child: Image.asset(
-                  'assets/impexally.png',
+                  'assets/app_logo.jpeg',
                   height: 36,
                 ),
               ),

@@ -837,7 +837,7 @@ class _ProductVariantsState extends State<ProductVariants> {
               onTap: () {
                 openPhotoDialog(
                     context,
-                    "https://seller.impexally.com/uploads/images/" +
+                    "https://seller.flylandexpress.com/uploads/images/" +
                         _initialImage!);
               },
               child: Container(
@@ -849,13 +849,13 @@ class _ProductVariantsState extends State<ProductVariants> {
                     child: Stack(
                       children: [
                         FadeInImage.assetNetwork(
-                          placeholder: 'assets/placeholder.png',
+                          placeholder: 'assets/flylande_loader.gif',
                           image:
-                              "https://seller.impexally.com/uploads/images/" +
+                              "https://seller.flylandexpress.com/uploads/images/" +
                                   _initialImage!,
                           fit: BoxFit.contain,
                           imageErrorBuilder: (context, error, stackTrace) {
-                            return Image.asset('assets/placeholder.png');
+                            return Image.asset('assets/app_logo.jpeg');
                           },
                         ),
                         Positioned(
@@ -870,7 +870,7 @@ class _ProductVariantsState extends State<ProductVariants> {
                               onPressed: () {
                                 openPhotoDialog(
                                     context,
-                                    "https://seller.impexally.com/uploads/images/" +
+                                    "https://seller.flylandexpress.com/uploads/images/" +
                                         _initialImage!);
                               },
                             ),
@@ -1087,12 +1087,14 @@ class _ProductVariantsState extends State<ProductVariants> {
                                 child: FadeInImage.assetNetwork(
                                   height: 50,
                                   width: 50,
-                                  placeholder: 'assets/placeholder.png',
+                                  placeholder: 'assets/flylande_loader.gif',
                                   image:
-                                      "https://seller.impexally.com/uploads/images/" +
+                                      "https://seller.flylandexpress.com/uploads/images/" +
                                           option.imageVariation!.imageDefault!,
                                   fit: BoxFit.contain,
-                                  imageErrorBuilder: (context, error, stackTrace) => Image.asset('assets/placeholder.png'),
+                                  imageErrorBuilder:
+                                      (context, error, stackTrace) =>
+                                          Image.asset('assets/app_logo.jpeg'),
                                 ),
                               ),
                             );

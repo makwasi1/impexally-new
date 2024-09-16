@@ -59,14 +59,14 @@ class _MiniProductCardState extends State<MiniProductCard> {
                           borderRadius: BorderRadius.vertical(
                               top: Radius.circular(6), bottom: Radius.zero),
                           child: FadeInImage.assetNetwork(
-                              placeholder: 'assets/placeholder.png',
+                              placeholder: 'assets/flylande_loader.gif',
                               image:
-                                  "https://seller.impexally.com/uploads/images/" +
+                                  "https://seller.flylandexpress.com/uploads/images/" +
                                       widget.image!,
                               fit: BoxFit.contain,
                               imageErrorBuilder: (context, error, stackTrace) =>
                                   Image.asset(
-                                    "assets/placeholder.png",
+                                    "assets/app_logo.jpeg",
                                     fit: BoxFit.cover,
                                   )))),
                 ),
@@ -90,7 +90,7 @@ class _MiniProductCardState extends State<MiniProductCard> {
                         ? widget.main_price!.replaceAll(
                             SystemConfig.systemCurrency!.code!,
                             SystemConfig.systemCurrency!.symbol!)
-                        : "GH₵" + widget.discount!,
+                        : "AED" + widget.discount!,
                     maxLines: 1,
                     style: TextStyle(
                         color: MyTheme.accent_color,

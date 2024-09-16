@@ -140,7 +140,7 @@ class _SellerDetailsState extends State<SellerDetails> {
         await ProductRepository().getVendorDetails(id: widget.slug);
     //print('ss:' + shopDetailsResponse.toString());
     _shopDetails = vendorDetailsResponse;
-  
+
     if (_shopDetails != null) {
       fetchOthers();
       // _shopDetails?.sliders?.forEach((slider) {
@@ -810,7 +810,7 @@ class _SellerDetailsState extends State<SellerDetails> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(5),
                 child: FadeInImage.assetNetwork(
-                  placeholder: 'assets/placeholder.png',
+                  placeholder: 'assets/flylande_loader.gif',
                   image: "https://seller.impexally.com/${_shopDetails?.avatar}",
                   fit: BoxFit.contain,
                   imageErrorBuilder: (BuildContext, Object, StackTrace) {

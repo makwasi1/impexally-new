@@ -45,8 +45,7 @@ class _ProfileEditState extends State<ProfileEdit> {
   XFile? _file;
 
   chooseAndUploadImage(context) async {
-
-  var status =  await Permission.camera.request();
+    var status = await Permission.camera.request();
     // var status = await Permission.photos.request();
     //
     // if (status.isDenied) {
@@ -295,7 +294,7 @@ class _ProfileEditState extends State<ProfileEdit> {
                     clipBehavior: Clip.hardEdge,
                     borderRadius: BorderRadius.all(Radius.circular(100.0)),
                     child: FadeInImage.assetNetwork(
-                      placeholder: 'assets/placeholder.png',
+                      placeholder: 'assets/flylande_loader.gif',
                       image: "${avatar_original.$}",
                       fit: BoxFit.fill,
                     )),
@@ -481,7 +480,6 @@ class _ProfileEditState extends State<ProfileEdit> {
             alignment: Alignment.center,
             width: 150,
             child: Btn.basic(
-
               minWidth: MediaQuery.of(context).size.width,
               padding: EdgeInsets.symmetric(vertical: 12),
               color: MyTheme.accent_color,

@@ -117,10 +117,8 @@ class _FlashDealListState extends State<FlashDealList> {
     } else if (default_length == 2 && txt.length == 1) {
       leading_zeros = "0";
     }
-  
-    var newtxt = (txt == "" || txt == null.toString())
-        ? blank_zeros
-        : txt;
+
+    var newtxt = (txt == "" || txt == null.toString()) ? blank_zeros : txt;
 
     if (default_length > txt.length) {
       newtxt = leading_zeros + newtxt;
@@ -300,7 +298,7 @@ class _FlashDealListState extends State<FlashDealList> {
           ClipRRect(
             clipBehavior: Clip.none,
             child: FadeInImage(
-              placeholder: AssetImage("assets/placeholder.png"),
+              placeholder: AssetImage("assets/app_logo.jpeg"),
               image: NetworkImage(flashDealResponse.flashDeals[flashDealIndex]
                   .products.products[productIndex].image),
             ),

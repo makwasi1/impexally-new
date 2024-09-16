@@ -381,7 +381,7 @@ class _CartState extends State<Cart> {
                   Spacer(),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                    child: Text("GH₵ " + _cartTotalString,
+                    child: Text("AED " + _cartTotalString,
                         style: TextStyle(
                             color: MyTheme.accent_color,
                             fontSize: 18,
@@ -575,8 +575,8 @@ class _CartState extends State<Cart> {
                       borderRadius: BorderRadius.horizontal(
                           left: Radius.circular(6), right: Radius.zero),
                       child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/placeholder.png',
-                        image: "https://seller.impexally.com/uploads/images/" +
+                        placeholder: 'assets/flylande_loader.gif',
+                        image: "https://seller.flylandexpress.com/uploads/images/" +
                             getItemImage(_shopList[
                                 seller_index]), // Assuming 'image' is the field for image URL
                         fit: BoxFit.contain,
@@ -682,7 +682,7 @@ class _CartState extends State<Cart> {
                           child: Row(
                             children: [
                               Text(
-                                'GH₵ ' + _shopList[seller_index].itemPrice,
+                                'AED ' + _shopList[seller_index].itemPrice,
                                 textAlign: TextAlign.left,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
@@ -799,7 +799,7 @@ class _CartState extends State<Cart> {
                     borderRadius: BorderRadius.horizontal(
                         left: Radius.circular(6), right: Radius.zero),
                     child: FadeInImage.assetNetwork(
-                      placeholder: 'assets/placeholder.png',
+                      placeholder: 'assets/flylande_loader.gif',
                       image: "",
                       fit: BoxFit.cover,
                     ))),
@@ -826,7 +826,7 @@ class _CartState extends State<Cart> {
                       child: Row(
                         children: [
                           Text(
-                            'GH₵ ' +
+                            'AED ' +
                                 _shopList[seller_index]
                                     .product
                                     .priceDiscounted!,

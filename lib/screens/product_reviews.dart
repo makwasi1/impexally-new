@@ -39,7 +39,7 @@ class _ProductReviewsState extends State<ProductReviews> {
   bool _isInitial = true;
   int _page = 1;
   int? _totalData = 0;
-  
+
   bool _showLoadingContainer = false;
 
   @override
@@ -70,7 +70,7 @@ class _ProductReviewsState extends State<ProductReviews> {
       page: _page,
     );
     _reviewList.addAll(reviewResponse.reviews);
-    
+
     _isInitial = false;
     _totalData = _reviewList.length;
     _showLoadingContainer = false;
@@ -285,7 +285,7 @@ class _ProductReviewsState extends State<ProductReviews> {
               child: ClipRRect(
                   borderRadius: BorderRadius.circular(35),
                   child: Image.asset(
-                    "assets/placeholder.png",
+                    "assets/app_logo.jpeg",
                     fit: BoxFit.cover,
                   )),
             ),

@@ -179,28 +179,33 @@ class _MessengerListState extends State<MessengerList> {
           return Chat(
             messenger_name: "", // Assuming dynamic data
             messenger_title: "", // Assuming dynamic data
-            messenger_image: "", // Assuming you'll add the correct image path here
+            messenger_image:
+                "", // Assuming you'll add the correct image path here
           );
         }));
       },
       child: Padding(
         padding: const EdgeInsets.only(bottom: 8.0),
-        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.start, children: <Widget>[
           Container(
             width: 40,
             height: 40,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(35),
-              border: Border.all(color: Color.fromRGBO(112, 112, 112, .3), width: 1),
+              border: Border.all(
+                  color: Color.fromRGBO(112, 112, 112, .3), width: 1),
             ),
             child: ClipRRect(
                 borderRadius: BorderRadius.circular(35),
                 child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/placeholder.png',
-                    image: "", // Assuming you'll add the correct image path here
+                    placeholder: 'assets/flylande_loader.gif',
+                    image:
+                        "", // Assuming you'll add the correct image path here
                     fit: BoxFit.contain,
-                    imageErrorBuilder: (context, error, stackTrace) => Image.asset(
-                          'assets/placeholder.png',
+                    imageErrorBuilder: (context, error, stackTrace) =>
+                        Image.asset(
+                          'assets/app_logo.jpeg',
                           fit: BoxFit.contain,
                         ))),
           ),

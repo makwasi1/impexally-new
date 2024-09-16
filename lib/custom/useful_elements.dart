@@ -9,14 +9,19 @@ class UsefulElements {
     return IconButton(
       padding: EdgeInsets.zero,
       icon: Icon(
-          app_language_rtl.$! ?CupertinoIcons.arrow_right :CupertinoIcons.arrow_left,
+          app_language_rtl.$!
+              ? CupertinoIcons.arrow_right
+              : CupertinoIcons.arrow_left,
           color: color == 'white' ? Colors.white : MyTheme.dark_font_grey),
       onPressed: () => Navigator.pop(context),
     );
   }
+
   static backIcon(context, {color = 'black'}) {
     return Icon(
-        app_language_rtl.$! ?CupertinoIcons.arrow_right :CupertinoIcons.arrow_left,
+        app_language_rtl.$!
+            ? CupertinoIcons.arrow_right
+            : CupertinoIcons.arrow_left,
         color: color == 'white' ? Colors.white : MyTheme.dark_font_grey);
   }
 
@@ -33,89 +38,81 @@ class UsefulElements {
     );
   }
 
-
   static Widget roundImageWithPlaceholder(
       {String? url,
-        double height = 0.0,
-        double elevation = 0.0,
-        double borderWidth = 0.0,
-        width = 0.0,
-        double paddingX = 0.0,
-        double paddingY = 0.0,
-        BorderRadius borderRadius =  BorderRadius.zero,
-        Color backgroundColor = Colors.white,
-        Color borderColor = Colors.white,
-        BoxFit fit = BoxFit.cover
-
-      }) {
+      double height = 0.0,
+      double elevation = 0.0,
+      double borderWidth = 0.0,
+      width = 0.0,
+      double paddingX = 0.0,
+      double paddingY = 0.0,
+      BorderRadius borderRadius = BorderRadius.zero,
+      Color backgroundColor = Colors.white,
+      Color borderColor = Colors.white,
+      BoxFit fit = BoxFit.cover}) {
     return Material(
       color: backgroundColor,
       elevation: elevation,
       borderRadius: borderRadius,
-      child:Container(
-          //padding: EdgeInsets.symmetric(horizontal: paddingY, vertical: paddingX),
-         // margin: EdgeInsets.symmetric(horizontal: marginY, vertical: marginX),
-          decoration: BoxDecoration(
-            borderRadius: borderRadius,
-            border: Border.all(color: borderColor, width: borderWidth),
-            color: backgroundColor,
+      child: Container(
+        //padding: EdgeInsets.symmetric(horizontal: paddingY, vertical: paddingX),
+        // margin: EdgeInsets.symmetric(horizontal: marginY, vertical: marginX),
+        decoration: BoxDecoration(
+          borderRadius: borderRadius,
+          border: Border.all(color: borderColor, width: borderWidth),
+          color: backgroundColor,
+        ),
+        height: height,
+        width: width,
 
-          ),
-          height: height,
-          width: width,
-
-          child:  ClipRRect(
-            borderRadius: borderRadius,
-            child: url != null && url.isNotEmpty
-                ? FadeInImage.assetNetwork(
-              placeholder: "assets/placeholder.png",
-              image: url,
-
-              imageErrorBuilder: (context, object, stackTrace) {
-                return  Container(
+        child: ClipRRect(
+          borderRadius: borderRadius,
+          child: url != null && url.isNotEmpty
+              ? FadeInImage.assetNetwork(
+                  placeholder: "assets/app_logo.jpeg",
+                  image: url,
+                  imageErrorBuilder: (context, object, stackTrace) {
+                    return Container(
+                      height: height,
+                      width: width,
+                      decoration: BoxDecoration(
+                          borderRadius: borderRadius,
+                          image: const DecorationImage(
+                              image: AssetImage("assets/app_logo.jpeg"),
+                              fit: BoxFit.cover)),
+                    );
+                  },
+                  height: height,
+                  width: width,
+                  fit: fit,
+                )
+              : Container(
                   height: height,
                   width: width,
                   decoration: BoxDecoration(
                       borderRadius: borderRadius,
-                      image:const DecorationImage(
-                          image: AssetImage("assets/placeholder.png"),
-                          fit: BoxFit.cover
-                      )
-                  ),
-                );
-              },
-              height: height,
-              width: width,
-              fit: fit,
-            )
-                : Container(
-              height: height,
-              width: width,
-              decoration: BoxDecoration(
-                  borderRadius: borderRadius,
-                  image:const DecorationImage(
-                      image: AssetImage("assets/placeholder.png"),
-                      fit: BoxFit.cover
-                  )
-              ),
-            ),
-          ),),
+                      image: const DecorationImage(
+                          image: AssetImage("assets/app_logo.jpeg"),
+                          fit: BoxFit.cover)),
+                ),
+        ),
+      ),
     );
   }
 
   Container customContainer(
       {double width = 0.0,
-        double borderWith = 1.0,
-        double height = 0.0,
-        double borderRadius = 0.0,
-        Color bgColor = const Color.fromRGBO(255, 255, 255, 0),
-        Color borderColor = const Color.fromRGBO(255, 255, 255, 0),
-        Widget? child,
-        double paddingX = 0.0,
-        paddingY = 0.0,
-        double marginX = 0.0,
-        double marginY = 0.0,
-        Alignment alignment = Alignment.center}) {
+      double borderWith = 1.0,
+      double height = 0.0,
+      double borderRadius = 0.0,
+      Color bgColor = const Color.fromRGBO(255, 255, 255, 0),
+      Color borderColor = const Color.fromRGBO(255, 255, 255, 0),
+      Widget? child,
+      double paddingX = 0.0,
+      paddingY = 0.0,
+      double marginX = 0.0,
+      double marginY = 0.0,
+      Alignment alignment = Alignment.center}) {
     return Container(
         alignment: alignment,
         padding: EdgeInsets.symmetric(horizontal: paddingY, vertical: paddingX),
@@ -129,6 +126,4 @@ class UsefulElements {
         width: width,
         child: child);
   }
-
-
 }

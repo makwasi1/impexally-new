@@ -285,8 +285,9 @@ class _ProductDetailsState extends State<ProductDetails>
         isOutOfStock = true;
       }
       _productDetails!.image!.forEach((photo) {
-        _productImageList.add("https://seller.impexally.com/uploads/images/" +
-            photo.imageDefault!);
+        _productImageList.add(
+            "https://seller.flylandexpress.com/uploads/images/" +
+                photo.imageDefault!);
       });
 
       // _productDetails!.choice_options!.forEach((choice_opiton) {
@@ -1573,7 +1574,7 @@ class _ProductDetailsState extends State<ProductDetails>
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(16.0),
                       child: Image.asset(
-                        'assets/placeholder.png',
+                        'assets/app_logo.jpeg',
                         fit: BoxFit.cover,
                       ),
                     ),
@@ -2629,7 +2630,7 @@ class _ProductDetailsState extends State<ProductDetails>
         //               child: ClipRRect(
         //                   borderRadius: BorderRadius.circular(5),
         //                   child: FadeInImage.assetNetwork(
-        //                     placeholder: 'assets/placeholder.png',
+        //                     placeholder: 'assets/flylande_loader.gif',
         //                     image: _productDetails!.brand.logo,
         //                     fit: BoxFit.contain,
         //                   )),
@@ -3058,7 +3059,7 @@ class _ProductDetailsState extends State<ProductDetails>
                                   /*Image.asset(
                                         singleProduct.product_images[index])*/
                                   FadeInImage.assetNetwork(
-                                placeholder: 'assets/placeholder.png',
+                                placeholder: 'assets/flylande_loader.gif',
                                 image: _productImageList[index],
                                 fit: BoxFit.contain,
                               )),
@@ -3113,7 +3114,7 @@ class _ProductDetailsState extends State<ProductDetails>
                           height: double.infinity,
                           width: double.infinity,
                           child: FadeInImage.assetNetwork(
-                            placeholder: 'assets/placeholder.png',
+                            placeholder: 'assets/flylande_loader.gif',
                             image: _productImageList[_currentImage],
                             fit: BoxFit.fitWidth,
                           )),

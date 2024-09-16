@@ -13,7 +13,7 @@
     <key>CFBundleInfoDictionaryVersion</key>
     <string>6.0</string>
     <key>CFBundleName</key>
-    <string>Impexally</string>
+    <string>Flyland Express</string>
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>CFBundleShortVersionString</key>
@@ -50,7 +50,7 @@
     <key>FacebookClientToken</key>
     <string></string>
     <key>FacebookDisplayName</key>
-    <string>impexally Ecommerce</string>
+    <string>Flyland Express</string>
     <key>LSApplicationCategoryType</key>
     <string></string>
     <key>LSApplicationQueriesSchemes</key>

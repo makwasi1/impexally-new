@@ -479,7 +479,7 @@ class _OrderListState extends State<OrderList> {
                           color: MyTheme.dark_font_grey, fontSize: 12)),
                   Spacer(),
                   Text(
-                    "GH₵ "+_orderList[index].priceTotal,
+                    "AED " + _orderList[index].priceTotal,
                     style: TextStyle(
                         color: MyTheme.accent_color,
                         fontSize: 16,

@@ -532,7 +532,7 @@ class _SelectAddressState extends State<SelectAddress>
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ $_cartTotalString",
+                        "AED $_cartTotalString",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 14,
@@ -557,7 +557,7 @@ class _SelectAddressState extends State<SelectAddress>
                       ),
                       Spacer(),
                       Text(
-                        "-GH₵.....",
+                        "-AED.....",
                         style: TextStyle(
                             color: MyTheme.green,
                             fontSize: 14,
@@ -582,7 +582,7 @@ class _SelectAddressState extends State<SelectAddress>
                       ),
                       Spacer(),
                       Text(
-                        _coupon_applied! ? "GH₵ " : "No Coupon(s) Applied",
+                        _coupon_applied! ? "AED " : "No Coupon(s) Applied",
                         style: TextStyle(
                             color: MyTheme.accent_color,
                             fontSize: 14,
@@ -607,7 +607,7 @@ class _SelectAddressState extends State<SelectAddress>
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ ${_shipping_cost_string.toString()}",
+                        "AED ${_shipping_cost_string.toString()}",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 14,
@@ -633,7 +633,7 @@ class _SelectAddressState extends State<SelectAddress>
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ ${_cartTotalString}",
+                        "AED ${_cartTotalString}",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 18,
@@ -833,8 +833,8 @@ class _SelectAddressState extends State<SelectAddress>
                       borderRadius: BorderRadius.horizontal(
                           left: Radius.circular(6), right: Radius.zero),
                       child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/placeholder.png',
-                        image: "https://seller.impexally.com/uploads/images/" +
+                        placeholder: 'assets/flylande_loader.gif',
+                        image: "https://seller.flylandexpress.com/uploads/images/" +
                             getItemImage(_shopList[
                                 seller_index]), // Assuming 'image' is the field for image URL
                         fit: BoxFit.contain,
@@ -862,7 +862,7 @@ class _SelectAddressState extends State<SelectAddress>
                           child: Row(
                             children: [
                               Text(
-                                'GH₵ ' + _shopList[seller_index].itemPrice,
+                                'AED ' + _shopList[seller_index].itemPrice,
                                 textAlign: TextAlign.left,
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 2,
@@ -968,8 +968,8 @@ class _SelectAddressState extends State<SelectAddress>
                       borderRadius: BorderRadius.horizontal(
                           left: Radius.circular(6), right: Radius.zero),
                       child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/placeholder.png',
-                        image: "https://seller.impexally.com/uploads/images/" +
+                        placeholder: 'assets/flylande_loader.gif',
+                        image: "https://seller.flylandexpress.com/uploads/images/" +
                             getItemImage(widget.cartList[
                                 seller_index]), // Assuming 'image' is the field for image URL
                         fit: BoxFit.cover,
@@ -998,7 +998,7 @@ class _SelectAddressState extends State<SelectAddress>
                           child: Row(
                             children: [
                               Text(
-                                'GH₵ ' +
+                                'AED ' +
                                     widget.cartList[seller_index].product
                                         .priceDiscounted!,
                                 textAlign: TextAlign.left,
@@ -1414,7 +1414,7 @@ class _SelectAddressState extends State<SelectAddress>
                 height: 50,
                 child: Center(
                   child: Text(
-                    "GH₵ ${_cartTotalString}",
+                    "AED ${_cartTotalString}",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 24,

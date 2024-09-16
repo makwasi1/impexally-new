@@ -16,7 +16,7 @@ class ListProductCard extends StatefulWidget {
   ListProductCard(
       {Key? key,
       this.id,
-        required this.slug,
+      required this.slug,
       this.image,
       this.name,
       this.main_price,
@@ -50,16 +50,18 @@ class _ListProductCardState extends State<ListProductCard> {
                   borderRadius: BorderRadius.horizontal(
                       left: Radius.circular(6), right: Radius.zero),
                   child: FadeInImage.assetNetwork(
-                    placeholder: 'assets/placeholder.png',
-                    image:  "https://seller.impexally.com/uploads/images/"+widget.image!,
+                    placeholder: 'assets/flylande_loader.gif',
+                    image: "https://seller.flylandexpress.com/uploads/images/" +
+                        widget.image!,
                     fit: BoxFit.cover,
                   ))),
           Flexible(
             child: Container(
-              padding: EdgeInsets.only(top: 10, left: 12,right: 12,bottom: 14),
+              padding:
+                  EdgeInsets.only(top: 10, left: 12, right: 12, bottom: 14),
               //width: 240,
               height: 100,
-             //color: Colors.red,
+              //color: Colors.red,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,7 +72,6 @@ class _ListProductCardState extends State<ListProductCard> {
                       widget.name!,
                       overflow: TextOverflow.ellipsis,
                       maxLines: 2,
-
                       style: TextStyle(
                           color: MyTheme.font_grey,
                           fontSize: 14,
@@ -95,16 +96,15 @@ class _ListProductCardState extends State<ListProductCard> {
                         ),
                         widget.has_discount!
                             ? Text(
-                          "${SystemConfig.currency + " "+ widget.stroked_price!}",
-
-                              textAlign: TextAlign.left,
-                              maxLines: 1,
-                              style: TextStyle(
-                                  decoration: TextDecoration.lineThrough,
-                                  color: MyTheme.medium_grey,
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w400),
-                            )
+                                "${SystemConfig.currency + " " + widget.stroked_price!}",
+                                textAlign: TextAlign.left,
+                                maxLines: 1,
+                                style: TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                    color: MyTheme.medium_grey,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w400),
+                              )
                             : Container(),
                       ],
                     ),

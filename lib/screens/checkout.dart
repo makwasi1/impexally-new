@@ -1,8 +1,9 @@
+import 'dart:developer';
+
 import 'package:active_ecommerce_flutter/custom/box_decorations.dart';
 import 'package:active_ecommerce_flutter/custom/btn.dart';
 import 'package:active_ecommerce_flutter/custom/enum_classes.dart';
 import 'package:active_ecommerce_flutter/custom/toast_component.dart';
-import 'package:active_ecommerce_flutter/data_model/login_response.dart';
 import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
@@ -16,12 +17,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:paypal_payment/paypal_payment.dart';
 import 'package:toast/toast.dart';
 
 import '../data_model/payment_type_response.dart';
 import '../dummy_data/payment_methods.dart';
-import '../helpers/auth_helper.dart';
 
+// ignore: must_be_immutable
 class Checkout extends StatefulWidget {
   int? order_id; // only need when making manual payment from order details
   String? list;
@@ -74,6 +76,7 @@ class _CheckoutState extends State<Checkout> {
   String payment_type = "cart_payment";
   String? _title;
   String? phone;
+  int cart_delivery_fee = 0;
 
   TextEditingController _phoneNumberController = TextEditingController();
 
@@ -122,34 +125,25 @@ class _CheckoutState extends State<Checkout> {
     List<PaymentTypeResponse> paymentTypeResponseList = [
       PaymentTypeResponse(
           payment_type: "1",
-          payment_type_key: "mobile_money",
-          name: "Checkout with Mobile Wallet",
-          image: "assets/MTN-Momo.png",
-          title: "MTN Mobile Money",
+          payment_type_key: "bank_card",
+          name: "Pay with Bank card",
+          image: "assets/paypal_pay.png",
+          title: "Pay With Bank card",
           offline_payment_id: 1,
-          details: "Pay with Mobile Money"),
+          details: "Pay with Bank card"),
       PaymentTypeResponse(
           payment_type: "2",
-          payment_type_key: "mobile_money",
-          name: "Checkout with Mobile Wallet",
-          image: "assets/MTN-Momo.png",
-          title: "Airtel Money",
-          offline_payment_id: 1,
-          details: "Pay with Mobile Money"),
-      PaymentTypeResponse(
-          payment_type: "3",
-          payment_type_key: "mobile_money",
-          name: "Checkout with Mobile Wallet",
-          image: "assets/MTN-Momo.png",
-          title: "Orange Money",
-          offline_payment_id: 1,
-          details: "Pay with Mobile Money"),
+          payment_type_key: "cod",
+          name: "Pay cash on delivery",
+          image: "assets/cash-on-delivery.png",
+          title: "Cash on delivery",
+          offline_payment_id: 2,
+          details: "Pay cash on delivery"),
     ];
 
     _paymentTypeList.addAll(paymentTypeResponseList);
     if (_paymentTypeList.length > 0) {
-      _selected_payment_method = _paymentTypeList[0].payment_type;
-      _selected_payment_method_key = _paymentTypeList[0].payment_type_key;
+      print("payment type ${_paymentTypeList.length}");
     }
     _isInitial = false;
     setState(() {});
@@ -259,7 +253,7 @@ class _CheckoutState extends State<Checkout> {
     }
     debugPrint("Selected Payment Method: " + _selected_payment_method!);
     phoneNumberReader();
-    onPaymentWithMobileMoney();
+    // onPayWithPayPal();
   }
 
   pay_by_wallet() async {
@@ -359,6 +353,18 @@ class _CheckoutState extends State<Checkout> {
       });
     }
 
+    if (_selected_payment_method_key == "cod") {
+      _grandTotalValue = _grandTotalValue! + 10;
+      setState(() {
+        cart_delivery_fee = 10;
+      });
+    } else {
+      onPayWithPayPal();
+      setState(() {
+        cart_delivery_fee = 0;
+      });
+    }
+
     //print(_selected_payment_method);
     //print(_selected_payment_method_key);
   }
@@ -379,6 +385,39 @@ class _CheckoutState extends State<Checkout> {
     String? phoneNumber = await storage.read(key: 'phone');
     debugPrint("hshdhsdhshdhsd ${phoneNumber}");
     return phoneNumber!;
+  }
+
+  onPayWithPayPal() {
+    final String url = "http://localhost:63329/app/example";
+    final String? amount = widget.cart_amount;
+
+// Listen for callbacks for device not for web
+    Navigator.of(context).push(MaterialPageRoute(
+      builder: (BuildContext context) => PaypalOrderPayment(
+        sandboxMode: true,
+        clientId:
+            "AdQ-MYoDX06QxjiyoAzz2PS_c4oC_jCRs2X_dXBKiPFBmkfSKq5PuXHWAAXFjZRfnBJV01kb3vTNSiI2",
+        secretKey:
+            "EChq_RbH5NMShNX0L2zleO61AEfxGSG9UEUf6K1dfUZDfbpMV5UTEsGV7voQrhfiTV0773vispGaXhXh",
+        currencyCode: "USD",
+        amount: amount,
+        returnURL: url,
+        cancelURL: url,
+        note: "Contact us for any questions on your order.",
+        onSuccess: (Map params) async {
+          log("onSuccess: $params");
+          Navigator.pop(context);
+        },
+        onError: (error) {
+          log("onError: $error");
+          Navigator.pop(context);
+        },
+        onCancel: () {
+          print('cancelled:');
+          Navigator.pop(context);
+        },
+      ),
+    ));
   }
 
   onPaymentWithMobileMoney() {
@@ -661,7 +700,7 @@ class _CheckoutState extends State<Checkout> {
                           padding: const EdgeInsets.all(16.0),
                           child: buildPaymentMethodList(),
                         ),
-                        buildOptionsDropDown(context),
+                        // buildOptionsDropDown(context),
                         Container(
                           height: 10,
                         ),
@@ -810,7 +849,7 @@ class _CheckoutState extends State<Checkout> {
               height: 14,
             );
           },
-          itemCount: 1,
+          itemCount: _paymentTypeList.length,
           scrollDirection: Axis.vertical,
           physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
@@ -860,7 +899,7 @@ class _CheckoutState extends State<Checkout> {
                   color: MyTheme.light_grey,
                   padding: EdgeInsets.all(8.0),
                   child: Text(
-                    "Get upto 25% discount on Impexally Pay using ICICI Bank Net banking or Cards",
+                    "Get upto 25% discount on Flyland Pay using ICICI Bank Net banking or Cards",
                     style: TextStyle(
                         color: MyTheme.font_grey,
                         fontSize: 12,
@@ -914,28 +953,6 @@ class _CheckoutState extends State<Checkout> {
             children: [],
           ),
         ),
-        Visibility(
-          visible: selectedPay,
-          child: Container(
-            padding: EdgeInsets.all(8.0),
-            color: Colors.white,
-            child: Column(
-              children: paymentMethodList.map((paymentType) {
-                return RadioListTile<String>(
-                  title: Text(paymentType.name!),
-                  value: paymentType.key!,
-                  groupValue: _selected_payment_method,
-                  onChanged: (String? value) {
-                    setState(() {
-                      _selected_payment_method = value;
-                      debugPrint("Selected Payment Method: $value");
-                    });
-                  },
-                );
-              }).toList(),
-            ),
-          ),
-        ),
       ],
     );
   }
@@ -948,6 +965,10 @@ class _CheckoutState extends State<Checkout> {
           selectedPay = !selectedPay;
           debugPrint("Selected Payment Method: $selectedPay");
         });
+
+        if (_paymentTypeList[index].key != "cod") {
+          onPayWithPayPal();
+        }
       },
       child: Stack(
         children: [
@@ -973,7 +994,7 @@ class _CheckoutState extends State<Checkout> {
                         padding: const EdgeInsets.all(16.0),
                         child: Image.asset(
                           _paymentTypeList[index].image,
-                          fit: BoxFit.fitWidth,
+                          fit: BoxFit.contain,
                         ),
                       )),
                   Container(
@@ -984,7 +1005,7 @@ class _CheckoutState extends State<Checkout> {
                         Padding(
                           padding: EdgeInsets.only(left: 0.0),
                           child: Text(
-                            "Select Mobile Money Payment Option",
+                            _paymentTypeList[index].title,
                             style: TextStyle(
                                 color: MyTheme.font_grey,
                                 fontSize: 14,
@@ -1033,7 +1054,7 @@ class _CheckoutState extends State<Checkout> {
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ ${widget.cart_amount}",
+                        "AED ${widget.cart_amount}",
                         style: TextStyle(
                             color: MyTheme.font_grey,
                             fontSize: 14,
@@ -1058,7 +1079,7 @@ class _CheckoutState extends State<Checkout> {
                       ),
                       Spacer(),
                       Text(
-                        "-GH₵.....",
+                        "-AED.....",
                         style: TextStyle(
                             color: MyTheme.green,
                             fontSize: 14,
@@ -1083,7 +1104,7 @@ class _CheckoutState extends State<Checkout> {
                       ),
                       Spacer(),
                       Text(
-                        _coupon_applied! ? "GH₵ " : "No Coupon(s) Applied",
+                        _coupon_applied! ? "AED " : "No Coupon(s) Applied",
                         style: TextStyle(
                             color: MyTheme.accent_color,
                             fontSize: 14,
@@ -1108,7 +1129,7 @@ class _CheckoutState extends State<Checkout> {
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ ${widget.delivery_fee}",
+                        "AED ${cart_delivery_fee}",
                         style: TextStyle(
                             color: MyTheme.font_grey,
                             fontSize: 14,
@@ -1134,7 +1155,7 @@ class _CheckoutState extends State<Checkout> {
                       ),
                       Spacer(),
                       Text(
-                        "GH₵ $_grandTotalValue",
+                        "AED $_grandTotalValue",
                         style: TextStyle(
                             color: Colors.black,
                             fontSize: 18,
@@ -1176,7 +1197,7 @@ class _CheckoutState extends State<Checkout> {
                 height: 50,
                 child: Center(
                   child: Text(
-                    "GH₵ $_grandTotalValue",
+                    "AED $_grandTotalValue",
                     style: TextStyle(
                         color: Colors.black,
                         fontSize: 24,

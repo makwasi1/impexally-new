@@ -152,7 +152,7 @@ class _WishlistState extends State<Wishlist> {
                     icon: Icon(Icons.cancel, color: Colors.red),
                     onPressed: () {
                       // Handle delete action here
-                         _onPressRemove(index);
+                      _onPressRemove(index);
                     },
                   ),
                 ),
@@ -199,7 +199,7 @@ class _WishlistState extends State<Wishlist> {
                             borderRadius: BorderRadius.horizontal(
                                 left: Radius.circular(16), right: Radius.zero),
                             child: FadeInImage.assetNetwork(
-                              placeholder: 'assets/placeholder.png',
+                              placeholder: 'assets/flylande_loader.gif',
                               image:
                                   _wishlistItems[index].product.thumbnail_image,
                               fit: BoxFit.cover,

@@ -121,8 +121,8 @@ class _ProfileState extends State<Profile> {
     int orderCount =
         await Provider.of<CartCounter>(context, listen: false).getOrderCount();
 
-    int wishlistCount =
-        await Provider.of<CartCounter>(context, listen: false).getWishlistCount();    
+    int wishlistCount = await Provider.of<CartCounter>(context, listen: false)
+        .getWishlistCount();
 
     setState(() {
       _cartCounter = cartCount;
@@ -133,7 +133,7 @@ class _ProfileState extends State<Profile> {
       _orderCounterString =
           counterText(_orderCounter.toString(), default_length: 2);
       _wishlistCounterString =
-          counterText(_wishlistCounter.toString(), default_length: 2);    
+          counterText(_wishlistCounter.toString(), default_length: 2);
     });
   }
 
@@ -1460,14 +1460,14 @@ class _ProfileState extends State<Profile> {
                       clipBehavior: Clip.hardEdge,
                       borderRadius: BorderRadius.all(Radius.circular(100.0)),
                       child: Image.asset(
-                        'assets/profile_placeholder.png',
+                        'assets/profile_app_logo.jpeg',
                         height: 48,
                         width: 48,
                         fit: BoxFit.fitHeight,
                       ),
                     )
                   : Image.asset(
-                      'assets/profile_placeholder.png',
+                      'assets/profile_app_logo.jpeg',
                       height: 48,
                       width: 48,
                       fit: BoxFit.fitHeight,

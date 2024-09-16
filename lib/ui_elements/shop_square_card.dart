@@ -11,7 +11,14 @@ class ShopSquareCard extends StatefulWidget {
   String? name;
   double? stars;
 
-  ShopSquareCard({Key? key,this.id, this.image, this.name,this.stars,required this.shopSlug}) : super(key: key);
+  ShopSquareCard(
+      {Key? key,
+      this.id,
+      this.image,
+      this.name,
+      this.stars,
+      required this.shopSlug})
+      : super(key: key);
 
   @override
   _ShopSquareCardState createState() => _ShopSquareCardState();
@@ -21,9 +28,11 @@ class _ShopSquareCardState extends State<ShopSquareCard> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: (){
+      onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return SellerDetails(slug: widget.shopSlug,);
+          return SellerDetails(
+            slug: widget.shopSlug,
+          );
         }));
       },
       child: Container(
@@ -34,18 +43,16 @@ class _ShopSquareCardState extends State<ShopSquareCard> {
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Container(
-
                   width: double.infinity,
                   height: 100,
                   child: ClipRRect(
                       borderRadius: BorderRadius.vertical(
                           top: Radius.circular(16), bottom: Radius.zero),
                       child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/placeholder.png',
-                        image:  widget.image!,
+                        placeholder: 'assets/flylande_loader.gif',
+                        image: widget.image!,
                         fit: BoxFit.scaleDown,
                       ))),
-
               Container(
                 child: Padding(
                   padding: EdgeInsets.fromLTRB(16, 8, 16, 8),
@@ -62,39 +69,44 @@ class _ShopSquareCardState extends State<ShopSquareCard> {
                   ),
                 ),
               ),
-
-
               Padding(
                 padding: const EdgeInsets.only(bottom: 8.0),
                 child: Container(
-
                   height: 15,
                   child: RatingBar(
-                    ignoreGestures: true,
+                      ignoreGestures: true,
                       initialRating: widget.stars!,
                       maxRating: 5,
                       direction: Axis.horizontal,
                       itemSize: 15.0,
                       itemCount: 5,
-                      ratingWidget:RatingWidget(full: Icon(Icons.star,color: Colors.amber,),
-                        half:Icon(Icons.star_half),
+                      ratingWidget: RatingWidget(
+                        full: Icon(
+                          Icons.star,
+                          color: Colors.amber,
+                        ),
+                        half: Icon(Icons.star_half),
                         empty: Icon(Icons.star,
                             color: Color.fromRGBO(224, 224, 225, 1)),
-                      ), onRatingUpdate:( newValue){
-
-                  }),
+                      ),
+                      onRatingUpdate: (newValue) {}),
                 ),
               ),
               Container(
-                height: 23,
+                  height: 23,
                   width: 103,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    border: Border.all(color: Colors.amber),
-                    color: MyTheme.amber,
-                    borderRadius: BorderRadius.circular(6)
-                  ),
-                  child: Text("Visit Store",style: TextStyle(fontSize: 10,color:Colors.amber.shade700,fontWeight: FontWeight.w500 ),))
+                      border: Border.all(color: Colors.amber),
+                      color: MyTheme.amber,
+                      borderRadius: BorderRadius.circular(6)),
+                  child: Text(
+                    "Visit Store",
+                    style: TextStyle(
+                        fontSize: 10,
+                        color: Colors.amber.shade700,
+                        fontWeight: FontWeight.w500),
+                  ))
             ]),
       ),
     );

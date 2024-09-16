@@ -3,7 +3,6 @@ import 'package:active_ecommerce_flutter/custom/useful_elements.dart';
 import 'package:flutter/material.dart';
 import 'package:active_ecommerce_flutter/my_theme.dart';
 
-
 import 'package:active_ecommerce_flutter/repositories/language_repository.dart';
 import 'package:active_ecommerce_flutter/repositories/coupon_repository.dart';
 import 'package:active_ecommerce_flutter/helpers/shimmer_helper.dart';
@@ -90,7 +89,6 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   }
 
   onLanguageItemTap(index) {
-
     if (index != _selected_index) {
       setState(() {
         _selected_index = index;
@@ -116,7 +114,8 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
   @override
   Widget build(BuildContext context) {
     return Directionality(
-      textDirection: app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
+      textDirection:
+          app_language_rtl.$! ? TextDirection.rtl : TextDirection.ltr,
       child: Scaffold(
           backgroundColor: Colors.white,
           appBar: buildAppBar(context),
@@ -161,7 +160,10 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
       ),
       title: Text(
         "${AppLocalizations.of(context)!.change_language_ucf} (${app_language.$}) - (${app_mobile_language.$})",
-        style: TextStyle(fontSize: 16, color: MyTheme.dark_font_grey,fontWeight: FontWeight.bold),
+        style: TextStyle(
+            fontSize: 16,
+            color: MyTheme.dark_font_grey,
+            fontWeight: FontWeight.bold),
       ),
       elevation: 0.0,
       titleSpacing: 0,
@@ -230,7 +232,7 @@ class _ChangeLanguageState extends State<ChangeLanguage> {
                           fit: BoxFit.fitWidth,
                         ),*/
                               FadeInImage.assetNetwork(
-                            placeholder: 'assets/placeholder.png',
+                            placeholder: 'assets/flylande_loader.gif',
                             image: _list[index].image,
                             fit: BoxFit.fitWidth,
                           ))),

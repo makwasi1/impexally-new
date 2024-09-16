@@ -80,11 +80,19 @@ class HomePresenter extends ChangeNotifier {
     //   carouselImageList.add(slider);
     // });
     carouselImageList.add(
-        AIZSlider(photo: "https://image.impexally.com/images/app/impexally/ng/savenow.webp", url: "https://image.impexally.com/images/app/impexally/ng/savenow.webp"),
-        );
+      AIZSlider(
+          photo:
+              "https://image.flylandexpress.com/images/app/flyland/ng/vip.webp",
+          url:
+              "https://image.flylandexpress.com/images/app/flyland/ng/oranges-banner.webp"),
+    );
     carouselImageList.add(
-        AIZSlider(photo: "https://image.impexally.com/images/app/impexally/Dreamland.webp", url: "https://image.impexally.com/images/app/impexally/Dreamland.webp"),
-        );    
+      AIZSlider(
+          url:
+              "https://image.flylandexpress.com/images/app/flyland/ng/oranges-banner.webp",
+          photo:
+              "https://image.flylandexpress.com/images/app/flyland/ng/oranges-banner.webp"),
+    );
     isCarouselInitial = false;
     notifyListeners();
   }
@@ -95,11 +103,19 @@ class HomePresenter extends ChangeNotifier {
     //   bannerOneImageList.add(slider);
     // });
     bannerOneImageList.add(
-               AIZSlider(photo: "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp", url: "https://image.impexally.com/images/app/impexally/Impexally-express-banner.webp"),
-        );
+      AIZSlider(
+          photo:
+              "https://image.flylandexpress.com/images/app/flyland/ng/vip.webp",
+          url:
+              "https://image.flylandexpress.com/images/app/flyland/ng/shop-now.webp"),
+    );
     bannerOneImageList.add(
-               AIZSlider(photo: "https://image.impexally.com/images/app/impexally/make-mone-online.png", url: "https://image.impexally.com/images/app/impexally/make-mone-online.png"),
-        );    
+      AIZSlider(
+          photo:
+              "https://image.flylandexpress.com/images/app/flyland/ng/shop-now.webp",
+          url:
+              "https://image.impexally.com/images/app/impexally/make-mone-online.png"),
+    );
     isBannerOneInitial = false;
     notifyListeners();
   }
@@ -110,8 +126,12 @@ class HomePresenter extends ChangeNotifier {
     //   bannerTwoImageList.add(slider);
     // });
     bannerTwoImageList.add(
-               AIZSlider(photo: "https://image.impexally.com/images/app/impexally/athleisure.webp", url: "https://image.impexally.com/images/app/impexally/athleisure.webp"),
-        );
+      AIZSlider(
+          photo:
+              "https://image.impexally.com/images/app/impexally/athleisure.webp",
+          url:
+              "https://image.impexally.com/images/app/impexally/athleisure.webp"),
+    );
     isBannerTwoInitial = false;
     notifyListeners();
   }

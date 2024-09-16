@@ -2,8 +2,8 @@ var this_year = DateTime.now().year.toString();
 
 class AppConfig {
   static String copyright_text =
-      "@ Impexally " + this_year; //this shows in the splash screen
-  static String app_name = "Impexally"; //this shows in the splash screen
+      "@ Flyland Express " + this_year; //this shows in the splash screen
+  static String app_name = "Flyland Express"; //this shows in the splash screen
 
   static String purchase_code =
       "xxxxxxx"; //enter your purchase code for the app from codecanyon
@@ -18,7 +18,7 @@ class AppConfig {
   //configure this
   static const bool HTTPS = true;
 
-  static const DOMAIN_PATH = "native.impexally.com"; //localhost
+  static const DOMAIN_PATH = "native.flylandexpress.com"; //localhost
 
   //do not configure these below
   static const String API_ENDPATH = "public/api";

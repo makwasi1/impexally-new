@@ -167,15 +167,6 @@ class _AuctionProductsDetailsState extends State<AuctionProductsDetails>
     }
   }
 
-
-
-
-
-
-
-
-
-
   reset() {
     restProductDetailValues();
     _currentImage = 0;
@@ -532,7 +523,9 @@ class _AuctionProductsDetailsState extends State<AuctionProductsDetails>
 
     var conversationCreateResponse = await ChatRepository()
         .getCreateConversationResponse(
-            product_id: _auctionproductDetails.id, title: title, message: message);
+            product_id: _auctionproductDetails.id,
+            title: title,
+            message: message);
 
     Navigator.of(loadingcontext).pop();
 
@@ -1067,7 +1060,7 @@ class _AuctionProductsDetailsState extends State<AuctionProductsDetails>
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(6.0),
                         child: FadeInImage.assetNetwork(
-                          placeholder: 'assets/placeholder.png',
+                          placeholder: 'assets/flylande_loader.gif',
                           image: _auctionproductDetails.shopLogo,
                           fit: BoxFit.cover,
                         ),
@@ -1585,9 +1578,6 @@ class _AuctionProductsDetailsState extends State<AuctionProductsDetails>
     );
   }
 
-
-
-
   buildBrandRow() {
     return _auctionproductDetails.brand.id > 0
         ? InkWell(
@@ -1642,7 +1632,7 @@ class _AuctionProductsDetailsState extends State<AuctionProductsDetails>
                   child: ClipRRect(
                       borderRadius: BorderRadius.circular(5),
                       child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/placeholder.png',
+                        placeholder: 'assets/flylande_loader.gif',
                         image: _auctionproductDetails.brand.logo,
                         fit: BoxFit.contain,
                       )),
@@ -1822,7 +1812,7 @@ class _AuctionProductsDetailsState extends State<AuctionProductsDetails>
                                   /*Image.asset(
                                         singleProduct.product_images[index])*/
                                   FadeInImage.assetNetwork(
-                                placeholder: 'assets/placeholder.png',
+                                placeholder: 'assets/flylande_loader.gif',
                                 image: _productImageList[index],
                                 fit: BoxFit.contain,
                               )),

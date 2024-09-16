@@ -144,7 +144,7 @@ class _FollowedSellersState extends State<FollowedSellers> {
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return SellerDetails(
-                    slug: sellerInfo.shopSlug??"",
+                    slug: sellerInfo.shopSlug ?? "",
                   );
                 }));
               },
@@ -155,12 +155,12 @@ class _FollowedSellersState extends State<FollowedSellers> {
                       borderRadius: BorderRadius.vertical(
                           top: Radius.circular(16), bottom: Radius.zero),
                       child: FadeInImage.assetNetwork(
-                        placeholder: 'assets/placeholder.png',
+                        placeholder: 'assets/flylande_loader.gif',
                         image: sellerInfo.shopLogo!,
                         fit: BoxFit.scaleDown,
                         imageErrorBuilder: (BuildContext errorContext,
                             Object obj, StackTrace? st) {
-                          return Image.asset('assets/placeholder.png');
+                          return Image.asset('assets/app_logo.jpeg');
                         },
                       ))),
             ),
@@ -186,7 +186,8 @@ class _FollowedSellersState extends State<FollowedSellers> {
                 height: 15,
                 child: RatingBar(
                     ignoreGestures: true,
-                    initialRating: double.parse(sellerInfo.shopRating.toString()),
+                    initialRating:
+                        double.parse(sellerInfo.shopRating.toString()),
                     maxRating: 5,
                     direction: Axis.horizontal,
                     itemSize: 15.0,
@@ -228,7 +229,7 @@ class _FollowedSellersState extends State<FollowedSellers> {
               onTap: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return SellerDetails(
-                    slug: sellerInfo.shopSlug??"",
+                    slug: sellerInfo.shopSlug ?? "",
                   );
                 }));
               },

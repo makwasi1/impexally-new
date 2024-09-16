@@ -805,7 +805,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                         ),
                         Spacer(),
                         Text(
-                          "GH₵ " + _orderDetails!.subtotal!,
+                          "AED " + _orderDetails!.subtotal!,
                           style: TextStyle(
                               color: MyTheme.accent_color,
                               fontSize: 14,
@@ -1381,7 +1381,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        "GH₵ " + _orderDetails!.grand_total!,
+                        "AED " + _orderDetails!.grand_total!,
                         style: TextStyle(
                             color: MyTheme.accent_color,
                             fontSize: 16,
@@ -1491,12 +1491,13 @@ class _OrderDetailsState extends State<OrderDetails> {
                 child: Row(
                   children: <Widget>[
                     FadeInImage.assetNetwork(
-                      placeholder: 'assets/placeholder.png',
-                      image: "https://seller.impexally.com/uploads/images/" +
-                          _orderedItemList[index]
-                              .variationOptions[0]
-                              .image
-                              .imageDefault,
+                      placeholder: 'assets/flylande_loader.gif',
+                      image:
+                          "https://seller.flylandexpress.com/uploads/images/" +
+                              _orderedItemList[index]
+                                  .variationOptions[0]
+                                  .image
+                                  .imageDefault,
                       width: 80,
                       height: 100,
                       fit: BoxFit.fitHeight,
@@ -1560,7 +1561,7 @@ class _OrderDetailsState extends State<OrderDetails> {
                               ),
                               SizedBox(width: 10),
                               Text(
-                                "GH₵ " +
+                                "AED " +
                                     _orderedItemList[index]!
                                         .product
                                         .priceDiscounted

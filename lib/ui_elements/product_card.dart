@@ -70,12 +70,13 @@ class _ProductCardState extends State<ProductCard> {
                     borderRadius: BorderRadius.vertical(
                         top: Radius.circular(6), bottom: Radius.zero),
                     child: FadeInImage.assetNetwork(
-                      placeholder: 'assets/placeholder.png',
-                      image: "https://seller.impexally.com/uploads/images/" +
-                          widget.image!,
+                      placeholder: 'assets/flylande_loader.gif',
+                      image:
+                          "https://seller.flylandexpress.com/uploads/images/" +
+                              widget.image!,
                       fit: BoxFit.contain,
                       imageErrorBuilder: (context, error, stackTrace) {
-                        return Image.asset('assets/placeholder.png');
+                        return Image.asset('assets/app_logo.jpeg');
                       },
                     ),
                   ),
@@ -103,7 +104,7 @@ class _ProductCardState extends State<ProductCard> {
                     Padding(
                       padding: EdgeInsets.fromLTRB(16, 0, 16, 2),
                       child: Text(
-                        "GH₵ ${widget.discount!} - ${widget.stock} Units(s) Left",
+                        "AED ${widget.discount!} - ${widget.stock} Units(s) Left",
                         textAlign: TextAlign.left,
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -126,13 +127,15 @@ class _ProductCardState extends State<ProductCard> {
                       ),
                     ),
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
-                          child: Image.network(
-                              height: 20,
-                              "https://image.flylandexpress.com/images/home-page/flylan-express-officia-1.webp"),
-                        ),
+                        // Padding(
+                        //   padding: EdgeInsets.fromLTRB(16, 0, 16, 0),
+                        //   child: Image.network(
+                        //       height: 20,
+                        //       "https://image.flylandexpress.com/images/home-page/flylan-express-officia-1.webp"),
+                        // ),
+
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [

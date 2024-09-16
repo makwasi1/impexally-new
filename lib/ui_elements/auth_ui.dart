@@ -57,7 +57,7 @@ class AuthScreen {
                               decoration: BoxDecoration(
                                   color: MyTheme.white,
                                   borderRadius: BorderRadius.circular(8)),
-                              child: Image.asset('assets/app_logo.png'),
+                              child: Image.asset('assets/app_logo.jpeg'),
                             ),
                           ],
                           mainAxisAlignment: MainAxisAlignment.center,
