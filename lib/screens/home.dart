@@ -431,7 +431,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                                     fit: BoxFit.cover,
                                   )
                                 : Image.asset(
-                                    'assets/app_logo.jpeg',
+                                    'assets/app_logo_1.png',
                                     fit: BoxFit.cover,
                                   ))),
                     Flexible(
@@ -906,7 +906,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  _makePhoneCall();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return CategoryProducts(
+                          slug: "93",
+                        );
+                      },
+                    ),
+                  );
                 },
                 child: Column(
                   children: [
@@ -940,12 +949,16 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return CategoryProducts(
-                      slug: homeData.featuredCategoryList[1].id.toString(),
-                      // category_name: homeData.featuredCategoryList[index].name,
-                    );
-                  }));
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) {
+                        return CategoryProducts(
+                          slug: "93",
+                        );
+                      },
+                    ),
+                  );
                 },
                 child: Column(
                   children: [
@@ -1018,7 +1031,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return CategoryProducts(
-                      slug: homeData.featuredCategoryList[3].id.toString(),
+                      slug: homeData.featuredCategoryList[2].id.toString(),
                       // category_name: homeData.featuredCategoryList[index].name,
                     );
                   }));
@@ -1056,7 +1069,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                 onTap: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return CategoryProducts(
-                      slug: homeData.featuredCategoryList[4].id.toString(),
+                      slug: homeData.featuredCategoryList[2].id.toString(),
                       // category_name: homeData.featuredCategoryList[index].name,
                     );
                   }));
@@ -1350,12 +1363,12 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             children: [
               Expanded(
                 child: Image.asset(
-                  'assets/app_logo.jpeg',
+                  'assets/app_logo_1.png',
                   height: 36,
                 ),
               ),
               Expanded(child: buildHomeSearchBox(context)),
-              SizedBox(width: 10),
+              SizedBox(width: 12),
               buildCartIcon(),
             ],
           )),
@@ -1392,7 +1405,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
           height: 40,
           decoration: BoxDecorations.buildBoxDecoration_2(),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 5.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               crossAxisAlignment: CrossAxisAlignment.center,

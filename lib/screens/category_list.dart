@@ -183,7 +183,7 @@ class _CategoryListState extends State<CategoryList> {
             MaterialPageRoute(
               builder: (context) {
                 return CategoryProducts(
-                  slug: categoryResponse.categories[index].id.toString() ?? "",
+                  slug: categoryResponse.categories[index].id.toString(),
                 );
               },
             ),
@@ -202,7 +202,7 @@ class _CategoryListState extends State<CategoryList> {
                       topLeft: Radius.circular(6)),
                   child: FadeInImage.assetNetwork(
                     placeholder: 'assets/flylande_loader.gif',
-                    image: "https://seller.impexally.com/" +
+                    image: "https://seller.flylandexpress.com/" +
                             categoryResponse.categories[index].image ??
                         "",
                     fit: BoxFit.contain,
