@@ -183,7 +183,7 @@ class _CategoryListState extends State<CategoryList> {
             MaterialPageRoute(
               builder: (context) {
                 return CategoryProducts(
-                  slug: categoryResponse.categories[index].id.toString() ?? "",
+                  slug: categoryResponse.categories[index].id.toString(),
                 );
               },
             ),
