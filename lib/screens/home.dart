@@ -634,16 +634,18 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
   }
 
   Widget buildHomeMenuRow2(BuildContext context) {
-    return Container(
-        padding: EdgeInsets.only(top: 5, bottom: 10),
-        child: CachedNetworkImage(
-          imageUrl:
-              "https://image.impexally.com/images/app/impexally/athleisure.webp",
-          placeholder: (context, url) => Container(), // Placeholder widget
-          errorWidget: (context, url, error) =>
-              Icon(Icons.error), // Error widget
-          // Adjust the height as needed
-        ));
+    return GestureDetector(
+      onTap: () => _makePhoneCall(),
+      child: Container(
+          padding: EdgeInsets.only(top: 5, bottom: 10),
+          child: CachedNetworkImage(
+            imageUrl: "https://image.impexally.com/images/ae/athleisure1.png",
+            placeholder: (context, url) => Container(), // Placeholder widget
+            errorWidget: (context, url, error) =>
+                Icon(Icons.error), // Error widget
+            // Adjust the height as needed
+          )),
+    );
   }
 
   Widget buildInfoBar(BuildContext context) {
@@ -793,8 +795,8 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
             Expanded(
               child: GestureDetector(
                 onTap: () {
-                  // _makePhoneCall();
-                  launchUrl(Uri.parse("https://app.impexally.com/riders-info"));
+                  _makePhoneCall();
+                  // launchUrl(Uri.parse("https://app.impexally.com/riders-info"));
                 },
                 child: Column(
                   children: [
@@ -832,8 +834,9 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
                     context,
                     MaterialPageRoute(
                         builder: (context) => const ImportFromChinaWebView(
-                          url: "https://app.impexally.com/import-from-china",
-                        )),
+                              url:
+                                  "https://app.impexally.com/import-from-china",
+                            )),
                   );
                 },
                 child: Column(
