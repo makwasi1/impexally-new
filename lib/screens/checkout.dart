@@ -307,7 +307,8 @@ class _CheckoutState extends State<Checkout> {
     }
     loading();
     var orderCreateResponse = await PaymentRepository()
-        .getOrderCreateResponseFromMomo(_phoneNumberController.text,
+        .getOrderCreateResponseFromMomo(
+            phone,
             _selected_payment_method, _grandTotalValue);
     Navigator.of(loadingcontext).pop();
     if (orderCreateResponse.result == false) {
