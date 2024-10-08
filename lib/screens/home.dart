@@ -999,8 +999,7 @@ class _HomeState extends State<Home> with TickerProviderStateMixin {
               Flexible(
                 child: GestureDetector(
                   onTap: () {
-                    launchUrl(
-                        Uri.parse("https://app.impexally.com/riders-info"));
+                    _makePhoneCall();
                   },
                   child: Column(
                     children: [

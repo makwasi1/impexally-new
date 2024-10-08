@@ -145,7 +145,7 @@ class HomePresenter extends ChangeNotifier {
 
     allProductList.addAll(productResponse.products!);
     isAllProductInitial = false;
-    totalAllProductData = 300;
+    totalAllProductData = productResponse.total;
     showAllLoadingContainer = false;
     notifyListeners();
   }

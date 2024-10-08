@@ -9,6 +9,7 @@ import 'package:active_ecommerce_flutter/helpers/shared_value_helper.dart';
 import 'package:active_ecommerce_flutter/helpers/system_config.dart';
 import 'package:active_ecommerce_flutter/repositories/api-request.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
 
 import '../data_model/product_detail.dart';
 import '../data_model/products_model.dart';
@@ -82,7 +83,16 @@ class ProductRepository {
     final response = await ApiRequest.get(url: url, headers: {
       "App-Language": app_language.$!,
     });
-    return productResponseFromJson(response.body);
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      // Assuming jsonResponse is a list of products
+      List<Products> products = (jsonResponse as List)
+          .map((product) => Products.fromJson(product))
+          .toList();
+      return ProductResponse(products: products);
+    } else {
+      throw Exception('Failed to load product details');
+    }
   }
 
   Future<ProductMiniResponse> getShopProducts(
@@ -116,7 +126,7 @@ class ProductRepository {
       categories = "",
       min = "",
       max = ""}) async {
-    String url = ("${AppConfig.BASE_URL}/products");
+    String url = ("${AppConfig.BASE_URL}/products?page=$page");
 
     print(url.toString());
     final response = await ApiRequest.get(url: url, headers: {
@@ -132,8 +142,13 @@ class ProductRepository {
     final response = await ApiRequest.get(url: url, headers: {
       "Content-Type": "application/json",
     });
-    var jsonResponse = jsonDecode(response.body);
-    return ProductResponse.fromJson(jsonResponse['products']["data"]);
+
+    if (response.statusCode == 200) {
+      var jsonResponse = jsonDecode(response.body);
+      return ProductResponse.fromJson(jsonResponse["products"]);
+    } else {
+      throw Exception('Failed to load product details');
+    }
   }
 
   Future<ProductMiniResponse> getFilteredProducts2(

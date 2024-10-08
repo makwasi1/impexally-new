@@ -10,16 +10,35 @@ String productMiniResponseToJson(ProductResponse data) =>
 class ProductResponse {
   ProductResponse({
     this.products,
+    this.currentPage,
+    this.total,
   });
 
   List<Products>? products;
+  int? currentPage;
+  int? total;
 
-  factory ProductResponse.fromJson(List<dynamic> json) =>
-      ProductResponse(
-        products: json.map((x) => Products.fromJson(x)).toList(),
-      );
 
-  List<dynamic> toJson() => products!.map((x) => x.toJson()).toList();
+  ProductResponse.fromJson(Map<String, dynamic> json) {
+    currentPage = json['current_page'];
+    total = json['total'];
+    if (json['data'] != null) {
+      products = <Products>[];
+      json['data'].forEach((v) {
+        products!.add(new Products.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = new Map<String, dynamic>();
+    data['current_page'] = this.currentPage;
+    data['total'] = this.total;
+    if (this.products != null) {
+      data['data'] = this.products!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
 }
 
 class Products {

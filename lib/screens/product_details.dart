@@ -264,7 +264,7 @@ class _ProductDetailsState extends State<ProductDetails>
         .getFilteredProductsFromSeller(_productDetails!.products!.userId);
 
     // Get the number of products to add
-    int numProductsToAdd = min(10, topProductResponse.products!.length);
+    int numProductsToAdd = min(10, topProductResponse.products!.isEmpty ? 0 : topProductResponse.products!.length);
 
     // Add only the first numProductsToAdd products to _topProducts
     _sellerProducts.addAll(topProductResponse.products!.take(numProductsToAdd));
@@ -275,7 +275,7 @@ class _ProductDetailsState extends State<ProductDetails>
   setProductDetailValues() {
     if (_productDetails != null) {
       controller.loadHtmlString(
-          makeHtml(_productDetails!.productDetails![0].description!));
+          makeHtml( _productDetails!.productDetails!.isNotEmpty ? _productDetails!.productDetails![0].description!: ""));
       initWebViewHeight();
       _appbarPriceString = _productDetails!.products!.price;
       _singlePriceString = _productDetails!.products!.price;
@@ -1241,28 +1241,28 @@ class _ProductDetailsState extends State<ProductDetails>
                   ),
                 ])),
 
-                SliverList(
-                  delegate: SliverChildListDelegate([
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        18.0,
-                        24.0,
-                        18.0,
-                        0.0,
-                      ),
-                      child: Text(
-                        "More From this Seller",
-                        style: TextStyle(
-                            color: MyTheme.dark_font_grey,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    (_productDetails?.products?.userId != null)
-                        ? buildProductList(context)
-                        : Container(),
-                  ]),
-                ),
+                // SliverList(
+                //   delegate: SliverChildListDelegate([
+                //     Padding(
+                //       padding: const EdgeInsets.fromLTRB(
+                //         18.0,
+                //         24.0,
+                //         18.0,
+                //         0.0,
+                //       ),
+                //       child: Text(
+                //         "More From this Seller",
+                //         style: TextStyle(
+                //             color: MyTheme.dark_font_grey,
+                //             fontSize: 18,
+                //             fontWeight: FontWeight.bold),
+                //       ),
+                //     ),
+                //     (_productDetails?.products?.userId != null)
+                //         ? buildProductList(context)
+                //         : Container(),
+                //   ]),
+                // ),
 
                 //Top selling product
                 SliverList(
@@ -2265,7 +2265,11 @@ class _ProductDetailsState extends State<ProductDetails>
             child: Padding(
               padding: const EdgeInsets.only(top: 22.0),
               child: Text(
-                _productDetails?.productDetails![0].title ?? "",
+                _productDetails != null &&
+                        _productDetails!.productDetails != null &&
+                        _productDetails!.productDetails!.isNotEmpty
+                    ? _productDetails!.productDetails![0].title ?? ""
+                    : "",
                 style: TextStyle(fontSize: 16, color: MyTheme.black),
               ),
             )),
@@ -2814,7 +2818,7 @@ class _ProductDetailsState extends State<ProductDetails>
                 id: _topProducts[index].id,
                 slug: _topProducts[index].slug,
                 image: _topProducts[index].image.imageDefault,
-                name: _topProducts[index].productDetail.title,
+                name: _topProducts[index].productDetail?.title,
                 main_price: _topProducts[index].priceDiscounted,
                 stroked_price: _topProducts[index].price,
                 has_discount: true);
